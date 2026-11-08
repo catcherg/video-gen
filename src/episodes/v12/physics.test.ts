@@ -23,5 +23,6 @@ describe("v12 specifics", () => {
   });
   it("reaches 870 Hz at redline", () => {
     expect(engine.bangsPerSecond(REDLINE)).toBe(870);
+    for (const c of toneChecks) expect(c.expectedHz).toBe(870);
   });
 });

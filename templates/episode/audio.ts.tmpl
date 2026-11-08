@@ -1,0 +1,18 @@
+import { defaultEngineAudio, renderEngineAudio, type EngineAudioSettings, type EpisodeAudio } from "../../core/audio";
+import { meta } from "./meta";
+import { BANGS, isSlowed, REAL_SPEED_START, SLOW_START } from "./physics";
+
+export const settings: EngineAudioSettings = {
+  ...defaultEngineAudio,
+  voiceOf: () => ({ thumpHz: 100, pan: 0.5, pulseGain: 1 }),
+  whooshes: [
+    { at: SLOW_START, rising: false },
+    { at: REAL_SPEED_START, rising: true },
+  ],
+};
+
+const audio: EpisodeAudio = {
+  render: () => renderEngineAudio({ durationS: meta.durationS, bangs: BANGS, isSlowed, settings }),
+};
+
+export default audio;

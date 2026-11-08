@@ -1,0 +1,14 @@
+import { describeFourStroke } from "../../core/engine/fourStroke.testkit";
+import { meta } from "./meta";
+import { engine, IDLE, REAL_SPEED_START, REDLINE, SLOW, SLOW_START, toneChecks } from "./physics";
+
+describeFourStroke("__SLUG__", {
+  engine,
+  durationS: meta.durationS,
+  steadyWindows: [
+    { from: 0.5, to: 2.5, rpm: REDLINE, slow: 1 },
+    { from: 4, to: 20, rpm: IDLE, slow: SLOW },
+  ],
+  speedChanges: [SLOW_START, REAL_SPEED_START],
+  toneChecks,
+});

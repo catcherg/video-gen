@@ -21,7 +21,8 @@ export const createRng = (initial: number): Rng => {
   };
 };
 
-export type BankVoice = { thumpHz: number; pan: number; pulseGain: number };
+/** `pulsePan` 0 = left, 1 = right. Leave it out to send real-speed pulses equally to both channels. */
+export type BankVoice = { thumpHz: number; pan: number; pulseGain: number; pulsePan?: number };
 
 export type ThumpSettings = {
   lengthS: number;
@@ -89,6 +90,63 @@ export type EngineAudioSettings = {
   mix: MixSettings;
 };
 
+/** Starting point for an episode: spread this, then set voiceOf and whooshes. */
+export const defaultEngineAudio: Omit<EngineAudioSettings, "voiceOf" | "whooshes"> = {
+  seed: 1234567,
+  thump: {
+    lengthS: 0.26,
+    sweepHz: 60,
+    sweepTau: 0.012,
+    bodyAmp: 0.75,
+    bodyTau: 0.055,
+    clickAmp: 0.45,
+    clickTau: 0.005,
+    snapAmp: 0.18,
+    snapHz: 2100,
+    snapTau: 0.004,
+  },
+  pulse: {
+    lengthS: 0.006,
+    decayTau: 0.0007,
+    decayLevel: 0.55,
+    ringLevel: 0.45,
+    ringHz: 1500,
+    noiseAmp: 0.12,
+    noiseTau: 0.002,
+    jitterMin: 0.9,
+    jitterRange: 0.2,
+  },
+  shaping: { dcCoef: 0.0015, lowpassHz: 4200, drive: 1.6 },
+  // A minor, 120 BPM: A2 F2 C3 G2, one 2-second bar each.
+  bed: {
+    barS: 2,
+    stepS: 0.25,
+    stepDecay: 4,
+    bassAmp: 0.5,
+    bass: [110.0, 87.31, 130.81, 98.0],
+    chords: [
+      [220.0, 261.63, 329.63],
+      [174.61, 220.0, 261.63],
+      [261.63, 329.63, 392.0],
+      [196.0, 246.94, 293.66],
+    ],
+    padAmp: 0.06,
+    detunedAmp: 0.04,
+    detune: 1.003,
+    rightGain: 0.96,
+  },
+  mix: {
+    bedGainSlowed: 0.32,
+    bedGainReal: 0.16,
+    pulseGain: 0.55,
+    thumpGain: 0.8,
+    fadeInS: 0.08,
+    fadeOutS: 0.6,
+    masterDrive: 0.9,
+    targetPeak: 0.72, // headroom so AAC encoding can't clip
+  },
+};
+
 export type EngineAudioInput = {
   durationS: number;
   bangs: Bang[];
@@ -118,12 +176,15 @@ const addThumps = (bangs: Bang[], s: EngineAudioSettings, rnd: Rng, L: Float32Ar
   }
 };
 
-const addPulses = (bangs: Bang[], s: EngineAudioSettings, rnd: Rng, out: Float32Array) => {
-  const N = out.length;
+const addPulses = (bangs: Bang[], s: EngineAudioSettings, rnd: Rng, L: Float32Array, R: Float32Array) => {
+  const N = L.length;
   const p = s.pulse;
   for (const b of bangs) {
     const i0 = Math.round(b.t * SR);
-    const gain = s.voiceOf(b.cyl).pulseGain;
+    const voice = s.voiceOf(b.cyl);
+    const gain = voice.pulseGain;
+    const gainL = voice.pulsePan === undefined ? 1 : (1 - voice.pulsePan) * 2;
+    const gainR = voice.pulsePan === undefined ? 1 : voice.pulsePan * 2;
     const len = Math.round(p.lengthS * SR);
     const jitter = p.jitterMin + p.jitterRange * rnd();
     for (let k = 0; k < len && i0 + k < N; k++) {
@@ -131,7 +192,8 @@ const addPulses = (bangs: Bang[], s: EngineAudioSettings, rnd: Rng, out: Float32
       const v =
         Math.exp(-tau / p.decayTau) * (p.decayLevel + p.ringLevel * Math.sin(2 * Math.PI * p.ringHz * tau)) +
         (rnd() * 2 - 1) * p.noiseAmp * Math.exp(-tau / p.noiseTau);
-      out[i0 + k] += v * gain * jitter;
+      L[i0 + k] += v * gain * jitter * gainL;
+      R[i0 + k] += v * gain * jitter * gainR;
     }
   }
 };
@@ -192,13 +254,15 @@ export const renderEngineAudio = ({ durationS, bangs, isSlowed, settings }: Engi
   const R = new Float32Array(N);
   const thumpL = new Float32Array(N);
   const thumpR = new Float32Array(N);
-  const pulses = new Float32Array(N);
+  const pulsesL = new Float32Array(N);
+  const pulsesR = new Float32Array(N);
   const bedL = new Float32Array(N);
   const bedR = new Float32Array(N);
 
   addThumps(bangs.filter((b) => isSlowed(b.t)), settings, rnd, thumpL, thumpR);
-  addPulses(bangs.filter((b) => !isSlowed(b.t)), settings, rnd, pulses);
-  shapeTone(pulses, settings.shaping);
+  addPulses(bangs.filter((b) => !isSlowed(b.t)), settings, rnd, pulsesL, pulsesR);
+  shapeTone(pulsesL, settings.shaping);
+  shapeTone(pulsesR, settings.shaping);
   renderBed(settings.bed, bedL, bedR);
   for (const w of settings.whooshes) addWhoosh(w, rnd, L, R);
 
@@ -208,8 +272,8 @@ export const renderEngineAudio = ({ durationS, bangs, isSlowed, settings }: Engi
     const bedGain = isSlowed(t) ? m.bedGainSlowed : m.bedGainReal;
     const fadeIn = smoothstep(t / m.fadeInS);
     const fadeOut = 1 - smoothstep((t - (durationS - m.fadeOutS)) / m.fadeOutS);
-    const l = L[i] + thumpL[i] * m.thumpGain + pulses[i] * m.pulseGain + bedL[i] * bedGain;
-    const r = R[i] + thumpR[i] * m.thumpGain + pulses[i] * m.pulseGain + bedR[i] * bedGain;
+    const l = L[i] + thumpL[i] * m.thumpGain + pulsesL[i] * m.pulseGain + bedL[i] * bedGain;
+    const r = R[i] + thumpR[i] * m.thumpGain + pulsesR[i] * m.pulseGain + bedR[i] * bedGain;
     L[i] = Math.tanh(l * m.masterDrive) * fadeIn * fadeOut;
     R[i] = Math.tanh(r * m.masterDrive) * fadeIn * fadeOut;
   }

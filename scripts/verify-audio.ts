@@ -2,6 +2,7 @@
 // Usage: npm run verify-audio <slug>
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
+import type { ToneCheck } from "../src/core/episode";
 import { audioPath, loadToneChecks, requireSlug, ROOT } from "./lib/episode";
 import { spectralPeaks } from "./lib/fft";
 
@@ -19,12 +20,19 @@ if (!existsSync(wavPath)) {
 const wav = readFileSync(wavPath);
 const sampleRate = wav.readUInt32LE(24);
 const frames = (wav.length - 44) / 4;
-const mono = new Float64Array(frames);
-for (let i = 0; i < frames; i++) mono[i] = (wav.readInt16LE(44 + i * 4) + wav.readInt16LE(46 + i * 4)) / 65536;
+const signal = (channel: ToneCheck["channel"]) => {
+  const out = new Float64Array(frames);
+  for (let i = 0; i < frames; i++) {
+    const l = wav.readInt16LE(44 + i * 4);
+    const r = wav.readInt16LE(46 + i * 4);
+    out[i] = (channel === "left" ? l * 2 : channel === "right" ? r * 2 : l + r) / 65536;
+  }
+  return out;
+};
 
 let failed = false;
 for (const check of await loadToneChecks(slug)) {
-  const section = mono.subarray(Math.round(check.from * sampleRate), Math.round(check.to * sampleRate));
+  const section = signal(check.channel).subarray(Math.round(check.from * sampleRate), Math.round(check.to * sampleRate));
   const [top, ...rest] = spectralPeaks(section, sampleRate, SEARCH_MIN_HZ, SEARCH_MAX_HZ);
   const error = Math.abs(top.hz - check.expectedHz) / check.expectedHz;
   const ok = error <= TOLERANCE;
@@ -32,7 +40,7 @@ for (const check of await loadToneChecks(slug)) {
   const next = rest.find((p) => Math.abs(p.hz - top.hz) / top.hz > 0.03);
   const margin = next ? `${(top.db - next.db).toFixed(1)} dB above ${next.hz.toFixed(1)} Hz` : "no competing peak";
   console.log(
-    `${ok ? "PASS" : "FAIL"} ${check.label} (${check.from}-${check.to} s): expected ${check.expectedHz.toFixed(1)} Hz, ` +
+    `${ok ? "PASS" : "FAIL"} ${check.label}${check.channel ? ` [${check.channel}]` : ""} (${check.from}-${check.to} s): expected ${check.expectedHz.toFixed(1)} Hz, ` +
       `dominant ${top.hz.toFixed(1)} Hz, error ${(error * 100).toFixed(3)}%, ${margin}`,
   );
 }

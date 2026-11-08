@@ -1,0 +1,37 @@
+// Single source of truth for this episode: scene, HUD, labels, captions and audio all read from here.
+//
+// TODO: every number below is a placeholder (a generic inline-4).
+// Replace them with the real engine and list a source for each spec here.
+
+import { createFourStroke } from "../../core/engine/fourStroke";
+import type { ToneCheck } from "../../core/episode";
+import { meta } from "./meta";
+
+export const BORE_MM = 86;
+export const STROKE_MM = 86;
+export const REDLINE = 6000;
+export const IDLE = 1500;
+
+/** Tachometer scale on the HUD. */
+export const TACH_MAX = 7000;
+export const TACH_RED_FROM = 6000;
+
+export const FIRING_ORDER = [1, 3, 4, 2];
+export const CYLINDERS = FIRING_ORDER.length;
+
+export const SLOW = 40;
+export const SLOW_START = 3;
+export const REAL_SPEED_START = 24;
+
+export const isSlowed = (t: number) => t >= SLOW_START && t < REAL_SPEED_START;
+export const slowAt = (t: number) => (isSlowed(t) ? SLOW : 1);
+export const rpmAt = (t: number) => (isSlowed(t) ? IDLE : REDLINE);
+
+export const engine = createFourStroke({ firingOrder: FIRING_ORDER, durationS: meta.durationS, rpmAt, slowAt });
+export const { cycleAt, bangs: BANGS, bangsPerSecond } = engine;
+
+/** Real-speed sections held at constant RPM, clear of whooshes. */
+export const toneChecks: ToneCheck[] = [
+  { label: "opening", from: 0.4, to: 2.4, expectedHz: bangsPerSecond(REDLINE) },
+  { label: "finale", from: 25, to: 29, expectedHz: bangsPerSecond(REDLINE) },
+];

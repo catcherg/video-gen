@@ -1,0 +1,28 @@
+import { useCurrentFrame, useVideoConfig } from "remotion";
+import { PixelStage } from "../../core/PixelStage";
+import { Ground } from "../../parts/cars/common";
+import { pinFor, PlaceholderEngine } from "../../parts/PlaceholderEngine";
+import { CRANK_R, CYL_SPACING, cylX, ORIGIN, ROD_L } from "./geometry";
+import { cycleAt, CYLINDERS, FIRING_ORDER } from "./physics";
+import { cameraAt } from "./timeline";
+
+// TODO: replace PlaceholderEngine with detailed parts from src/parts.
+export const Scene: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const t = frame / fps;
+  const cylinders = [...FIRING_ORDER].sort((a, b) => a - b).map((cyl) => ({ cyl, x: cylX(cyl), bankRad: 0, c: cycleAt(cyl, t) }));
+  return (
+    <PixelStage t={t} cameraAt={cameraAt}>
+      <Ground shadow={[14, 7]} />
+      <PlaceholderEngine
+        origin={ORIGIN}
+        cylinders={cylinders}
+        pins={cylinders.map(({ x, bankRad, c }) => pinFor(x, bankRad, c))}
+        crankR={CRANK_R}
+        rodL={ROD_L}
+        length={CYLINDERS * CYL_SPACING + 1}
+      />
+    </PixelStage>
+  );
+};

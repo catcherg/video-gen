@@ -82,11 +82,12 @@ export const describeFourStroke = (name: string, cfg: FourStrokeTestConfig) => {
 
     if (cfg.toneChecks) {
       const checks = cfg.toneChecks;
-      it("runs at the expected tone throughout each audio check window", () => {
+      it("holds real speed and steady RPM throughout each audio check window", () => {
         for (const c of checks) {
+          const rpm = engine.rpmAt(c.from);
           for (let t = c.from; t <= c.to; t += 0.02) {
             expect(engine.slowAt(t)).toBe(1);
-            expect(Math.abs(engine.bangsPerSecond(engine.rpmAt(t)) - c.expectedHz) / c.expectedHz).toBeLessThan(0.001);
+            expect(Math.abs(engine.rpmAt(t) - rpm) / rpm).toBeLessThan(0.001);
           }
         }
       });

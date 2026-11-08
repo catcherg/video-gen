@@ -30,7 +30,8 @@ src/episodes/
     audio.ts      mix settings for renderEngineAudio
     index.tsx     makeEpisode(slug, Scene, Overlay)
     physics.test.ts  calls describeFourStroke
-scripts/        audio, stills, render, verify-audio
+scripts/        audio, stills, render, verify-audio, new-episode
+templates/      Files copied by new-episode
 poc/            Original proof of concept, kept for reference. Not part of the build.
 ```
 
@@ -40,6 +41,7 @@ Units in 3D scenes: 1 = 10 cm.
 
 ```bash
 npm run studio                       # Remotion Studio preview
+npm run new-episode <slug>           # scaffold and register a new episode
 npm test                             # physics tests
 npm run typecheck
 npm run audio <slug>                 # writes public/<slug>/audio.wav
@@ -68,11 +70,11 @@ After rendering, run `npm run verify-audio <slug>`.
 
 ## Adding an episode
 
-1. Create `src/episodes/<slug>/` with the files listed above and add it to `src/episodes/registry.ts`.
-2. Write `physics.ts` first. Add sources. Use `createFourStroke` for four-stroke engines, with `firingAnglesDeg` if the engine is odd-fire.
-3. Define `toneChecks`: real-speed sections held at constant RPM, clear of ramps and whooshes. `expectedHz` is what a listener should hear as dominant. That is not always the firing frequency: uneven firing per bank can make a lower order dominate, so derive it from the engine.
+1. Run `npm run new-episode <slug> -- --title "Title"`, or use `/new-episode`. It copies `templates/episode/` and registers the episode. The scaffold works as-is with a placeholder inline-4, so fix TODOs one at a time and keep it running.
+2. Replace the placeholders in `physics.ts` first. Add sources. Use `createFourStroke` for four-stroke engines, with `firingAnglesDeg` if the engine is odd-fire.
+3. Define `toneChecks`: real-speed sections held at constant RPM, clear of ramps and whooshes. `expectedHz` is what should be dominant, and it is not always the firing frequency. With uneven firing per bank, pan each bank to its own side with `pulsePan`, set `channel` on the check, and predict the tone with `dominantPulseHz`. `episodes/v8-cross-flat` does this.
 4. Add `physics.test.ts` with `describeFourStroke`.
-5. Build the scene from `src/parts/`. Add new reusable models to `parts/`, not to the episode.
+5. Build the scene from `src/parts/`, replacing `PlaceholderEngine`. Add new reusable models to `parts/`, not to the episode.
 6. Follow the check-frames workflow, then render.
 
 ## Things to preserve

@@ -28,6 +28,34 @@ export const strokeName = (c: number) =>
 
 export const meanPistonSpeed = (strokeMm: number, rpm: number) => (2 * (strokeMm / 1000) * rpm) / 60;
 
+/**
+ * Loudest frequency of a train of identical exhaust pulses that repeats every 720° of crank rotation.
+ * Line k has period 720°/k and strength |sum of e^(-i·k·angle)|, weighted by a decaying pulse's
+ * spectrum. Uneven firing shifts energy away from the firing frequency, which is why a cross-plane
+ * bank does not simply sound like its firing rate.
+ */
+export const dominantPulseHz = (anglesDeg: number[], rpm: number, pulseTauS: number, maxHz = 2000) => {
+  const cycleHz = rpm / 120;
+  let bestHz = 0;
+  let bestAmp = -1;
+  for (let k = 1; k * cycleHz <= maxHz; k++) {
+    const hz = k * cycleHz;
+    let re = 0;
+    let im = 0;
+    for (const a of anglesDeg) {
+      const phase = (2 * Math.PI * k * a) / CYCLE_DEG;
+      re += Math.cos(phase);
+      im += Math.sin(phase);
+    }
+    const amp = Math.hypot(re, im) / Math.sqrt(1 + (2 * Math.PI * hz * pulseTauS) ** 2);
+    if (amp > bestAmp + 1e-9) {
+      bestAmp = amp;
+      bestHz = hz;
+    }
+  }
+  return bestHz;
+};
+
 export const createFourStroke = (spec: FourStrokeSpec) => {
   const { firingOrder, durationS, rpmAt, slowAt, phaseLockT } = spec;
   const cylinders = firingOrder.length;

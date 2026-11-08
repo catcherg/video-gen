@@ -1,0 +1,32 @@
+import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
+import { Captions } from "../../core/Captions";
+import { Flashes } from "../../core/Flashes";
+import { useFonts } from "../../core/fonts";
+import { EngineHud, type EngineHudConfig } from "../../core/hud";
+import { engine, isSlowed, REAL_SPEED_START, REDLINE, SLOW, SLOW_START, TACH_MAX, TACH_RED_FROM } from "./physics";
+import { CAPTIONS, END_FADE_FROM, HUD_IN } from "./timeline";
+
+const HUD_CONFIG: EngineHudConfig = {
+  engine,
+  isSlowed,
+  slow: SLOW,
+  hudIn: HUD_IN,
+  realSpeedStart: REAL_SPEED_START,
+  redline: REDLINE,
+  tachMax: TACH_MAX,
+  tachRedFrom: TACH_RED_FROM,
+};
+
+export const Overlay: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const t = frame / fps;
+  useFonts();
+  return (
+    <AbsoluteFill>
+      <EngineHud t={t} config={HUD_CONFIG} />
+      <Captions t={t} captions={CAPTIONS} />
+      <Flashes t={t} at={[SLOW_START, REAL_SPEED_START]} endFadeFrom={END_FADE_FROM} />
+    </AbsoluteFill>
+  );
+};

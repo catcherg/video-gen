@@ -1,0 +1,25 @@
+// Camera keys, captions and label windows. Numbers in captions come from physics.
+import { makeCameraRig, type CameraKey } from "../../core/camera";
+import type { Caption } from "../../core/Captions";
+import { fmtInt } from "../../core/math";
+import { bangsPerSecond, CYLINDERS, REDLINE, SLOW } from "./physics";
+
+const KEYS: CameraKey[] = [
+  { t: 0, pos: [10, 7, 12], target: [0, 3.5, 0], fov: 40 },
+  { t: 3, pos: [9, 7, 13], target: [0, 3.5, 0], fov: 40 },
+  { t: 14, pos: [0, 6, 13], target: [0, 3.5, 0], fov: 40, via: [8, 10, 12] },
+  { t: 24, pos: [-6, 7, 12], target: [0, 3.5, 0], fov: 40 },
+  { t: 30, pos: [-10, 7, 12], target: [0, 3.5, 0], fov: 40 },
+];
+
+export const cameraAt = makeCameraRig(KEYS);
+
+// TODO: write this episode's own captions.
+export const CAPTIONS: Caption[] = [
+  { from: 0.25, to: 2.9, lines: [`${fmtInt(REDLINE)} RPM. ${CYLINDERS} CYLINDERS.`, "TODO: THE HOOK"], size: "big", y: 300 },
+  { from: 3.3, to: 12, lines: [`SLOWED DOWN ${SLOW}×`, "TODO: EXPLAIN"] },
+  { from: 24.5, to: 29.5, lines: [`${fmtInt(bangsPerSecond(REDLINE))} BANGS A SECOND.`, "TODO: THE PAYOFF"] },
+];
+
+export const HUD_IN = 3.05;
+export const END_FADE_FROM = 29.5;

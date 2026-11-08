@@ -1,0 +1,9 @@
+// Model dimensions and world placement, shared by the scene and the overlay. Units: 1 = 10 cm.
+import { STROKE_MM } from "./physics";
+
+export const CRANK_R = STROKE_MM / 200;
+export const ROD_L = 1.5;
+export const CYL_SPACING = 1.12;
+export const ORIGIN: [number, number, number] = [0, 3, 0];
+
+export const cylX = (cyl: number) => (cyl - 2.5) * CYL_SPACING;
