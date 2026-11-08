@@ -89,7 +89,7 @@ Synthesis order matters. `createRng` output depends on call order, so reordering
 
 The computer cannot hear the result. Timing, tuning and balance can be measured, but only a person can decide whether the song is good, so get the user's approval before building on it.
 
-**Once a song is approved, lock it.** Record its hash before touching anything else, and compare afterwards:
+**Once a song is approved, lock it.** Record its hash in [PROJECT_STATUS.md](PROJECT_STATUS.md) before touching anything else, and compare afterwards:
 
 ```bash
 shasum -a 256 public/<slug>/audio.wav

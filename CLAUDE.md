@@ -6,6 +6,8 @@ An episode is mostly a new physics file, a new 3D model and a new timeline.
 
 The full production process, with reasoning and worked formulas, is in [docs/VIDEO_PRODUCTION.md](docs/VIDEO_PRODUCTION.md). Read it before starting or substantially changing an episode. `src/episodes/v12` is the reference implementation.
 
+Episode status, approved song hashes and the backlog are in [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md). Read it at the start of any new work, and keep it up to date.
+
 ## Non-negotiable rules
 
 1. **Determinism.** Everything visible or audible is a pure function of the frame number. No clocks, `Math.random` or per-frame deltas. Use `hash` from `src/core/math.ts` in visuals and `createRng` in audio. Any frame must render identically in isolation.
@@ -17,7 +19,7 @@ The full production process, with reasoning and worked formulas, is in [docs/VID
 ## Layout
 
 ```
-docs/           VIDEO_PRODUCTION.md, the master production playbook
+docs/           VIDEO_PRODUCTION.md (master production playbook), PROJECT_STATUS.md (status, locked songs, backlog)
 src/core/       Shared engine: fourStroke physics, camera rig + projection, PixelStage (canvas, lights, pixel pass),
                 HUD blocks, Captions, Callout, diagrams, Tag, Flashes, fonts, theme, audio and song synthesis
 src/parts/      Reusable models: PistonRod, Crankshaft, ValveTrain, Headers, BlockShell, Induction, Accessories,
@@ -111,7 +113,7 @@ These define the finished quality level. Follow them for every full episode, in 
 - Put shared musical data in the episode's `song.ts`, read by both `audio.ts` and the visuals.
 - Give `toneChecks` a `minHz`/`maxHz` band above the music so `verify-audio` measures the engine.
 - Timing can be measured but taste cannot. Get the user's approval on the song before building on it.
-- Once approved, record the WAV's SHA-256 and confirm it is unchanged after any later work.
+- Once approved, record the WAV's SHA-256 in `docs/PROJECT_STATUS.md` and confirm it is unchanged after any later work.
 
 **Shots**
 
