@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { hash } from "../core/math";
 import { C } from "../core/theme";
+import { dimmed } from "./Lam";
 
 export const headerCurve = (points: THREE.Vector3[]) => new THREE.CatmullRomCurve3(points);
 
@@ -8,13 +9,13 @@ export const headerCurve = (points: THREE.Vector3[]) => new THREE.CatmullRomCurv
 export const headerTube = (points: THREE.Vector3[], radius = 0.15) => new THREE.TubeGeometry(headerCurve(points), 20, radius, 6, false);
 
 /** Exhaust headers. `ghost` 0..1 fades one tube out so the camera can see past it; `glow` 0..1 heats them up. */
-export const Headers: React.FC<{ tubes: THREE.BufferGeometry[]; ghost: (index: number) => number; glow?: number }> = ({ tubes, ghost, glow = 0 }) => (
+export const Headers: React.FC<{ tubes: THREE.BufferGeometry[]; ghost: (index: number) => number; glow?: number; dim?: number }> = ({ tubes, ghost, glow = 0, dim = 0 }) => (
   <>
     {tubes.map((g, i) => {
       const fade = ghost(i);
       return (
         <mesh key={i} geometry={g} visible={fade < 0.97}>
-          <meshLambertMaterial color={C.header} emissive="#ff3a10" emissiveIntensity={glow * 0.85} flatShading transparent={fade > 0} opacity={1 - fade * 0.85} depthWrite={fade < 0.5} />
+          <meshLambertMaterial color={dimmed(C.header, dim)} emissive="#ff3a10" emissiveIntensity={glow * 0.85 * (1 - dim)} flatShading transparent={fade > 0} opacity={1 - fade * 0.85} depthWrite={fade < 0.5} />
         </mesh>
       );
     })}

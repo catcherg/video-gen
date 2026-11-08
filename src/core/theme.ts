@@ -23,6 +23,22 @@ export const C = {
   tyre: "#1c1d30",
   hot: "#fff27a",
   warm: "#ffa133",
+  // Colour language for parts: the same colour means the same job in every shot and diagram.
+  crankGold: "#f2c14e",
+  bearing: "#c98a2e",
+  rodRight: "#5cc8ff",
+  rodLeft: "#6ee7b0",
+  intake: "#4fc3ff",
+  exhaust: "#ff6a4d",
+  camLobe: "#f4f1ff",
+};
+
+/** What each of the four strokes looks like, in 3D gas and in diagrams. */
+export const STROKE_COLORS: Record<string, string> = {
+  BANG: "#ffd84d",
+  EXHAUST: "#ff8a4d",
+  INTAKE: "#4fc3ff",
+  SQUEEZE: "#a78bff",
 };
 
 export const UI = {

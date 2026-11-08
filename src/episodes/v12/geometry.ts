@@ -55,4 +55,13 @@ export const engineOrigin = (t: number) => new THREE.Vector3(ENGINE_X, ENGINE_RE
 export const cylPoint = (cyl: number, d: number, t: number) =>
   engineOrigin(t).add(new THREE.Vector3(cylX(cyl), 0, 0)).add(bankDir(cyl).multiplyScalar(d));
 
+/** World position of a point given in a cylinder's own frame: along the crank, up the bore, across the bore. */
+export const cylLocal = (cyl: number, dx: number, y: number, z: number, t: number) => {
+  const b = bankAngle(cyl);
+  return engineOrigin(t)
+    .add(new THREE.Vector3(cylX(cyl) + dx, 0, 0))
+    .add(new THREE.Vector3(0, Math.cos(b), Math.sin(b)).multiplyScalar(y))
+    .add(new THREE.Vector3(0, -Math.sin(b), Math.cos(b)).multiplyScalar(z));
+};
+
 export const crownWorld = (cyl: number, t: number) => cylPoint(cyl, wristDist(cycleAt(cyl, t) % 360) + PIN_TO_CROWN, t);

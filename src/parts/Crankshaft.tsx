@@ -27,33 +27,40 @@ const TEETH = 28;
  * A crankshaft generated from a pin layout. Flat-plane, cross-plane and shared-pin cranks are just different layouts.
  * `spin` is the shaft's rotation in radians, used to turn the flywheel and pulley when `ends` is set.
  */
-export const Crankshaft: React.FC<{ pins: CrankPin[]; throwR: number; length: number; webOffset?: number; spin?: number; ends?: boolean }> = ({
+export const Crankshaft: React.FC<{ pins: CrankPin[]; throwR: number; length: number; webOffset?: number; spin?: number; ends?: boolean; color?: string; weightColor?: string }> = ({
   pins,
   throwR,
   length,
   webOffset = 0.36,
   spin = 0,
   ends = false,
+  color = C.metalLight,
+  weightColor = C.metal,
 }) => (
   <group>
     <mesh rotation={ALONG_X}>
       <cylinderGeometry args={[0.2, 0.2, length, 10]} />
-      <Lam c={C.metalLight} />
+      <Lam c={color} />
     </mesh>
     {pins.map(({ x, alpha }, k) => (
       <group key={k}>
         <mesh position={[x, throwR * Math.cos(alpha), throwR * Math.sin(alpha)]} rotation={ALONG_X}>
           <cylinderGeometry args={[0.15, 0.15, 0.62, 8]} />
-          <Lam c={C.metalLight} />
+          <Lam c={color} />
         </mesh>
         {[-webOffset, webOffset].map((dx) => (
           <group key={dx} position={[x + dx, 0, 0]} rotation={[alpha, 0, 0]}>
             <mesh position={[0, throwR / 2, 0]}>
               <boxGeometry args={[0.1, throwR + 0.34, 0.34]} />
-              <Lam c={C.metalLight} />
+              <Lam c={color} />
+            </mesh>
+            {/* oil drilling */}
+            <mesh position={[dx > 0 ? 0.06 : -0.06, throwR / 2, 0]} rotation={ALONG_X}>
+              <cylinderGeometry args={[0.05, 0.05, 0.02, 8]} />
+              <Lam c={C.metalDark} />
             </mesh>
             <mesh geometry={counterweightGeo}>
-              <Lam c={C.metal} />
+              <Lam c={weightColor} />
             </mesh>
           </group>
         ))}
@@ -99,6 +106,10 @@ export const MainBearings: React.FC<{ xs: number[] }> = ({ xs }) => (
         <mesh>
           <boxGeometry args={[0.2, 0.26, 1.15]} />
           <Lam c={C.metalDark} />
+        </mesh>
+        <mesh position={[0, 0.2, 0]} rotation={ALONG_X}>
+          <cylinderGeometry args={[0.24, 0.24, 0.17, 12]} />
+          <Lam c={C.bearing} />
         </mesh>
         {[1, -1].map((s) => (
           <mesh key={s} position={[0, -0.16, s * 0.45]}>

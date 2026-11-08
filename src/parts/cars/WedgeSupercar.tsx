@@ -195,6 +195,14 @@ export const WedgeSupercar: React.FC<WedgeSupercarProps> = ({ coverAngle, pulse 
             {PANEL_LINES.map(([x, y, h]) => (
               <Box key={x} p={[x, y, s * 10.02]} s={[0.1, h, 0.06]} c={C.trim} />
             ))}
+            {/* door handle, sill and rear haunch vents */}
+            <Box p={[2.4, 6.5, s * 10.05]} s={[1.3, 0.22, 0.12]} c={C.metalDark} />
+            <Box p={[1, 2.0, s * 10.06]} s={[24, 0.34, 0.12]} c={C.trim} />
+            {[0, 1, 2].map((k) => (
+              <Box key={`v${k}`} p={[20.4 + k * 0.9, 5.9, s * 10.04]} s={[0.4, 1.5, 0.08]} c={C.trim} />
+            ))}
+            {/* wiper */}
+            <Box p={[-3, 8.4, s * 2.4]} s={[0.14, 0.1, 4.6]} c={C.coil} r={[0, 0.2 * s, 0]} />
             {/* mirror */}
             <Box p={[-1.5, 8.4, s * 9.2]} s={[1, 0.7, 1.5]} c={C.body} />
             <Box p={[-1.4, 8.1, s * 8.1]} s={[0.3, 0.2, 1]} c={C.trim} />
@@ -240,6 +248,11 @@ export const WedgeSupercar: React.FC<WedgeSupercarProps> = ({ coverAngle, pulse 
         <Box p={[-23.4, 1.25, 0]} s={[3.2, 0.2, 19.5]} c={C.trim} />
         {[1, -1].map((s) => (
           <Box key={s} p={[-14, 4.9, s * 3.4]} s={[4.5, 0.08, 3.4]} c={C.trim} r={[0, 0, 0.18]} />
+        ))}
+        {/* blank rear plate and upper grille */}
+        <Box p={[24.66, 4.1, 0]} s={[0.08, 1.4, 4.8]} c={C.body} />
+        {[0, 1, 2, 3, 4].map((k) => (
+          <Box key={k} p={[24.64, 6.5 - k * 0.2, 0]} s={[0.08, 0.08, 8]} c={C.trim} />
         ))}
         {/* roof scoop */}
         <Box p={[6.4, 11.1, 0]} s={[2.6, 0.5, 3.2]} c={C.trim} />

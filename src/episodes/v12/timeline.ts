@@ -14,15 +14,15 @@ const KEYS: CameraKey[] = [
   // engine rises, look down the V from behind: left/right banks
   { t: barT(3), pos: [27.5, 28, 7], target: [11, 14.6, 0], fov: 42 },
   { t: barT(4), pos: [27, 27.5, 4.5], target: [11, 14.6, 0], fov: 42 },
-  // front cross-section of cylinders 1 & 7: the four strokes
-  { t: beatT(18), pos: [-1.3, 18.9, -5.3], target: [8.1, 15.4, -0.6], fov: 40, via: [5, 27, -10] },
-  { t: beatT(26), pos: [-0.8, 18.4, -6.0], target: [8.1, 15.2, -0.6], fov: 40 },
-  // low side view: crankshaft and rods (right-bank headers ghosted)
-  { t: barT(7), pos: [5.5, 10.6, -17.5], target: [11, 14.1, 0], fov: 40 },
-  { t: barT(9), pos: [7.5, 10.6, -18], target: [11, 14.1, 0], fov: 40 },
+  // head-on view of the front pair of cylinders: the four strokes
+  { t: beatT(18), pos: [-9.5, 18.2, -2.2], target: [8.1, 15.2, -0.2], fov: 40, via: [2, 30, -12] },
+  { t: beatT(26), pos: [-9.5, 17.8, -1.4], target: [8.1, 15.2, -0.2], fov: 40 },
+  // level side view: crankshaft and rods (right-bank headers ghosted)
+  { t: barT(7), pos: [9.5, 14.8, -21.5], target: [11, 14.2, 0], fov: 40 },
+  { t: barT(9), pos: [12, 14.8, -21.5], target: [11, 14.2, 0], fov: 40 },
   // above: four cams, 48 valves
-  { t: barT(10), pos: [16, 35, -6.5], target: [11, 16.6, 0], fov: 40 },
-  { t: barT(12), pos: [14, 35, -7.5], target: [11, 16.6, 0], fov: 40 },
+  { t: barT(10), pos: [15, 36, -6.5], target: [11, 15.8, 0], fov: 40 },
+  { t: barT(12), pos: [13.5, 36, -7.5], target: [11, 15.8, 0], fov: 40 },
   // wide 3/4 of the whole engine at redline
   { t: beatT(50), pos: [24.5, 24.5, -14.5], target: [11, 14.8, 0], fov: 42 },
   { t: barT(14), pos: [25.5, 24, -17], target: [11, 14.8, 0], fov: 42 },
@@ -68,6 +68,33 @@ export const SHOW_CYL_NUMBERS = (t: number) => (t > barT(3) - 0.2 && t < barT(4)
 export const SHOW_CRANK_TAG = (t: number) => t > barT(7) && t < barT(9);
 /** Right-bank exhaust headers turn see-through for the crankshaft shot. */
 export const headerGhost = (t: number) => Math.max(0, Math.min(1, Math.min((t - 10.6) / 0.5, (15.6 - t) / 0.5)));
+/** Which part of the engine a shot is about. Everything else fades back so the subject reads clearly. */
+export type FocusKind = "none" | "strokes" | "crank" | "cams";
+export const focusAt = (t: number): { kind: FocusKind; amount: number } => {
+  const windowed = (kind: FocusKind, from: number, to: number) => ({
+    kind,
+    amount: Math.max(0, Math.min(1, Math.min((t - from) / 0.3, (to - t) / 0.3))),
+  });
+  if (t >= beatT(17) && t < beatT(27)) return windowed("strokes", beatT(17), beatT(27));
+  if (t >= beatT(27) && t < beatT(39.5)) return windowed("crank", beatT(27), beatT(39.5));
+  if (t >= beatT(39.5) && t < barT(12)) return windowed("cams", beatT(39.5), barT(12));
+  return { kind: "none", amount: 0 };
+};
+
+/** Which live diagram sits under the captions. */
+export type PanelKind = "firing" | "stroke" | "crank" | "valves" | "pulses";
+export const panelAt = (t: number): { kind: PanelKind; fade: number } | null => {
+  const span = (kind: PanelKind, from: number, to: number) => (t >= from && t < to ? { kind, fade: Math.max(0, Math.min(1, Math.min((t - from) / 0.15, (to - t) / 0.15))) } : null);
+  return (
+    span("firing", barT(2) + 0.2, beatT(16)) ??
+    span("stroke", beatT(16), beatT(28)) ??
+    span("crank", beatT(28), beatT(40)) ??
+    span("valves", beatT(40), barT(12)) ??
+    span("firing", barT(12), barT(14)) ??
+    span("pulses", barT(14), barT(20) - 0.1)
+  );
+};
+
 /** The belt and alternator sit between the camera and the piston in the front close-up, so they hide for it. */
 export const SHOW_FRONT_DRIVE = (t: number) => t < beatT(16) || t > beatT(28);
 export const HUD_IN = barT(2) + 0.05;

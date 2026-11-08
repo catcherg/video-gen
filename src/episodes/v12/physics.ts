@@ -94,6 +94,10 @@ export const engine = createFourStroke({
 
 export const { crankAt, cycleAt, bangs: BANGS, firstBangAfter, bangsPerSecond } = engine;
 
+/** Valve open windows in cycle degrees. Schematic, not measured L539 cam timing; label them that way on screen. */
+export const EXHAUST_VALVE = { open: 150, close: 390, peak: 270 };
+export const INTAKE_VALVE = { open: 330, close: 590, peak: 460 };
+
 /** The engine's redline note. The song is tuned so this is exactly its tonic, A. */
 export const ENGINE_NOTE_HZ = bangsPerSecond(REDLINE);
 /** A4 for the song: one octave below the engine's redline note. */

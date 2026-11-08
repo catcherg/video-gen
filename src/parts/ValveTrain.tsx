@@ -20,19 +20,22 @@ const springGeo = (() => {
 const VALVE_DX = [-0.2, 0.2];
 const VALVE_Z = 0.24;
 
-/** Poppet valves with springs and retainers, in the cylinder's local frame. One pair per row. */
-export const Valves: React.FC<{ deck: number; rows: { side: number; lift: number }[] }> = ({ deck, rows }) => (
+export type ValveRow = { side: number; lift: number; color?: string };
+
+/** Poppet valves with springs, retainers and followers, in the cylinder's local frame. One pair per row. */
+export const Valves: React.FC<{ deck: number; rows: ValveRow[] }> = ({ deck, rows }) => (
   <>
-    {rows.map(({ side, lift }) =>
+    {rows.map(({ side, lift, color = C.metalLight }) =>
       VALVE_DX.map((dx) => (
         <group key={`${side}${dx}`} position={[dx, 0, side * VALVE_Z]}>
+          {/* mushroom head */}
           <mesh position={[0, deck + 0.12 - lift, 0]}>
-            <cylinderGeometry args={[0.13, 0.13, 0.04, 8]} />
-            <Lam c={C.metalDark} />
+            <cylinderGeometry args={[0.05, 0.14, 0.08, 10]} />
+            <Lam c={color} />
           </mesh>
           <mesh position={[0, deck + 0.55 - lift, 0]}>
             <cylinderGeometry args={[0.03, 0.03, 0.85, 4]} />
-            <Lam c={C.metalLight} />
+            <Lam c={color} />
           </mesh>
           <mesh geometry={springGeo} position={[0, deck + 0.38, 0]} scale={[1, 0.62 - lift, 1]}>
             <Lam c={C.spring} />
@@ -52,15 +55,31 @@ export const Valves: React.FC<{ deck: number; rows: { side: number; lift: number
   </>
 );
 
+/** Egg-shaped cam profile: a base circle with a nose that reaches the follower at full lift. */
+const LOBE_BASE = 0.13;
+const LOBE_NOSE = 0.36;
+const lobeGeo = (() => {
+  const s = new THREE.Shape();
+  s.moveTo(0, -LOBE_NOSE);
+  s.quadraticCurveTo(LOBE_BASE * 1.05, -LOBE_NOSE * 0.55, LOBE_BASE, 0);
+  s.absarc(0, 0, LOBE_BASE, 0, Math.PI, false);
+  s.quadraticCurveTo(-LOBE_BASE * 1.05, -LOBE_NOSE * 0.55, 0, -LOBE_NOSE);
+  const g = new THREE.ExtrudeGeometry(s, { depth: 0.14, bevelEnabled: false, curveSegments: 8 });
+  g.translate(0, 0, -0.07);
+  g.rotateY(Math.PI / 2);
+  return g;
+})();
+
+export type LobeRow = { side: number; peak: number; color?: string };
+
 /** Cam lobes. Cams turn at half crank speed, so the angle is half the 720° cycle position. */
-export const CamLobes: React.FC<{ camDist: number; c: number; rows: { side: number; peak: number }[] }> = ({ camDist, c, rows }) => (
+export const CamLobes: React.FC<{ camDist: number; c: number; rows: LobeRow[] }> = ({ camDist, c, rows }) => (
   <>
-    {rows.map(({ side, peak }) =>
+    {rows.map(({ side, peak, color = C.cam }) =>
       VALVE_DX.map((dx) => (
         <group key={`l${side}${dx}`} position={[dx, camDist, side * VALVE_Z]} rotation={[((c - peak) / 2) * D2R, 0, 0]}>
-          <mesh position={[0, -0.07, 0]}>
-            <boxGeometry args={[0.14, 0.42, 0.26]} />
-            <Lam c={C.cam} />
+          <mesh geometry={lobeGeo}>
+            <Lam c={color} />
           </mesh>
         </group>
       )),
@@ -72,10 +91,18 @@ export const CamLobes: React.FC<{ camDist: number; c: number; rows: { side: numb
 export const CamCaps: React.FC<{ xs: number[]; camDist: number; side: number }> = ({ xs, camDist, side }) => (
   <>
     {xs.map((x) => (
-      <mesh key={x} position={[x, camDist + 0.03, side * VALVE_Z]}>
-        <boxGeometry args={[0.14, 0.2, 0.26]} />
-        <Lam c={C.metalDark} />
-      </mesh>
+      <group key={x} position={[x, camDist + 0.03, side * VALVE_Z]}>
+        <mesh>
+          <boxGeometry args={[0.14, 0.2, 0.26]} />
+          <Lam c={C.metalDark} />
+        </mesh>
+        {[1, -1].map((s) => (
+          <mesh key={s} position={[0, 0.12, s * 0.09]}>
+            <cylinderGeometry args={[0.035, 0.035, 0.05, 6]} />
+            <Lam c={C.warm} />
+          </mesh>
+        ))}
+      </group>
     ))}
   </>
 );
@@ -117,9 +144,9 @@ export const TimingChain: React.FC<{ curve: THREE.Curve<THREE.Vector3>; links: n
 );
 
 /** A camshaft bar running along the bank, in the bank's frame. */
-export const CamShaft: React.FC<{ x: number; camDist: number; side: number; length: number }> = ({ x, camDist, side, length }) => (
+export const CamShaft: React.FC<{ x: number; camDist: number; side: number; length: number; color?: string }> = ({ x, camDist, side, length, color = C.cam }) => (
   <mesh position={[x, camDist, side * VALVE_Z]} rotation={[0, 0, Math.PI / 2]}>
     <cylinderGeometry args={[0.07, 0.07, length, 6]} />
-    <Lam c={C.cam} />
+    <Lam c={color} />
   </mesh>
 );

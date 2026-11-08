@@ -56,6 +56,36 @@ export const FrontDrive: React.FC<{ x: number; crankSpin: number }> = ({ x, cran
   </group>
 );
 
+/** Fuel rail along a bank, feeding the injectors, in the bank's frame. */
+export const FuelRail: React.FC<{ x: number; y: number; z: number; length: number }> = ({ x, y, z, length }) => (
+  <mesh position={[x, y, z]} rotation={ALONG_X}>
+    <cylinderGeometry args={[0.07, 0.07, length, 8]} />
+    <Lam c={C.intake} />
+  </mesh>
+);
+
+/** Oil filter and starter motor mounted on the side of the block. */
+export const SideAncillaries: React.FC = () => (
+  <>
+    <mesh position={[-1.4, -0.65, 2.0]}>
+      <cylinderGeometry args={[0.34, 0.34, 0.8, 12]} />
+      <Lam c={C.crankGold} />
+    </mesh>
+    <mesh position={[-1.4, -0.2, 2.0]}>
+      <cylinderGeometry args={[0.2, 0.2, 0.16, 10]} />
+      <Lam c={C.metalDark} />
+    </mesh>
+    <mesh position={[3.0, -0.55, -1.7]} rotation={ALONG_X}>
+      <cylinderGeometry args={[0.3, 0.3, 1.2, 12]} />
+      <Lam c={C.metalDark} />
+    </mesh>
+    <mesh position={[3.72, -0.55, -1.7]} rotation={ALONG_X}>
+      <cylinderGeometry args={[0.18, 0.18, 0.3, 10]} />
+      <Lam c={C.metalLight} />
+    </mesh>
+  </>
+);
+
 /** Ignition harness running along a bank, in the bank's frame. */
 export const Harness: React.FC<{ x: number; y: number; length: number }> = ({ x, y, length }) => (
   <mesh position={[x, y, 0]} rotation={ALONG_X}>

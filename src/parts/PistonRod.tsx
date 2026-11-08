@@ -1,6 +1,7 @@
+import { useContext } from "react";
 import { D2R, hash } from "../core/math";
-import { C } from "../core/theme";
-import { Lam } from "./Lam";
+import { C, STROKE_COLORS } from "../core/theme";
+import { DimContext, Lam } from "./Lam";
 
 /** Distance from crank centre to wrist pin at crank angle c (deg): real slider-crank kinematics. */
 export const wristDistance = (c: number, crankR: number, rodL: number) => {
@@ -15,7 +16,7 @@ export const crankPinInBank = (c: number, crankR: number): [number, number] => [
 const ALONG_X: [number, number, number] = [0, 0, Math.PI / 2];
 
 /** I-beam rod with a bolted big-end cap and a small-end eye, between two points in the cylinder's (y, z) plane. */
-const Rod: React.FC<{ a: [number, number]; b: [number, number] }> = ({ a, b }) => {
+const Rod: React.FC<{ a: [number, number]; b: [number, number]; color: string }> = ({ a, b, color }) => {
   const dy = b[0] - a[0];
   const dz = b[1] - a[1];
   const len = Math.hypot(dy, dz);
@@ -30,13 +31,17 @@ const Rod: React.FC<{ a: [number, number]; b: [number, number] }> = ({ a, b }) =
       {[1, -1].map((s) => (
         <mesh key={s} position={[0, 0, s * 0.09]}>
           <boxGeometry args={[0.16, len, 0.035]} />
-          <Lam c={C.metal} />
+          <Lam c={color} />
         </mesh>
       ))}
-      {/* big end, cap and bolts */}
+      {/* big end, bearing shell, cap and bolts */}
       <mesh position={[0, -len / 2, 0]} rotation={ALONG_X}>
         <cylinderGeometry args={[0.24, 0.24, 0.18, 12]} />
-        <Lam c={C.metal} />
+        <Lam c={color} />
+      </mesh>
+      <mesh position={[0, -len / 2, 0]} rotation={ALONG_X}>
+        <cylinderGeometry args={[0.175, 0.175, 0.2, 12]} />
+        <Lam c={C.bearing} />
       </mesh>
       <mesh position={[0, -len / 2 - 0.2, 0]}>
         <boxGeometry args={[0.18, 0.12, 0.46]} />
@@ -68,13 +73,14 @@ const RELIEFS: [number, number][] = [
  * Piston, rings, wrist pin and rod in the cylinder's local frame (bore axis = +y, crank centre at the origin).
  * `heat` 0..1 colours the crown during combustion.
  */
-export const PistonRod: React.FC<{ crown: number; wrist: number; pin: [number, number]; radius: number; height: number; heat: number }> = ({
+export const PistonRod: React.FC<{ crown: number; wrist: number; pin: [number, number]; radius: number; height: number; heat: number; rodColor?: string }> = ({
   crown,
   wrist,
   pin,
   radius,
   height,
   heat,
+  rodColor = C.metal,
 }) => {
   const crownColor = heat > 0.66 ? C.hot : heat > 0.33 ? C.warm : heat > 0.02 ? C.red : C.metalLight;
   return (
@@ -105,8 +111,23 @@ export const PistonRod: React.FC<{ crown: number; wrist: number; pin: [number, n
         <cylinderGeometry args={[0.075, 0.075, radius * 2 + 0.02, 8]} />
         <Lam c={C.spring} />
       </mesh>
-      <Rod a={pin} b={[wrist, 0]} />
+      <Rod a={pin} b={[wrist, 0]} color={rodColor} />
     </>
+  );
+};
+
+/** The gas above the piston, coloured by stroke and growing denser as it is squeezed. */
+export const GasColumn: React.FC<{ crown: number; deck: number; radius: number; c: number; stroke: string }> = ({ crown, deck, radius, c, stroke }) => {
+  const dim = useContext(DimContext);
+  const height = deck - crown;
+  if (height < 0.02 || dim > 0.5) return null;
+  const inStroke = (c % 180) / 180;
+  const opacity = stroke === "BANG" ? 0.9 - inStroke * 0.55 : stroke === "SQUEEZE" ? 0.3 + inStroke * 0.55 : 0.34;
+  return (
+    <mesh position={[0, crown + height / 2, 0]}>
+      <cylinderGeometry args={[radius, radius, height, 16]} />
+      <meshBasicMaterial color={STROKE_COLORS[stroke]} transparent opacity={opacity * (1 - dim)} depthWrite={false} />
+    </mesh>
   );
 };
 

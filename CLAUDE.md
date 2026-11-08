@@ -88,6 +88,15 @@ After rendering, run `npm run verify-audio <slug>`.
 - Put bars, kicks and other shared musical data in the episode's `song.ts`, read by both `audio.ts` and the visuals.
 - Tune the song to the engine (`SONG_A4_HZ`), and give `toneChecks` a `minHz`/`maxHz` band above the bass, chords and lead so `verify-audio` measures the engine.
 
+## Keeping shots clear
+
+Detail is only useful if the viewer knows where to look. `episodes/v12` uses these tools:
+
+- **One subject per shot.** `focusAt` in `timeline.ts` names the shot's subject; `DimContext` fades everything else back, and faded parts drop their fine detail.
+- **Colour means a job.** Part and stroke colours live in `core/theme.ts` and are the same in 3D, callouts and diagrams.
+- **Callouts** (`core/Callout.tsx`) sit in fixed screen columns. List them in the same top-to-bottom order as their parts so leader lines don't cross, and bring them in on beats.
+- **Diagrams** (`core/diagrams.tsx`) sit under the captions and take their values from physics. If a value is illustrative rather than sourced, say so on screen, as the valve-timing panel does.
+
 ## Things to preserve
 
 - Audio synthesis order matters. `createRng` output depends on call order, so reordering synthesis steps changes the WAV.

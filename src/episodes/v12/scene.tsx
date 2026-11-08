@@ -1,16 +1,19 @@
 import { useMemo } from "react";
 import * as THREE from "three";
 import { useCurrentFrame, useVideoConfig } from "remotion";
+import { strokeName } from "../../core/engine/fourStroke";
 import { D2R, hash } from "../../core/math";
 import { PixelStage } from "../../core/PixelStage";
-import { FrontDrive, Harness } from "../../parts/Accessories";
+import { C } from "../../core/theme";
+import { FrontDrive, FuelRail, Harness, SideAncillaries } from "../../parts/Accessories";
 import { BlockShell, CoilPack, CylinderLiner, DeckFrame } from "../../parts/BlockShell";
 import { WedgeSupercar } from "../../parts/cars/WedgeSupercar";
 import { Crankshaft, MainBearings } from "../../parts/Crankshaft";
 import { Garage } from "../../parts/Garage";
 import { ExhaustPulse, headerCurve, Headers, headerTube } from "../../parts/Headers";
 import { Injector, SparkPlug, VelocityStack } from "../../parts/Induction";
-import { CombustionFlash, crankPinInBank, PistonRod } from "../../parts/PistonRod";
+import { DimContext } from "../../parts/Lam";
+import { CombustionFlash, crankPinInBank, GasColumn, PistonRod } from "../../parts/PistonRod";
 import { CamCaps, CamLobes, CamShaft, Sprocket, TimingChain, Valves, valveBump } from "../../parts/ValveTrain";
 import {
   bankAngle,
@@ -29,18 +32,26 @@ import {
   PISTON_R,
   wristDist,
 } from "./geometry";
-import { crankAt, CRANK_PINS, cycleAt, CYLINDERS, FIRING_ORDER, isRightBank, isSlowed, REDLINE, rpmAt } from "./physics";
+import { crankAt, CRANK_PINS, cycleAt, CYLINDERS, EXHAUST_VALVE, FIRING_ORDER, INTAKE_VALVE, isRightBank, isSlowed, REDLINE, rpmAt } from "./physics";
 import { kickPulse, stabPulse } from "./song";
-import { cameraAt, headerGhost, SHOW_FRONT_DRIVE } from "./timeline";
+import { cameraAt, focusAt, type FocusKind, headerGhost, SHOW_FRONT_DRIVE } from "./timeline";
 
 const CYLS = [...FIRING_ORDER].sort((a, b) => a - b);
-
-// Valve timing (cycle degrees).
-const EXHAUST = { open: 150, close: 390, peak: 270 };
-const INTAKE = { open: 330, close: 590, peak: 460 };
 const VALVE_LIFT = 0.22;
 
-const Cylinder: React.FC<{ cyl: number; t: number; frame: number }> = ({ cyl, t, frame }) => {
+/** How far each group of parts fades back in each kind of shot. */
+const FOCUS: Record<FocusKind, { piston: number; top: number; crank: number; headers: number; drive: number }> = {
+  none: { piston: 0, top: 0, crank: 0, headers: 0, drive: 0 },
+  strokes: { piston: 0, top: 0, crank: 0.25, headers: 0.8, drive: 0.85 },
+  crank: { piston: 0.45, top: 0.8, crank: 0, headers: 0.7, drive: 0.7 },
+  cams: { piston: 0.75, top: 0, crank: 0.75, headers: 0.75, drive: 0.6 },
+};
+
+/** In the strokes shot only the front pair stays lit: cylinder 1 fully, its partner a little less. */
+const STROKES_CYLINDER_DIM: Record<number, number> = { 1: 0, 7: 0.25 };
+const OTHER_CYLINDERS_DIM = 0.88;
+
+const Cylinder: React.FC<{ cyl: number; t: number; frame: number; pistonDim: number; topDim: number }> = ({ cyl, t, frame, pistonDim, topDim }) => {
   const c = cycleAt(cyl, t);
   const cm = c % 360;
   const w = wristDist(cm);
@@ -57,33 +68,47 @@ const Cylinder: React.FC<{ cyl: number; t: number; frame: number }> = ({ cyl, t,
   // Fuel and air only show while they can be followed by eye.
   const spray = slowed && c > 380 && c < 480 ? (c - 380) / 100 : -1;
   const air = slowed && c > 360 && c < 540 ? (c - 360) / 180 : -1;
+  // Faded-back cylinders drop their fine parts so they stop competing with the subject.
+  const showTop = topDim < 0.6;
+  const showPiston = pistonDim < 0.8;
 
   return (
     <group position={[cylX(cyl), 0, 0]} rotation={[bankAngle(cyl), 0, 0]}>
-      <PistonRod crown={crown} wrist={w} pin={crankPinInBank(cm, CRANK_R)} radius={PISTON_R} height={PISTON_H} heat={heat} />
-      <DeckFrame deck={DECK} spacing={CYL_SPACING} boreR={PISTON_R} />
-      {/* 4 valves: intake pair on the V side, exhaust pair outside */}
-      <Valves
-        deck={DECK}
-        rows={[
-          { side: inner, lift: valveBump(c, INTAKE.open, INTAKE.close) * VALVE_LIFT },
-          { side: -inner, lift: valveBump(c, EXHAUST.open, EXHAUST.close) * VALVE_LIFT },
-        ]}
-      />
-      <CamLobes
-        camDist={CAM_DIST}
-        c={c}
-        rows={[
-          { side: inner, peak: INTAKE.peak },
-          { side: -inner, peak: EXHAUST.peak },
-        ]}
-      />
-      <SparkPlug deck={DECK} crown={crown} firing={firing} seed={cyl + frame * 0.1} />
-      <Injector deck={DECK} side={inner} spraying={spray} seed={cyl} />
-      <VelocityStack deck={DECK} side={inner} drawing={air} seed={cyl} />
-      <CoilPack y={CAM_DIST + 0.36} />
-      <CombustionFlash crown={crown} age={flashAge} seed={cyl} />
-      <CylinderLiner y0={1.0} y1={DECK} r={PISTON_R + 0.05} heat={heat} />
+      <DimContext.Provider value={pistonDim}>
+        {showPiston ? (
+          <PistonRod crown={crown} wrist={w} pin={crankPinInBank(cm, CRANK_R)} radius={PISTON_R} height={PISTON_H} heat={heat} rodColor={isRightBank(cyl) ? C.rodRight : C.rodLeft} />
+        ) : null}
+        <DeckFrame deck={DECK} spacing={CYL_SPACING} boreR={PISTON_R} />
+        {slowed ? <GasColumn crown={crown} deck={DECK} radius={PISTON_R} c={c} stroke={strokeName(c)} /> : null}
+      </DimContext.Provider>
+      <DimContext.Provider value={topDim}>
+        {showTop ? (
+          <>
+            {/* 4 valves: intake pair on the V side, exhaust pair outside */}
+            <Valves
+              deck={DECK}
+              rows={[
+                { side: inner, lift: valveBump(c, INTAKE_VALVE.open, INTAKE_VALVE.close) * VALVE_LIFT, color: C.intake },
+                { side: -inner, lift: valveBump(c, EXHAUST_VALVE.open, EXHAUST_VALVE.close) * VALVE_LIFT, color: C.exhaust },
+              ]}
+            />
+            <CamLobes
+              camDist={CAM_DIST}
+              c={c}
+              rows={[
+                { side: inner, peak: INTAKE_VALVE.peak, color: C.camLobe },
+                { side: -inner, peak: EXHAUST_VALVE.peak, color: C.camLobe },
+              ]}
+            />
+            <SparkPlug deck={DECK} crown={crown} firing={firing} seed={cyl + frame * 0.1} />
+            <Injector deck={DECK} side={inner} spraying={spray} seed={cyl} />
+            <VelocityStack deck={DECK} side={inner} drawing={air} seed={cyl} />
+            <CoilPack y={CAM_DIST + 0.36} />
+            <CombustionFlash crown={crown} age={flashAge} seed={cyl} />
+          </>
+        ) : null}
+      </DimContext.Provider>
+      {pistonDim < 0.5 ? <CylinderLiner y0={1.0} y1={DECK} r={PISTON_R + 0.05} heat={heat} /> : null}
     </group>
   );
 };
@@ -147,31 +172,51 @@ const Engine: React.FC<{ t: number; frame: number; origin: THREE.Vector3 }> = ({
   const chainPhase = (((crankDeg / 360) * (2 * Math.PI * CRANK_SPROCKET_R)) / chainLength) % 1;
   const rpmHeat = rpmAt(t) / REDLINE;
   const glow = Math.max(0, rpmHeat * rpmHeat * 0.9 + (isSlowed(t) ? 0 : kickPulse(t) * 0.35));
+
+  const { kind, amount } = focusAt(t);
+  const dims = FOCUS[kind];
+  const cylinderDim = (cyl: number) => (kind === "strokes" ? (STROKES_CYLINDER_DIM[cyl] ?? OTHER_CYLINDERS_DIM) * amount : 0);
+  const showChain = !(kind === "strokes" && amount > 0.4) && !(kind === "crank" && amount > 0.4);
   return (
     <group position={origin}>
-      <Crankshaft pins={pins} throwR={CRANK_R} length={7.6} spin={crankRad} ends />
-      <MainBearings xs={journalXs} />
+      <DimContext.Provider value={dims.crank * amount}>
+        <Crankshaft pins={pins} throwR={CRANK_R} length={7.6} spin={crankRad} ends color={C.crankGold} weightColor={C.metal} />
+        <MainBearings xs={journalXs} />
+      </DimContext.Provider>
       {CYLS.map((cyl) => (
-        <Cylinder key={cyl} cyl={cyl} t={t} frame={frame} />
+        <Cylinder key={cyl} cyl={cyl} t={t} frame={frame} pistonDim={Math.max(dims.piston * amount, cylinderDim(cyl))} topDim={Math.max(dims.top * amount, cylinderDim(cyl))} />
       ))}
-      {CAMSHAFT_BANKS.map((ref) => (
-        <group key={ref} rotation={[bankAngle(ref), 0, 0]}>
-          {[1, -1].map((side) => (
-            <group key={side}>
-              <CamShaft x={(cylX(ref) + cylX(ref + 5)) / 2} camDist={CAM_DIST} side={side} length={6.9} />
-              <CamCaps xs={camCapXs} camDist={CAM_DIST} side={side} />
-              <Sprocket x={cylX(ref) - 0.68} y={CAM_DIST} z={side * CHAIN_SIDE} r={CAM_SPROCKET_R} teeth={14} spin={camRad} />
-            </group>
-          ))}
-          <group position={[cylX(ref) - 0.68, 0, 0]}>
-            <TimingChain curve={chain} links={CHAIN_LINKS} phase={chainPhase} />
+      <DimContext.Provider value={dims.top * amount}>
+        {CAMSHAFT_BANKS.map((ref) => (
+          <group key={ref} rotation={[bankAngle(ref), 0, 0]}>
+            {dims.top * amount < 0.6
+              ? [1, -1].map((side) => (
+                  <group key={side}>
+                    <CamShaft x={(cylX(ref) + cylX(ref + 5)) / 2} camDist={CAM_DIST} side={side} length={6.9} color={C.camLobe} />
+                    <CamCaps xs={camCapXs} camDist={CAM_DIST} side={side} />
+                    {showChain ? <Sprocket x={cylX(ref) - 0.68} y={CAM_DIST} z={side * CHAIN_SIDE} r={CAM_SPROCKET_R} teeth={14} spin={camRad} /> : null}
+                  </group>
+                ))
+              : null}
+            {showChain ? (
+              <>
+                <group position={[cylX(ref) - 0.68, 0, 0]}>
+                  <TimingChain curve={chain} links={CHAIN_LINKS} phase={chainPhase} />
+                </group>
+                <Sprocket x={cylX(ref) - 0.68} y={0} z={0} r={CRANK_SPROCKET_R} teeth={18} spin={crankRad} />
+              </>
+            ) : null}
+            {dims.top * amount < 0.6 ? (
+              <>
+                <Harness x={(cylX(ref) + cylX(ref + 5)) / 2} y={CAM_DIST + 0.74} length={6.2} />
+                <FuelRail x={(cylX(ref) + cylX(ref + 5)) / 2} y={DECK + 0.66} z={(isRightBank(ref) ? 1 : -1) * 0.5} length={6.3} />
+              </>
+            ) : null}
           </group>
-          <Sprocket x={cylX(ref) - 0.68} y={0} z={0} r={CRANK_SPROCKET_R} teeth={18} spin={crankRad} />
-          <Harness x={(cylX(ref) + cylX(ref + 5)) / 2} y={CAM_DIST + 0.74} length={6.2} />
-        </group>
-      ))}
-      <Headers tubes={tubes} ghost={(i) => (i < RIGHT_BANK_HEADERS ? ghost : 0)} glow={glow} />
-      {isSlowed(t)
+        ))}
+      </DimContext.Provider>
+      <Headers tubes={tubes} ghost={(i) => (i < RIGHT_BANK_HEADERS ? ghost : 0)} glow={glow} dim={dims.headers * amount} />
+      {isSlowed(t) && kind === "none"
         ? CYLS.map((cyl, i) => {
             if (i < RIGHT_BANK_HEADERS && ghost > 0.5) return null;
             const c = cycleAt(cyl, t);
@@ -181,16 +226,17 @@ const Engine: React.FC<{ t: number; frame: number; origin: THREE.Vector3 }> = ({
       {[1, -1].map((s) => (
         <mesh key={s} position={[5.1, -1.1, s * 2.3]} rotation={[0, 0, Math.PI / 2]}>
           <cylinderGeometry args={[0.36, 0.36, 1.5, 10]} />
-          <meshLambertMaterial color={C_COLLECTOR} emissive="#ff3a10" emissiveIntensity={glow * 0.6} flatShading />
+          <meshLambertMaterial color="#8a4a2a" emissive="#ff3a10" emissiveIntensity={glow * 0.6 * (1 - dims.headers * amount)} flatShading />
         </mesh>
       ))}
-      <BlockShell showPan={ghost < 0.5} />
+      <DimContext.Provider value={dims.drive * amount}>
+        <BlockShell showPan={ghost < 0.5} />
+        <SideAncillaries />
+      </DimContext.Provider>
       {SHOW_FRONT_DRIVE(t) ? <FrontDrive x={-4.02} crankSpin={crankRad} /> : null}
     </group>
   );
 };
-
-const C_COLLECTOR = "#8a4a2a";
 
 const BAY_FLOOR_Y = 2.7;
 
@@ -222,7 +268,7 @@ export const Scene: React.FC = () => {
   const origin = engineOrigin(t);
   const realSpeed = !isSlowed(t);
   return (
-    <PixelStage t={t} cameraAt={cameraAt} pixelSize={3}>
+    <PixelStage t={t} cameraAt={cameraAt} pixelSize={2} normalEdge={0.55} depthEdge={0.85}>
       <Garage t={t} pulse={kick} />
       <WedgeSupercar coverAngle={coverAngleAt(t)} pulse={Math.max(kick, stab)} squat={kick * 0.16} flame={realSpeed ? Math.max(stab, (rpmAt(t) / REDLINE) ** 2 * kick * 0.85) : 0} />
       <Engine t={t} frame={frame} origin={origin} />

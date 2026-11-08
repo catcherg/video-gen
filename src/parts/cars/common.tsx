@@ -51,6 +51,16 @@ export const Wheel: React.FC<{ x: number; z: number }> = ({ x, z }) => {
         <cylinderGeometry args={[0.7, 0.7, 0.1, 10]} />
         <meshLambertMaterial color={C.metalLight} flatShading />
       </mesh>
+      {/* lug nuts */}
+      {[0, 1, 2, 3, 4].map((k) => {
+        const a = (k * Math.PI * 2) / 5 + 0.6;
+        return (
+          <mesh key={k} position={[Math.cos(a) * 0.45, out * 1.56, Math.sin(a) * 0.45]}>
+            <cylinderGeometry args={[0.12, 0.12, 0.08, 6]} />
+            <meshLambertMaterial color={C.trim} flatShading />
+          </mesh>
+        );
+      })}
       {/* brake disc and caliper, seen through the spokes */}
       <mesh position={[0, out * 1.1, 0]}>
         <cylinderGeometry args={[2.1, 2.1, 0.12, 16]} />

@@ -88,6 +88,32 @@ const ToolChest: React.FC<{ x: number; z: number }> = ({ x, z }) => (
   </>
 );
 
+const Workbench: React.FC<{ x: number; z: number }> = ({ x, z }) => (
+  <>
+    <Box p={[x, 8, z]} s={[6, 0.6, 26]} c={C.metalDark} />
+    {[1, -1].flatMap((sz) =>
+      [1, -1].map((sx) => <Box key={`${sz}${sx}`} p={[x + sx * 2.4, 4, z + sz * 12]} s={[0.6, 8, 0.6]} c={C.trim} />),
+    )}
+    {/* pegboard and hanging tools */}
+    <Box p={[x - 3.4, 18, z]} s={[0.4, 16, 28]} c="#2c2f58" />
+    {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+      <Box key={i} p={[x - 3, 17 + (i % 2) * 3, z - 11 + i * 3.6]} s={[0.3, 4 + (i % 3), 0.7]} c={i % 3 === 0 ? C.red : C.metalLight} />
+    ))}
+    <Box p={[x, 9.3, z - 7]} s={[3, 2, 5]} c={C.header} />
+    <Box p={[x, 9, z + 6]} s={[2.4, 1.2, 8]} c={C.metal} />
+  </>
+);
+
+const Extinguisher: React.FC<{ x: number; z: number }> = ({ x, z }) => (
+  <>
+    <mesh position={[x, 2.6, z]}>
+      <cylinderGeometry args={[0.9, 0.9, 5.2, 10]} />
+      <meshLambertMaterial color={C.red} flatShading />
+    </mesh>
+    <Box p={[x, 5.6, z]} s={[0.5, 0.9, 0.5]} c={C.metalDark} />
+  </>
+);
+
 const Lift: React.FC<{ x: number; z: number; pulse: number }> = ({ x, z, pulse }) => (
   <>
     <Box p={[x, 11, z]} s={[2.4, 22, 2.4]} c={C.warm} />
@@ -159,6 +185,8 @@ export const Garage: React.FC<{ t: number; pulse: number }> = ({ t, pulse }) => 
       <Drum x={-96} z={62} c={C.metal} />
       <ToolChest x={-40} z={-82} />
       <ToolChest x={-92} z={-30} />
+      <Workbench x={-100} z={22} />
+      <Extinguisher x={-78} z={-82} />
       <Dust t={t} />
     </>
   );
