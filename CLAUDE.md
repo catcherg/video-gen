@@ -4,6 +4,8 @@ Short vertical "how engines work" explainers in a pixel-art 3D style (1080×1920
 
 An episode is mostly a new physics file, a new 3D model and a new timeline.
 
+The full production process, with reasoning and worked formulas, is in [docs/VIDEO_PRODUCTION.md](docs/VIDEO_PRODUCTION.md). Read it before starting or substantially changing an episode. `src/episodes/v12` is the reference implementation.
+
 ## Non-negotiable rules
 
 1. **Determinism.** Everything visible or audible is a pure function of the frame number. No clocks, `Math.random` or per-frame deltas. Use `hash` from `src/core/math.ts` in visuals and `createRng` in audio. Any frame must render identically in isolation.
@@ -15,9 +17,11 @@ An episode is mostly a new physics file, a new 3D model and a new timeline.
 ## Layout
 
 ```
+docs/           VIDEO_PRODUCTION.md, the master production playbook
 src/core/       Shared engine: fourStroke physics, camera rig + projection, PixelStage (canvas, lights, pixel pass),
-                HUD blocks, Captions, Tag, Flashes, fonts, theme, audio synthesis
-src/parts/      Reusable models: PistonRod, Crankshaft, ValveTrain, Headers, BlockShell, cars/, Gallery (dev preview)
+                HUD blocks, Captions, Callout, diagrams, Tag, Flashes, fonts, theme, audio and song synthesis
+src/parts/      Reusable models: PistonRod, Crankshaft, ValveTrain, Headers, BlockShell, Induction, Accessories,
+                Garage, cars/, PlaceholderEngine, Gallery (dev preview)
 src/episodes/
   registry.ts   Every episode is listed here; Root.tsx registers one Composition each
   <slug>/
@@ -25,9 +29,10 @@ src/episodes/
     physics.ts    specs + sources, RPM curve, slow-motion, firing order, toneChecks
     geometry.ts   model dimensions and world placement, shared by scene and overlay
     scene.tsx     3D scene built from parts inside <PixelStage>
-    timeline.ts   camera keys, captions, label windows
-    overlay.tsx   2D layer: labels, HUD, captions, flashes
-    audio.ts      mix settings for renderEngineAudio
+    timeline.ts   camera keys, captions, label windows, shot focus, diagram windows
+    overlay.tsx   2D layer: callouts, HUD, captions, diagrams, flashes
+    song.ts       optional: bars, kicks and other musical data shared by audio and visuals
+    audio.ts      mix settings or a full song for renderEngineAudio
     index.tsx     makeEpisode(slug, Scene, Overlay)
     physics.test.ts  calls describeFourStroke
 scripts/        audio, stills, render, verify-audio, new-episode
@@ -61,10 +66,12 @@ GL settings live in `render-settings.ts`. `angle` uses the Mac's GPU.
 Before any full render:
 
 1. Pick the busiest moments: every camera arrival, every label window, each caption change, the slow-to-real-speed transitions.
-2. `npm run stills <slug> <frames...>`, then open and look at each PNG.
+2. `npm run stills <slug> <frames...>`, then open and look at each PNG. Inspect at least one at full size, because some problems don't show in thumbnails.
 3. Confirm the camera never passes through geometry, including during moves between keys. Check the midpoint of every `via` move.
-4. Confirm no label or HUD element overlaps the subject, sits behind the HUD, or is clipped at the frame edge.
-5. Fix `timeline.ts` or `overlay.tsx` and re-check. Then render.
+4. Confirm nothing stands between the camera and the subject, and that the subject sits between the HUD and the captions.
+5. Confirm no label or HUD element overlaps the subject, sits behind the HUD or a caption, or is clipped at the frame edge. No leader line may cross another line or a label.
+6. Confirm every number on screen agrees with physics, and that diagrams match the 3D scene at a known moment.
+7. Fix `timeline.ts` or `overlay.tsx` and re-check. Then render.
 
 After rendering, run `npm run verify-audio <slug>`.
 
@@ -77,25 +84,67 @@ After rendering, run `npm run verify-audio <slug>`.
 5. Build the scene from `src/parts/`, replacing `PlaceholderEngine`. Add new reusable models to `parts/`, not to the episode.
 6. Follow the check-frames workflow, then render.
 
-## Keeping a song in sync
+## Production rules
 
-`episodes/v12` shows the pattern for a soundtrack that is locked to the engine:
+These define the finished quality level. Follow them for every full episode, in this order. Reasoning and formulas are in [docs/VIDEO_PRODUCTION.md](docs/VIDEO_PRODUCTION.md).
 
-- Choose the tempo in `physics.ts` so firing events fall on a musical grid while slowed. In the V12, 150 BPM makes redline exactly 32nd notes, which is why `SLOW` is derived (43.5×) and RPM steps are redline divided by powers of two.
-- Change slowed RPM only on bar lines, in steps rather than ramps. A ramp would drift the bangs off the grid.
-- Use `phaseLockT` on a downbeat, and set `durationS` to a whole number of bars.
+**Story and facts**
+
+- Answer one question per video: hook, slow down, explain in steps, return to real speed, payoff.
+- Source each spec separately, and record confidence in the `physics.ts` comment when a figure is single-sourced, forum-sourced or variant-specific. Tell the user about weak sources.
+- Check that firing order, crank layout and bank alternation agree with each other, not only that a citation exists.
+- Never present an invented number as real. Label illustrative values on screen.
+
+**Beat grid**
+
+- Choose the tempo from the engine: `SLOW = redline bangs per second / ((BPM / 60) × subdivision)`. Derive `SLOW` rather than typing it.
+- Use RPM steps of redline divided by powers of two, so each halving moves up one note value.
+- Pick a BPM where `60 × fps / BPM` is a whole number, and make the duration a whole number of bars.
+- Change slowed RPM only on bar lines, in steps. Never ramp while slowed.
+- Use `phaseLockT` on a downbeat and `beatT`/`barT` for times. Add a test that every slowed bang is on the grid.
+
+**Song**
+
+- Make a real song with chords, bass, drums, melody and an arrangement that builds with the story.
 - Turn slowed firing events into drum hits directly from the bang list, so they cannot drift.
-- Put bars, kicks and other shared musical data in the episode's `song.ts`, read by both `audio.ts` and the visuals.
-- Tune the song to the engine (`SONG_A4_HZ`), and give `toneChecks` a `minHz`/`maxHz` band above the bass, chords and lead so `verify-audio` measures the engine.
+- Tune the song to the engine (`SONG_A4_HZ`) and keep the lead below the engine's note.
+- Put shared musical data in the episode's `song.ts`, read by both `audio.ts` and the visuals.
+- Give `toneChecks` a `minHz`/`maxHz` band above the music so `verify-audio` measures the engine.
+- Timing can be measured but taste cannot. Get the user's approval on the song before building on it.
+- Once approved, record the WAV's SHA-256 and confirm it is unchanged after any later work.
 
-## Keeping shots clear
+**Shots**
 
-Detail is only useful if the viewer knows where to look. `episodes/v12` uses these tools:
+- Write a shot list first: bar number, one subject, caption and diagram for each shot.
+- Put every camera arrival, caption change, label and flash on a bar or beat.
+- Keep the subject between the HUD (y=484) and the captions (y=1290). At 40° field of view, camera distance is about 3.3 × subject height.
+- The scene and overlay must use the same `cameraAt`.
 
-- **One subject per shot.** `focusAt` in `timeline.ts` names the shot's subject; `DimContext` fades everything else back, and faded parts drop their fine detail.
-- **Colour means a job.** Part and stroke colours live in `core/theme.ts` and are the same in 3D, callouts and diagrams.
-- **Callouts** (`core/Callout.tsx`) sit in fixed screen columns. List them in the same top-to-bottom order as their parts so leader lines don't cross, and bring them in on beats.
-- **Diagrams** (`core/diagrams.tsx`) sit under the captions and take their values from physics. If a value is illustrative rather than sourced, say so on screen, as the valve-timing panel does.
+**Detail**
+
+- Use real kinematics, and make parts touch where they touch in a real engine.
+- Build only what can be seen: art pixels per unit ≈ `960 / (0.73 × camera distance)` at pixel size 2. Below about 3 art pixels a part won't read.
+- Prioritise detail that explains the process, such as gas, sparks, fuel and exhaust, over decoration.
+- Keep environment props on the far side of the car from the camera, and put reusable models in `src/parts/`.
+
+**Clarity**
+
+- One subject per shot: `focusAt` names it, and `DimContext` fades the rest and drops their fine detail.
+- Colour means a job. Define part and stroke colours once in `core/theme.ts`, and use them in 3D, callouts and diagrams alike.
+- Show what is invisible, such as gas coloured by stroke.
+- Name parts with `core/Callout.tsx`, one per beat, in the same top-to-bottom order as the parts. Compute which way the axes run in a shot before choosing label sides.
+- Explain with a live panel from `core/diagrams.tsx`, driven by physics.
+
+**Changing finished work**
+
+- Record what must not change before starting: stills, the audio hash, or both.
+- Prove refactors neutral by byte comparison. Keep intentional changes in a separate commit and report which frames changed.
+- Visual-only work must leave `audio.ts`, `song.ts` and physics timing alone.
+
+**Publishing**
+
+- Before a public push, scan staged files for keys and personal data, and all history for a new repo.
+- Use a GitHub no-reply address. Keep generated media and unlicensed third-party files out of the repo.
 
 ## Things to preserve
 
