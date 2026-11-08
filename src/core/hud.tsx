@@ -146,6 +146,8 @@ export type EngineHudConfig = {
   redline: number;
   tachMax: number;
   tachRedFrom: number;
+  /** Beat within the bar (0-3). When set, the HUD shows a four-light beat counter. */
+  beatAt?: (t: number) => number;
 };
 
 /** RPM, bangs per second, rev bar, what-you-hear strip and note readout. */
@@ -165,6 +167,13 @@ export const EngineHud: React.FC<{ t: number; config: EngineHudConfig }> = ({ t,
         <span style={{ color: slowed ? UI.cream : UI.yellow }}>{slowed ? `SLOWED ${slow}×` : "REAL SPEED"}</span>
       </div>
       <BigNumbers left={fmtInt(rpm)} right={fmtInt(bangs)} leftColor={hot ? UI.red : UI.cream} />
+      {config.beatAt ? (
+        <div style={{ position: "absolute", right: 28, top: 84, display: "flex", gap: 10 }}>
+          {[0, 1, 2, 3].map((b) => (
+            <div key={b} style={{ width: 26, height: 26, background: b === config.beatAt?.(t) ? UI.yellow : "#262848" }} />
+          ))}
+        </div>
+      ) : null}
       <RevBar rpm={rpm} max={tachMax} redFrom={tachRedFrom} hot={hot} />
       <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginTop: 12 }}>
         <WhatYouHear t={t} engine={engine} isSlowed={isSlowed} hudIn={hudIn} realSpeedStart={realSpeedStart} redline={redline} />

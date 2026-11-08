@@ -51,17 +51,28 @@ export const Wheel: React.FC<{ x: number; z: number }> = ({ x, z }) => {
         <cylinderGeometry args={[0.7, 0.7, 0.1, 10]} />
         <meshLambertMaterial color={C.metalLight} flatShading />
       </mesh>
+      {/* brake disc and caliper, seen through the spokes */}
+      <mesh position={[0, out * 1.1, 0]}>
+        <cylinderGeometry args={[2.1, 2.1, 0.12, 16]} />
+        <meshLambertMaterial color={C.metal} flatShading />
+      </mesh>
+      <mesh position={[1.25, out * 1.12, 0.3]}>
+        <boxGeometry args={[1.3, 0.5, 1.7]} />
+        <meshLambertMaterial color={C.red} flatShading />
+      </mesh>
     </group>
   );
 };
 
 /** Studio floor and a soft rectangular shadow under the car. */
-export const Ground: React.FC<{ shadow?: [number, number] }> = ({ shadow = [54, 24] }) => (
+export const Ground: React.FC<{ shadow?: [number, number]; floor?: boolean }> = ({ shadow = [54, 24], floor = true }) => (
   <>
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
-      <planeGeometry args={[400, 400]} />
-      <meshLambertMaterial color={C.floor} />
-    </mesh>
+    {floor ? (
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
+        <planeGeometry args={[400, 400]} />
+        <meshLambertMaterial color={C.floor} />
+      </mesh>
+    ) : null}
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
       <planeGeometry args={shadow} />
       <meshBasicMaterial color={C.shadow} />

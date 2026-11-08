@@ -9,14 +9,14 @@ import { useVideoConfig } from "remotion";
 import { CAMERA_FAR, CAMERA_NEAR, type CameraFn } from "./camera";
 import { C, PIXEL_SIZE } from "./theme";
 
-const PixelPass: React.FC = () => {
+const PixelPass: React.FC<{ pixelSize: number }> = ({ pixelSize }) => {
   const { gl, scene, camera, size } = useThree();
   const composer = useMemo(() => {
     const c = new EffectComposer(gl);
-    c.addPass(new RenderPixelatedPass(PIXEL_SIZE, scene, camera, { normalEdgeStrength: 0.35, depthEdgeStrength: 0.5 }));
+    c.addPass(new RenderPixelatedPass(pixelSize, scene, camera, { normalEdgeStrength: 0.35, depthEdgeStrength: 0.5 }));
     c.addPass(new OutputPass());
     return c;
-  }, [gl, scene, camera]);
+  }, [gl, scene, camera, pixelSize]);
   useEffect(() => composer.setSize(size.width, size.height), [composer, size]);
   useFrame(() => composer.render(), 1);
   return null;
@@ -38,7 +38,7 @@ const CameraRig: React.FC<{ t: number; cameraAt: CameraFn }> = ({ t, cameraAt })
 };
 
 /** The standard 3D setup: canvas, lights, camera rig and pixel pass around an episode's models. */
-export const PixelStage: React.FC<{ t: number; cameraAt: CameraFn; children: React.ReactNode }> = ({ t, cameraAt, children }) => {
+export const PixelStage: React.FC<{ t: number; cameraAt: CameraFn; children: React.ReactNode; pixelSize?: number }> = ({ t, cameraAt, children, pixelSize = PIXEL_SIZE }) => {
   const { width, height } = useVideoConfig();
   return (
     <ThreeCanvas width={width} height={height} flat linear={false} camera={{ fov: 30, position: [40, 15, 40] }}>
@@ -48,7 +48,7 @@ export const PixelStage: React.FC<{ t: number; cameraAt: CameraFn; children: Rea
       <directionalLight position={[-30, 15, 30]} intensity={0.55} color="#b9c0ff" />
       <CameraRig t={t} cameraAt={cameraAt} />
       {children}
-      <PixelPass />
+      <PixelPass pixelSize={pixelSize} />
     </ThreeCanvas>
   );
 };

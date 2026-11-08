@@ -14,5 +14,6 @@ export type EpisodeProps = { withAudio?: boolean };
 /**
  * One real-speed section the audio must match. Picked to avoid rev ramps and whooshes.
  * `channel` analyses one stereo side, for episodes that pan each bank to its own side. Default is mono.
+ * `minHz` and `maxHz` narrow the search when music shares the mix, so the check measures the engine.
  */
-export type ToneCheck = { label: string; from: number; to: number; expectedHz: number; channel?: "left" | "right" };
+export type ToneCheck = { label: string; from: number; to: number; expectedHz: number; channel?: "left" | "right"; minHz?: number; maxHz?: number };

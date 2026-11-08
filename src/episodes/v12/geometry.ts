@@ -3,7 +3,7 @@
 import * as THREE from "three";
 import { smoothstep } from "../../core/math";
 import { wristDistance } from "../../parts/PistonRod";
-import { BANK_ANGLE_DEG, cycleAt, isRightBank, SLOW_START, STROKE_MM } from "./physics";
+import { barT, beatT, BANK_ANGLE_DEG, cycleAt, isRightBank, SLOW_START, STROKE_MM } from "./physics";
 
 export const CRANK_R = STROKE_MM / 200;
 export const ROD_L = 1.5;
@@ -35,18 +35,19 @@ export const wristDist = (c: number) => wristDistance(c, CRANK_R, ROD_L);
 export const ENGINE_X = 11;
 export const ENGINE_REST_Y = 4.6;
 export const LIFT = 9.5;
-const LIFT_UP_S = 1.6;
-const LOWER_FROM = 24.0;
-const LOWER_S = 2.4;
+// The engine rises during one bar and drops back during another.
+const LIFT_S = barT(1);
+const LOWER_FROM = beatT(60);
 
 export const liftAt = (t: number) => {
   if (t < SLOW_START) return 0;
-  if (t < SLOW_START + LIFT_UP_S) return LIFT * smoothstep((t - SLOW_START) / LIFT_UP_S);
+  if (t < SLOW_START + LIFT_S) return LIFT * smoothstep((t - SLOW_START) / LIFT_S);
   if (t < LOWER_FROM) return LIFT;
-  if (t < LOWER_FROM + LOWER_S) return LIFT * (1 - smoothstep((t - LOWER_FROM) / LOWER_S));
+  if (t < LOWER_FROM + LIFT_S) return LIFT * (1 - smoothstep((t - LOWER_FROM) / LIFT_S));
   return 0;
 };
-export const coverAngleAt = (t: number) => (liftAt(t) / LIFT) * 1.15; // radians
+/** The split engine cover folds outward about its hinges, radians. */
+export const coverAngleAt = (t: number) => (liftAt(t) / LIFT) * 3.1;
 
 export const engineOrigin = (t: number) => new THREE.Vector3(ENGINE_X, ENGINE_REST_Y + liftAt(t), 0);
 

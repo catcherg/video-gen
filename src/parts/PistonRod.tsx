@@ -12,22 +12,60 @@ export const wristDistance = (c: number, crankR: number, rodL: number) => {
 /** Crank-pin position in the cylinder's (y, z) plane at crank angle c (deg). */
 export const crankPinInBank = (c: number, crankR: number): [number, number] => [crankR * Math.cos(c * D2R), crankR * Math.sin(c * D2R)];
 
-/** Rod between two points in the cylinder's (y, z) plane. */
+const ALONG_X: [number, number, number] = [0, 0, Math.PI / 2];
+
+/** I-beam rod with a bolted big-end cap and a small-end eye, between two points in the cylinder's (y, z) plane. */
 const Rod: React.FC<{ a: [number, number]; b: [number, number] }> = ({ a, b }) => {
   const dy = b[0] - a[0];
   const dz = b[1] - a[1];
   const len = Math.hypot(dy, dz);
   const beta = Math.atan2(dz, dy);
   return (
-    <mesh position={[0, (a[0] + b[0]) / 2, (a[1] + b[1]) / 2]} rotation={[beta, 0, 0]}>
-      <boxGeometry args={[0.16, len, 0.2]} />
-      <Lam c={C.metal} />
-    </mesh>
+    <group position={[0, (a[0] + b[0]) / 2, (a[1] + b[1]) / 2]} rotation={[beta, 0, 0]}>
+      {/* web and flanges */}
+      <mesh>
+        <boxGeometry args={[0.05, len, 0.18]} />
+        <Lam c={C.metalDark} />
+      </mesh>
+      {[1, -1].map((s) => (
+        <mesh key={s} position={[0, 0, s * 0.09]}>
+          <boxGeometry args={[0.16, len, 0.035]} />
+          <Lam c={C.metal} />
+        </mesh>
+      ))}
+      {/* big end, cap and bolts */}
+      <mesh position={[0, -len / 2, 0]} rotation={ALONG_X}>
+        <cylinderGeometry args={[0.24, 0.24, 0.18, 12]} />
+        <Lam c={C.metal} />
+      </mesh>
+      <mesh position={[0, -len / 2 - 0.2, 0]}>
+        <boxGeometry args={[0.18, 0.12, 0.46]} />
+        <Lam c={C.metalLight} />
+      </mesh>
+      {[1, -1].map((s) => (
+        <mesh key={s} position={[0, -len / 2 - 0.26, s * 0.17]}>
+          <boxGeometry args={[0.09, 0.07, 0.09]} />
+          <Lam c={C.warm} />
+        </mesh>
+      ))}
+      {/* small-end eye */}
+      <mesh position={[0, len / 2, 0]} rotation={ALONG_X}>
+        <cylinderGeometry args={[0.12, 0.12, 0.17, 10]} />
+        <Lam c={C.metalLight} />
+      </mesh>
+    </group>
   );
 };
 
+const RELIEFS: [number, number][] = [
+  [-0.17, 0.17],
+  [0.17, 0.17],
+  [-0.17, -0.17],
+  [0.17, -0.17],
+];
+
 /**
- * Piston, rings and rod in the cylinder's local frame (bore axis = +y, crank centre at the origin).
+ * Piston, rings, wrist pin and rod in the cylinder's local frame (bore axis = +y, crank centre at the origin).
  * `heat` 0..1 colours the crown during combustion.
  */
 export const PistonRod: React.FC<{ crown: number; wrist: number; pin: [number, number]; radius: number; height: number; heat: number }> = ({
@@ -49,12 +87,24 @@ export const PistonRod: React.FC<{ crown: number; wrist: number; pin: [number, n
         <cylinderGeometry args={[radius * 0.98, radius * 0.98, 0.03, 14]} />
         <Lam c={crownColor} e={crownColor} ei={heat > 0.02 ? 0.9 : 0} />
       </mesh>
-      {[0.12, 0.22].map((d) => (
+      {/* valve reliefs in the crown */}
+      {RELIEFS.map(([x, z]) => (
+        <mesh key={`${x}${z}`} position={[x, crown + 0.012, z]}>
+          <cylinderGeometry args={[0.1, 0.1, 0.012, 10]} />
+          <Lam c={C.metalDark} />
+        </mesh>
+      ))}
+      {[0.12, 0.22, 0.3].map((d) => (
         <mesh key={d} position={[0, crown - d, 0]}>
           <cylinderGeometry args={[radius + 0.012, radius + 0.012, 0.035, 14]} />
           <Lam c={C.metalDark} />
         </mesh>
       ))}
+      {/* wrist pin, visible through the skirt */}
+      <mesh position={[0, wrist, 0]} rotation={ALONG_X}>
+        <cylinderGeometry args={[0.075, 0.075, radius * 2 + 0.02, 8]} />
+        <Lam c={C.spring} />
+      </mesh>
       <Rod a={pin} b={[wrist, 0]} />
     </>
   );

@@ -6,6 +6,16 @@ out/
 public/*/audio.wav
 poc/public/audio.wav
 
+# Secrets and local settings
+.env
+.env.*
+*.pem
+*.key
+.claude/settings.local.json
+
+# Third-party Remotion skills. Restore with: npx skills experimental_install
+.claude/skills/
+
 # Remotion / tooling caches
 .remotion/
 *.tsbuildinfo

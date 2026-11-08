@@ -85,10 +85,14 @@ export type EngineAudioSettings = {
   thump: ThumpSettings;
   pulse: PulseSettings;
   shaping: ToneShaping;
-  bed: MusicBed;
+  /** Simple looping backing. Leave out when the episode supplies a `song`. */
+  bed?: MusicBed;
   whooshes: Whoosh[];
   mix: MixSettings;
 };
+
+/** A full stereo music track, plus an optional per-sample gain for the real-speed engine tone. */
+export type SongTrack = { L: Float32Array; R: Float32Array; engineGain?: Float32Array };
 
 /** Starting point for an episode: spread this, then set voiceOf and whooshes. */
 export const defaultEngineAudio: Omit<EngineAudioSettings, "voiceOf" | "whooshes"> = {
@@ -152,6 +156,8 @@ export type EngineAudioInput = {
   bangs: Bang[];
   isSlowed: (t: number) => boolean;
   settings: EngineAudioSettings;
+  /** Builds the song. It receives the same seeded generator as the engine synthesis. */
+  song?: (sampleCount: number, rnd: Rng) => SongTrack;
 };
 
 const addThumps = (bangs: Bang[], s: EngineAudioSettings, rnd: Rng, L: Float32Array, R: Float32Array) => {
@@ -247,7 +253,7 @@ const addWhoosh = ({ at, rising }: Whoosh, rnd: Rng, L: Float32Array, R: Float32
 
 export type StereoAudio = { L: Float32Array; R: Float32Array; norm: number; summary: string };
 
-export const renderEngineAudio = ({ durationS, bangs, isSlowed, settings }: EngineAudioInput): StereoAudio => {
+export const renderEngineAudio = ({ durationS, bangs, isSlowed, settings, song }: EngineAudioInput): StereoAudio => {
   const N = Math.ceil(durationS * SR);
   const rnd = createRng(settings.seed);
   const L = new Float32Array(N);
@@ -263,8 +269,9 @@ export const renderEngineAudio = ({ durationS, bangs, isSlowed, settings }: Engi
   addPulses(bangs.filter((b) => !isSlowed(b.t)), settings, rnd, pulsesL, pulsesR);
   shapeTone(pulsesL, settings.shaping);
   shapeTone(pulsesR, settings.shaping);
-  renderBed(settings.bed, bedL, bedR);
+  if (settings.bed) renderBed(settings.bed, bedL, bedR);
   for (const w of settings.whooshes) addWhoosh(w, rnd, L, R);
+  const track = song?.(N, rnd);
 
   const m = settings.mix;
   for (let i = 0; i < N; i++) {
@@ -272,8 +279,9 @@ export const renderEngineAudio = ({ durationS, bangs, isSlowed, settings }: Engi
     const bedGain = isSlowed(t) ? m.bedGainSlowed : m.bedGainReal;
     const fadeIn = smoothstep(t / m.fadeInS);
     const fadeOut = 1 - smoothstep((t - (durationS - m.fadeOutS)) / m.fadeOutS);
-    const l = L[i] + thumpL[i] * m.thumpGain + pulsesL[i] * m.pulseGain + bedL[i] * bedGain;
-    const r = R[i] + thumpR[i] * m.thumpGain + pulsesR[i] * m.pulseGain + bedR[i] * bedGain;
+    const engine = m.pulseGain * (track?.engineGain?.[i] ?? 1);
+    const l = L[i] + thumpL[i] * m.thumpGain + pulsesL[i] * engine + bedL[i] * bedGain + (track?.L[i] ?? 0);
+    const r = R[i] + thumpR[i] * m.thumpGain + pulsesR[i] * engine + bedR[i] * bedGain + (track?.R[i] ?? 0);
     L[i] = Math.tanh(l * m.masterDrive) * fadeIn * fadeOut;
     R[i] = Math.tanh(r * m.masterDrive) * fadeIn * fadeOut;
   }

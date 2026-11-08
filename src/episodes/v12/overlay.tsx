@@ -9,7 +9,8 @@ import { EngineHud, HUD_BOTTOM, type EngineHudConfig } from "../../core/hud";
 import { Tag } from "../../core/Tag";
 import { UI } from "../../core/theme";
 import { CAMS_LABEL_D, crownWorld, cylPoint, engineOrigin } from "./geometry";
-import { CYLINDERS, cycleAt, engine, isSlowed, REAL_SPEED_START, REDLINE, SLOW, SLOW_START, TACH_MAX, TACH_RED_FROM } from "./physics";
+import { CYLINDERS, cycleAt, DROP, engine, isSlowed, REAL_SPEED_START, REDLINE, SLOW, SLOW_START, TACH_MAX, TACH_RED_FROM } from "./physics";
+import { beatInBar } from "./song";
 import { cameraAt, CAPTIONS, END_FADE_FROM, HUD_IN, SHOW_BANK_LABELS, SHOW_CRANK_TAG, SHOW_CYL_NUMBERS, SHOW_STROKE_TAG } from "./timeline";
 
 const project = makeProjector(cameraAt);
@@ -27,6 +28,7 @@ const HUD_CONFIG: EngineHudConfig = {
   redline: REDLINE,
   tachMax: TACH_MAX,
   tachRedFrom: TACH_RED_FROM,
+  beatAt: beatInBar,
 };
 
 const Labels: React.FC<{ t: number; w: number; h: number }> = ({ t, w, h }) => {
@@ -74,7 +76,7 @@ export const Overlay: React.FC = () => {
       <Labels t={t} w={width} h={height} />
       <EngineHud t={t} config={HUD_CONFIG} />
       <Captions t={t} captions={CAPTIONS} />
-      <Flashes t={t} at={[SLOW_START, REAL_SPEED_START]} endFadeFrom={END_FADE_FROM} />
+      <Flashes t={t} at={[SLOW_START, REAL_SPEED_START, DROP]} endFadeFrom={END_FADE_FROM} />
     </AbsoluteFill>
   );
 };

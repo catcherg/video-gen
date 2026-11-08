@@ -33,7 +33,7 @@ const signal = (channel: ToneCheck["channel"]) => {
 let failed = false;
 for (const check of await loadToneChecks(slug)) {
   const section = signal(check.channel).subarray(Math.round(check.from * sampleRate), Math.round(check.to * sampleRate));
-  const [top, ...rest] = spectralPeaks(section, sampleRate, SEARCH_MIN_HZ, SEARCH_MAX_HZ);
+  const [top, ...rest] = spectralPeaks(section, sampleRate, check.minHz ?? SEARCH_MIN_HZ, check.maxHz ?? SEARCH_MAX_HZ);
   const error = Math.abs(top.hz - check.expectedHz) / check.expectedHz;
   const ok = error <= TOLERANCE;
   failed ||= !ok;

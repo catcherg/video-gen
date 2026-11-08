@@ -77,8 +77,19 @@ After rendering, run `npm run verify-audio <slug>`.
 5. Build the scene from `src/parts/`, replacing `PlaceholderEngine`. Add new reusable models to `parts/`, not to the episode.
 6. Follow the check-frames workflow, then render.
 
+## Keeping a song in sync
+
+`episodes/v12` shows the pattern for a soundtrack that is locked to the engine:
+
+- Choose the tempo in `physics.ts` so firing events fall on a musical grid while slowed. In the V12, 150 BPM makes redline exactly 32nd notes, which is why `SLOW` is derived (43.5×) and RPM steps are redline divided by powers of two.
+- Change slowed RPM only on bar lines, in steps rather than ramps. A ramp would drift the bangs off the grid.
+- Use `phaseLockT` on a downbeat, and set `durationS` to a whole number of bars.
+- Turn slowed firing events into drum hits directly from the bang list, so they cannot drift.
+- Put bars, kicks and other shared musical data in the episode's `song.ts`, read by both `audio.ts` and the visuals.
+- Tune the song to the engine (`SONG_A4_HZ`), and give `toneChecks` a `minHz`/`maxHz` band above the bass, chords and lead so `verify-audio` measures the engine.
+
 ## Things to preserve
 
 - Audio synthesis order matters. `createRng` output depends on call order, so reordering synthesis steps changes the WAV.
 - `scene.tsx` and `overlay.tsx` must use the same `cameraAt`, or labels drift off their parts.
-- The Remotion agent skills in `.claude/skills/` cover general Remotion API usage. This file overrides them for this project.
+- The Remotion agent skills cover general Remotion API usage. This file overrides them for this project. They are not stored in this repo; restore them into `.claude/skills/` with `npx skills experimental_install`, which reads `skills-lock.json`.

@@ -23,7 +23,6 @@ export const BORE_MM = 95;
 export const STROKE_MM = 76.4;
 export const BANK_ANGLE_DEG = 60;
 export const REDLINE = 8700;
-export const IDLE = 1100;
 export const CAMSHAFTS = 4;
 export const VALVES_PER_CYLINDER = 4;
 
@@ -45,25 +44,45 @@ export const CRANK_PINS: [number, number][] = [
 ];
 export const isRightBank = (cyl: number) => cyl <= 6;
 
-export const SLOW = 40; // slow-motion factor in the explainer section
-export const SLOW_START = 3.0;
-export const REAL_SPEED_START = 22.5;
+// ---- the beat ----
+// The song's tempo is chosen so the engine lands on it exactly: at redline, slowed, the firing
+// rate is 32nd notes at this BPM. Each halving of RPM then moves up one note value, so 16ths,
+// 8ths and quarter notes are literally the engine at 1/2, 1/4 and 1/8 of redline.
+export const BPM = 150;
+export const BEATS_PER_BAR = 4;
+export const BARS = 20;
+/** On-screen time of a beat. Written as a single division so grid times match the crank table exactly. */
+export const beatT = (beat: number) => (beat * 60) / BPM;
+export const barT = (bar: number) => beatT(bar * BEATS_PER_BAR);
+
+const REDLINE_BANGS = (REDLINE / 60) * (CYLINDERS / 2);
+export const SLOW = REDLINE_BANGS / ((BPM / 60) * 8);
+export const IDLE = REDLINE / 8;
+
+export const SLOW_START = barT(2);
+export const REAL_SPEED_START = barT(14);
+export const DROP = barT(16);
 
 export const isSlowed = (t: number) => t >= SLOW_START && t < REAL_SPEED_START;
 export const slowAt = (t: number) => (isSlowed(t) ? SLOW : 1);
 
 export const rpmAt = (t: number): number => {
-  if (t < SLOW_START) return ramp(t, 0, 0.7, 6500, REDLINE);
-  if (t < 11.5) return IDLE;
-  if (t < 15.8) return ramp(t, 11.5, 12.3, IDLE, 2200);
-  if (t < 19.6) return ramp(t, 15.8, 16.6, 2200, 4400);
-  if (t < REAL_SPEED_START) return ramp(t, 19.6, 20.6, 4400, REDLINE);
-  if (t < 30.6) return ramp(t, 23.0, 24.8, IDLE, REDLINE);
-  return ramp(t, 30.6, 31.6, REDLINE, 1600);
+  if (t < SLOW_START) return REDLINE;
+  if (t < barT(8)) return IDLE;
+  if (t < barT(10)) return IDLE * 2;
+  if (t < barT(12)) return IDLE * 4;
+  if (t < REAL_SPEED_START) return REDLINE;
+  // Back at real speed the engine climbs in octaves on the beat, then opens up into the drop.
+  if (t < beatT(58)) return IDLE;
+  if (t < beatT(60)) return IDLE * 2;
+  if (t < beatT(62)) return IDLE * 4;
+  if (t < DROP) return ramp(t, beatT(62), DROP, IDLE * 4, REDLINE);
+  if (t < barT(19)) return REDLINE;
+  return ramp(t, barT(19), beatT(79), REDLINE, IDLE);
 };
 
-// Cylinder 1 fires exactly at the "only one is a bang" beat.
-export const BANG_BEAT = 8.0;
+// Cylinder 1 fires exactly on this downbeat, which puts every slowed bang on the grid.
+export const BANG_BEAT = barT(5);
 
 export const engine = createFourStroke({
   firingOrder: FIRING_ORDER,
@@ -75,8 +94,17 @@ export const engine = createFourStroke({
 
 export const { crankAt, cycleAt, bangs: BANGS, firstBangAfter, bangsPerSecond } = engine;
 
-/** Sections held at redline at real speed, clear of rev ramps and whooshes. */
+/** The engine's redline note. The song is tuned so this is exactly its tonic, A. */
+export const ENGINE_NOTE_HZ = bangsPerSecond(REDLINE);
+/** A4 for the song: one octave below the engine's redline note. */
+export const SONG_A4_HZ = ENGINE_NOTE_HZ / 2;
+
+/**
+ * Sections held at redline at real speed, clear of rev ramps and whooshes. The search band sits
+ * above the song's bass, chords and lead, so the check measures the engine and not the music.
+ */
+const ENGINE_BAND = { minHz: 780, maxHz: 2000 };
 export const toneChecks: ToneCheck[] = [
-  { label: "opening", from: 0.8, to: 2.6, expectedHz: bangsPerSecond(REDLINE) },
-  { label: "finale", from: 25.0, to: 30.4, expectedHz: bangsPerSecond(REDLINE) },
+  { label: "opening", from: 0.06, to: 1.5, expectedHz: ENGINE_NOTE_HZ, ...ENGINE_BAND },
+  { label: "finale", from: 25.7, to: 30.3, expectedHz: ENGINE_NOTE_HZ, ...ENGINE_BAND },
 ];
