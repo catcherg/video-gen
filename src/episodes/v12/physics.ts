@@ -8,7 +8,11 @@
 //   8,700 rpm maximum engine speed (Aventador SVJ variant, reported spec, not confirmed in factory text):
 //     https://openers.jp/en/car/car_news/1662796
 //     https://www.autoexpress.co.uk/lamborghini/aventador/104421/new-lamborghini-aventador-svj-blasts-in-at-pebble-beach-with-759bhp
-//   Firing order: carried over unchanged from the proof of concept for now.
+//   Firing order 1-12-4-9-2-11-6-7-3-10-5-8 (Aventador L539; earlier Lamborghini V12s used a different order):
+//     http://www.kfz-tech.de/Engl/Buchprojekte/Lamborghini/LamborghiniV121.htm
+//     https://en.wikipedia.org/wiki/Lamborghini_Aventador (table row is uncited)
+//     Secondary sources only; no factory workshop manual was found. Which physical bank is
+//     1-6 is likewise unconfirmed for this engine, and the labels assume right = 1-6.
 
 import { createFourStroke } from "../../core/engine/fourStroke";
 import type { ToneCheck } from "../../core/episode";
@@ -28,7 +32,7 @@ export const TACH_MAX = 9000;
 export const TACH_RED_FROM = 8000;
 
 // Cylinders 1-6 = right bank, 7-12 = left bank.
-export const FIRING_ORDER = [1, 7, 4, 10, 2, 8, 6, 12, 3, 9, 5, 11];
+export const FIRING_ORDER = [1, 12, 4, 9, 2, 11, 6, 7, 3, 10, 5, 8];
 export const CYLINDERS = FIRING_ORDER.length;
 /** Each pin carries one rod from each bank. */
 export const CRANK_PINS: [number, number][] = [

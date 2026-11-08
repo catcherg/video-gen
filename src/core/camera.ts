@@ -30,6 +30,13 @@ export const makeCameraRig = (keys: CameraKey[]): CameraFn => (t) => {
   return { pos, target: lerp(a.target, b.target), fov: a.fov + (b.fov - a.fov) * u };
 };
 
+/** Keeps a label's centre clear of the frame edges and below a top limit such as the HUD. */
+export const keepClear = <P extends { x: number; y: number }>(p: P, width: number, top: number, sideMargin: number): P => ({
+  ...p,
+  x: Math.min(width - sideMargin, Math.max(sideMargin, p.x)),
+  y: Math.max(top, p.y),
+});
+
 /** Projects a world point to screen pixels using the same camera the scene draws with. */
 export const makeProjector = (cameraAt: CameraFn) => (p: THREE.Vector3, t: number, w: number, h: number) => {
   const cam = cameraAt(t);

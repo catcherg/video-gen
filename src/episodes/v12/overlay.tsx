@@ -1,11 +1,11 @@
 import * as THREE from "three";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
-import { makeProjector } from "../../core/camera";
+import { keepClear, makeProjector } from "../../core/camera";
 import { Captions } from "../../core/Captions";
 import { strokeName } from "../../core/engine/fourStroke";
 import { Flashes } from "../../core/Flashes";
 import { useFonts } from "../../core/fonts";
-import { EngineHud, type EngineHudConfig } from "../../core/hud";
+import { EngineHud, HUD_BOTTOM, type EngineHudConfig } from "../../core/hud";
 import { Tag } from "../../core/Tag";
 import { UI } from "../../core/theme";
 import { CAMS_LABEL_D, crownWorld, cylPoint, engineOrigin } from "./geometry";
@@ -13,6 +13,10 @@ import { CYLINDERS, cycleAt, engine, isSlowed, REAL_SPEED_START, REDLINE, SLOW, 
 import { cameraAt, CAPTIONS, END_FADE_FROM, HUD_IN, SHOW_BANK_LABELS, SHOW_CRANK_TAG, SHOW_CYL_NUMBERS, SHOW_STROKE_TAG } from "./timeline";
 
 const project = makeProjector(cameraAt);
+
+// Half of a cylinder-number tag's height and width, plus a small gap.
+const CYL_TAG_CLEARANCE = 30;
+const CYL_TAG_MARGIN = 46;
 
 const HUD_CONFIG: EngineHudConfig = {
   engine,
@@ -30,8 +34,9 @@ const Labels: React.FC<{ t: number; w: number; h: number }> = ({ t, w, h }) => {
   const slowed = isSlowed(t);
   if (SHOW_CYL_NUMBERS(t)) {
     for (let cyl = 1; cyl <= CYLINDERS; cyl++) {
-      const p = project(cylPoint(cyl, CAMS_LABEL_D, t), t, w, h);
-      if (!p.visible) continue;
+      const projected = project(cylPoint(cyl, CAMS_LABEL_D, t), t, w, h);
+      if (!projected.visible) continue;
+      const p = keepClear(projected, w, HUD_BOTTOM + CYL_TAG_CLEARANCE, CYL_TAG_MARGIN);
       const hot = slowed ? cycleAt(cyl, t) < 110 : false;
       out.push(<Tag key={`c${cyl}`} x={p.x} y={p.y} text={`${cyl}`} hot={hot} size={24} />);
     }

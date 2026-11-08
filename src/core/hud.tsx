@@ -8,6 +8,9 @@ const INNER_W = HUD_W - 56;
 const STRIP_W = 560;
 const STRIP_WINDOW_S = 2.0;
 
+/** Lowest screen y the HUD panel reaches, including its outline. Labels stay below this. */
+export const HUD_BOTTOM = 484;
+
 export const HudPanel: React.FC<{ pop: number; children: React.ReactNode }> = ({ pop, children }) => (
   <div
     style={{
