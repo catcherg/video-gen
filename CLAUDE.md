@@ -38,23 +38,33 @@ Update the status of each milestone in `docs/PROJECT_STATUS.md`.
    - Separate the subject-neutral core from an engine kit.
    - Define the video spec, and have it drive V12's format, song grid, facts and captions.
    - Prove every finished video is byte-identical afterwards, in both frames and audio.
-2. **Product decisions.** These shape everything after them, and they are the user's to make.
-   - Define "8-bit": whether colours are limited to a fixed palette, and whether every song must be chiptune.
-   - Decide who uses the interface, and where renders run. Byte-exact renders are so far proven only on this Mac's GPU.
-3. **Generic visual library.** Shape, motion and layout tools, general diagrams (charts, timelines, flows, comparisons, maps), code checks for generated scenes, and shared Reels and TikTok safe zones.
-4. **Song generator.** Style and structure in, a seeded and repeatable WAV out, with the data `song-map` needs generated too, so it runs automatically. The user listens across several styles and seeds.
+2. **Product decisions.** Done; recorded under [Product decisions](#product-decisions).
+3. **Generic visual library.** Shape, motion and layout tools, general diagrams (charts, timelines, flows, comparisons, maps), code checks for generated scenes, shared Reels and TikTok safe zones, and a palette for each video set in its spec.
+4. **Song generator.** Style and structure in, a seeded and repeatable WAV out, with the data `song-map` needs generated too, so it runs automatically. Two styles: deep bass house by default, and dubstep for slower, more dramatic videos. Tempos must land on whole frames: at 30 fps, 14 frames a beat is about 128.6 BPM for house and 13 frames is about 138.5 BPM for dubstep. Check that bass hits still read on phone speakers, which reproduce little sub-bass. The user listens across both styles and several seeds.
 5. **Non-machine videos from specs.** "Why the sky is blue", then a history or finance topic to test sourcing. Neither may need changes to framework code.
 6. **Automated checks.** Replace the manual reviews: frame checks, overlaps, on-screen numbers, drum timing and frame comparison. The pipeline can't retry on its own without these.
-7. **AI pipeline, run headless.** Uploads become facts, then a story, a spec and scene code, with automatic retries when checks fail. It is one command with resumable stages that stop for approval of facts, song and frames; those stops become the interface's screens. Track the cost and time per video.
-8. **Sandboxing and licensing.** Required before anyone other than the user can generate videos; skip it if the interface stays personal.
-   - Isolate generated code from the network and file system, because an uploaded document could steer what gets written.
-   - Check Remotion's licence for the planned use. It is free for individuals and for-profit companies with up to 3 employees, larger companies need a paid licence, and selling a modified copy of Remotion is not allowed.
+7. **AI pipeline, run headless.** Uploads become facts, then a story, a spec and scene code, with automatic retries when checks fail. It is one command with resumable stages that stop for approval of facts, song and frames; those stops become the interface's screens. Track the cost and time per video. Decide how each person gets AI access without sharing the owner's key, given that nothing is hosted.
+8. **Sandboxing and licensing.** Required before friends and family use it.
+   - Isolate generated code from the network and file system, because an uploaded document could steer what gets written and the code runs on the user's own computer.
+   - Keep AI credentials out of anything shared with other people.
+   - Re-check Remotion's licence if use ever goes beyond friends and family. It is free for individuals and for-profit companies with up to 3 employees, larger companies need a paid licence, and selling a modified copy of Remotion is not allowed.
    - Add a licence to this repository, and set a policy for the rights to uploaded material.
 9. **Identity cleanup, at the start of interface work.**
    - Write an in-depth `README.md`, and reframe this file around an interface for generating 8-bit reels.
    - Rename the `engine-reels` package, and change "episode" to "video" in code and commands.
    - Replace the engine-only scaffold with a general template, and move `f1-v8` and `v8-cross-flat` onto the spec.
-10. **Interface and render workers.** Describe, upload, approve the song, review frames, download the video.
+10. **Local interface.** One command starts it and prompts the user to open a local page. On that page they describe, upload, approve the song, review frames and download the video. Renders run on the same computer. Setup must be simple enough for non-developers, and must be tested on computers other than this Mac, including ones without a strong GPU. Renders need to repeat on one computer, but not match byte for byte between computers.
+
+## Product decisions
+
+Decided by the user. Later milestones build on these.
+
+- **8-bit is only a visual style:** pixelated rendering and pixel type. It does not restrict colours or music.
+- **Colours change with the type of video.** There is no fixed framework palette; each video sets its own.
+- **All music is extremely bass-heavy EDM,** with very impactful, punchy bass hits. Deep bass house is the default, and dubstep is the option for slower, more dramatic videos.
+- **Musical inspiration is Odd Mob and Subtronics.** Take inspiration from the style only. Never copy their melodies, vocals, samples or track structures, and keep their names out of what appears in a video.
+- **Users are friends and family.** It is not a public product.
+- **Everyone installs it on their own computer.** Renders run locally, through a local page the user is prompted to open. Nothing is hosted.
 
 ## Layout
 
@@ -166,7 +176,7 @@ These define the finished quality level. Follow them for every full video, in th
 
 **Song**
 
-- Make a real song with chords, bass, drums, melody and an arrangement that builds with the story.
+- Make a real song with chords, bass, drums, melody and an arrangement that builds with the story. New songs follow the styles in [Product decisions](#product-decisions).
 - Put shared musical data in the video's `song.ts`, read by both `audio.ts` and the visuals.
 - Timing can be measured but taste cannot. Get the user's approval on the song before building on it.
 - Once approved, record the WAV's SHA-256 in `docs/PROJECT_STATUS.md` and confirm it is unchanged after any later work.

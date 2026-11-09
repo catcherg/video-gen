@@ -9,15 +9,15 @@ The goal is an interface that turns a description and uploaded information into 
 | # | Milestone | State | Notes |
 |---|---|---|---|
 | 1 | Core split, umbrella folder and spec | Done | All three videos and WAVs were byte-identical before and after. V12 is the only video on the spec so far. |
-| 2 | Product decisions | Waiting on the user | What "8-bit" means, who uses the interface, and where renders run. |
-| 3 | Generic visual library | Not started | Includes the safe zones from the backlog. |
-| 4 | Song generator | Not started | |
+| 2 | Product decisions | Done | Recorded in `CLAUDE.md`. Everyone installs it on their own computer. |
+| 3 | Generic visual library | Not started | Includes the safe zones from the backlog, and a palette per video. |
+| 4 | Song generator | Not started | Deep bass house by default, dubstep as the option for slower, dramatic videos. |
 | 5 | Non-machine videos from specs | Not started | "Why the sky is blue", then a history or finance topic. |
 | 6 | Automated checks | Not started | Includes the sync and frame-comparison scripts from the backlog. |
-| 7 | AI pipeline, run headless | Not started | |
-| 8 | Sandboxing and licensing | Not started | Only needed if people other than the user will generate videos. |
+| 7 | AI pipeline, run headless | Not started | Must settle how each person gets AI access without sharing the owner's key. |
+| 8 | Sandboxing and licensing | Not started | Required before friends and family use it. |
 | 9 | Identity cleanup | Not started | At the start of interface work: README, 8-bit reel framing in `CLAUDE.md`, renames, general template. |
-| 10 | Interface and render workers | Not started | |
+| 10 | Local interface | Not started | One command starts it and prompts the user to open a local page. Renders run on the same computer. Needs simple setup, tested beyond this Mac. |
 
 Known gaps after Milestone 1:
 
