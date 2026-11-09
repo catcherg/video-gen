@@ -1,0 +1,164 @@
+{
+  "version": 1,
+  "slug": "voc-economics",
+  "title": "How the Dutch East India Company made and lost a fortune",
+  "description": "Public shares, a state-backed monopoly and spice islands taken by force made the VOC rich. Profitless growth and war made it bankrupt.",
+  "question": "How did the Dutch East India Company make a fortune, and how did it lose it?",
+  "kit": "none",
+  "palette": "history",
+  "format": { "fps": 30, "width": 1080, "height": 1920, "durationS": 31.2 },
+  "song": {
+    "bpm": 138.46153846153845,
+    "beatsPerBar": 4,
+    "bars": 18,
+    "style": "Dubstep",
+    "lockedWavSha256": "ccbe26888eb19cf0e0ecd0ea5762eec2fe94f6b689e2e4079dad56f460a8befd",
+    "generator": { "style": "dubstep", "seed": 1 }
+  },
+  "facts": [
+    {
+      "id": "capitalM",
+      "claim": "Capital raised at the founding in 1602, in millions of guilders",
+      "value": 6.4,
+      "unit": "million guilders",
+      "confidence": "secondary",
+      "sources": ["https://www.worldhistory.org/Dutch_East_India_Company/", "https://en.wikipedia.org/wiki/Dutch_East_India_Company"],
+      "note": "Wikipedia gives both 6,440,200 and 6,424,588 guilders. Both round to 6.4 million."
+    },
+    {
+      "id": "charterYears",
+      "claim": "Length of the 1602 charter granting the trade monopoly, in years",
+      "value": 21,
+      "unit": "years",
+      "confidence": "secondary",
+      "sources": ["https://www.worldhistory.org/Dutch_East_India_Company/"]
+    },
+    {
+      "id": "outboundVoyages",
+      "claim": "Voyages from the Netherlands to Asia, 1602 to 1795",
+      "value": 4730,
+      "unit": "voyages",
+      "confidence": "secondary",
+      "sources": ["https://resolve.cambridge.org/core/journals/journal-of-southeast-asian-studies/article/between-batavia-and-the-cape-shipping-patterns-of-the-dutch-east-india-company/9CD79760674B0AE0363828DF9FDE9C6D", "https://resources.huygens.knaw.nl/das/EnglishIntro"],
+      "note": "From the Dutch-Asiatic Shipping reference work, as cited by the Cambridge article."
+    },
+    {
+      "id": "nutmegOnlyInBanda",
+      "claim": "In this period nutmeg grew only on the Banda Islands",
+      "value": "only Banda",
+      "confidence": "secondary",
+      "sources": ["https://en.wikipedia.org/wiki/Dutch_conquest_of_the_Banda_Islands"]
+    },
+    {
+      "id": "bandaPopulationBefore",
+      "claim": "Estimated population of the Banda Islands before the 1621 conquest",
+      "value": 15000,
+      "unit": "people",
+      "confidence": "secondary",
+      "sources": ["https://en.wikipedia.org/wiki/Dutch_conquest_of_the_Banda_Islands"],
+      "note": "Corn 1998 and Loth 1995, as cited by Wikipedia. Other estimates start at 13,000. All are uncertain and are labelled as estimates on screen."
+    },
+    {
+      "id": "bandaSurvivors",
+      "claim": "Estimated Bandanese survivors of the conquest",
+      "value": 1000,
+      "unit": "people",
+      "confidence": "secondary",
+      "sources": ["https://en.wikipedia.org/wiki/Dutch_conquest_of_the_Banda_Islands"],
+      "note": "Corn 1998 and Loth 1995, as cited by Wikipedia. Uncertain, and labelled as an estimate on screen."
+    },
+    {
+      "id": "bandaLossPct",
+      "claim": "Estimated share of the Bandanese population killed, enslaved or deported",
+      "value": 90,
+      "unit": "percent",
+      "confidence": "secondary",
+      "sources": ["https://en.wikipedia.org/wiki/Dutch_conquest_of_the_Banda_Islands"],
+      "note": "Lape 2000, as cited by Wikipedia."
+    },
+    {
+      "id": "dividendPct",
+      "claim": "Average annual dividend as a share of capital, for almost 200 years",
+      "value": 18,
+      "unit": "percent",
+      "confidence": "single-source",
+      "sources": ["https://en.wikipedia.org/wiki/Dutch_East_India_Company", "https://en.wikipedia.org/wiki/Dividend"],
+      "note": "Both pages are Wikipedia. The specialist study this comes from wasn't found. The figure is against the original share capital, not what later buyers paid."
+    },
+    {
+      "id": "profit1630sM",
+      "claim": "Average annual profit, 1630 to 1670, in millions of guilders",
+      "value": 2.1,
+      "unit": "million guilders a year",
+      "confidence": "secondary",
+      "sources": ["https://en.wikipedia.org/wiki/Dutch_East_India_Company"]
+    },
+    {
+      "id": "profit1680sM",
+      "claim": "Average annual profit during the expansion of 1680 to 1730, in millions of guilders",
+      "value": 2.0,
+      "unit": "million guilders a year",
+      "confidence": "secondary",
+      "sources": ["https://en.wikipedia.org/wiki/Dutch_East_India_Company"],
+      "note": "Wikipedia calls this period profitless growth."
+    },
+    {
+      "id": "netCapital1780M",
+      "claim": "Total capital net of outstanding debt in 1780, in millions of guilders",
+      "value": 62,
+      "unit": "million guilders",
+      "confidence": "secondary",
+      "sources": ["https://en.wikipedia.org/wiki/Dutch_East_India_Company"]
+    },
+    {
+      "id": "warDamageM",
+      "claim": "Damage suffered in the Fourth Anglo-Dutch War of 1780 to 1784, up to this many millions of guilders",
+      "value": 43,
+      "unit": "million guilders",
+      "confidence": "secondary",
+      "sources": ["https://en.wikipedia.org/wiki/Dutch_East_India_Company"]
+    },
+    {
+      "id": "finalDebtFloorM",
+      "claim": "The debts taken over by the state were more than this many millions of guilders",
+      "value": 100,
+      "unit": "million guilders",
+      "confidence": "secondary",
+      "sources": ["https://outsidethecase.org/dutch-east-india-company-voc/", "https://www.swaen.com/articles-about-trading-companies/voc", "https://www.gutenberg.net.au/VOC.html"],
+      "note": "Published totals disagree: 110 million (Swaen), about 134 million (attributed to Gaastra) and 219 million (Reynders). The video only claims more than 100 million, which all of them support."
+    }
+  ],
+  "shots": [
+    { "from": 0, "to": { "bar": 2 }, "subject": "A company ship, on the hook" },
+    { "from": { "bar": 2 }, "to": { "bar": 4 }, "subject": "Shares and coins" },
+    { "from": { "bar": 4 }, "to": { "bar": 6 }, "subject": "The monopoly's sea route", "diagram": "route" },
+    { "from": { "bar": 6 }, "to": { "bar": 8 }, "subject": "The Banda Islands, seized" },
+    { "from": { "bar": 8 }, "to": { "bar": 9 }, "subject": "The cost to the Bandanese", "diagram": "banda" },
+    { "from": { "bar": 9 }, "to": { "bar": 10 }, "subject": "Dividends paid out" },
+    { "from": { "bar": 10 }, "to": { "bar": 12 }, "subject": "More cargo, the same profit", "diagram": "profit" },
+    { "from": { "bar": 12 }, "to": { "bar": 14 }, "subject": "War with Britain" },
+    { "from": { "bar": 14 }, "to": { "bar": 16 }, "subject": "Net worth falling to zero", "diagram": "net" },
+    { "from": { "bar": 16 }, "to": { "bar": 18 }, "subject": "The debt that was left" }
+  ],
+  "captions": [
+    { "from": { "beat": 0 }, "to": { "beat": 1.5 }, "lines": ["A COMPANY"], "size": "big", "y": 290 },
+    { "from": { "beat": 1.5 }, "to": { "beat": 3 }, "lines": ["YOU COULD"], "size": "big", "y": 290 },
+    { "from": { "beat": 3 }, "to": { "beat": 4 }, "lines": ["BUY INTO."], "size": "big", "y": 290 },
+    { "from": { "beat": 4 }, "to": { "beat": 5.5 }, "lines": ["IT PAID OUT"], "size": "big", "y": 290 },
+    { "from": { "beat": 5.5 }, "to": { "beat": 7 }, "lines": ["FOR 200 YEARS."], "size": "big", "y": 290 },
+    { "from": { "beat": 7 }, "to": { "beat": 8 }, "lines": ["THEN..."], "size": "big", "y": 290 },
+    { "from": { "bar": 2 }, "to": { "bar": 3, "add": -0.1 }, "lines": ["1602: THE DUTCH EAST INDIA", "COMPANY SELLS SHARES"], "size": "compact" },
+    { "from": { "bar": 3 }, "to": { "bar": 4, "add": -0.1 }, "lines": ["{capital}M GUILDERS", "FROM THE PUBLIC"], "size": "compact" },
+    { "from": { "bar": 4 }, "to": { "bar": 5, "add": -0.1 }, "lines": ["A {years}-YEAR MONOPOLY", "ON TRADE WITH ASIA"], "size": "compact" },
+    { "from": { "bar": 5 }, "to": { "bar": 6, "add": -0.1 }, "lines": ["{voyages} VOYAGES", "OUT TO ASIA BY 1795"], "size": "compact" },
+    { "from": { "bar": 6 }, "to": { "bar": 7, "add": -0.1 }, "lines": ["NUTMEG GREW ONLY", "ON THE BANDA ISLANDS"], "size": "compact" },
+    { "from": { "bar": 7 }, "to": { "bar": 8, "add": -0.1 }, "lines": ["IN 1621 THE COMPANY", "TOOK THEM BY FORCE"], "size": "compact" },
+    { "from": { "bar": 8 }, "to": { "bar": 9, "add": -0.1 }, "lines": ["ABOUT {p}% KILLED, ENSLAVED", "OR DEPORTED"], "size": "compact" },
+    { "from": { "bar": 9 }, "to": { "bar": 10, "add": -0.1 }, "lines": ["SHAREHOLDERS AVERAGED", "ABOUT {dividend}% A YEAR"], "size": "compact" },
+    { "from": { "bar": 10 }, "to": { "bar": 12, "add": -0.1 }, "lines": ["BUT FROM 1680 TO 1730,", "TRADE GREW. PROFIT DIDN'T."], "size": "compact" },
+    { "from": { "bar": 12 }, "to": { "bar": 14, "add": -0.1 }, "lines": ["WAR WITH BRITAIN, 1780-84:", "UP TO {d}M GUILDERS LOST"], "size": "compact" },
+    { "from": { "bar": 14 }, "to": { "bar": 16, "add": -0.1 }, "lines": ["NET WORTH WAS {net}M.", "LOANS TOOK IT TO ZERO."], "size": "compact" },
+    { "from": { "bar": 16 }, "to": { "bar": 17, "add": -0.1 }, "lines": ["DEBTS OF OVER {b}M GUILDERS", "PASSED TO THE DUTCH STATE"], "size": "compact" },
+    { "from": { "bar": 17 }, "to": { "bar": 18, "add": -0.3 }, "lines": ["DISSOLVED, DECEMBER 1799."], "size": "compact" }
+  ]
+}
