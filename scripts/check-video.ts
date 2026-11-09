@@ -6,7 +6,6 @@ import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { bundle } from "@remotion/bundler";
 import { renderStill, selectComposition } from "@remotion/renderer";
 import { AUDIT_PREFIX } from "../src/core/AuditProbe";
 import type { Caption } from "../src/core/Captions";
@@ -17,6 +16,7 @@ import { GL } from "../render-settings";
 import { audioLagS, makeAudibleDelay } from "./lib/audible";
 import { audioPath, loadMeta, loadSongPlan, outputDir, requireSlug, ROOT, videoDir } from "./lib/episode";
 import { dominantShare, readPng } from "./lib/pngDiff";
+import { guardedBrowser, readCaptionsSandboxed, secureBundle } from "./lib/sandbox";
 import { checkSource } from "./lib/sceneChecks";
 import { auditLayout, checkCaptionNumbers, checkCaptionTiming, checkHitSync, pickFrames, type AuditReport, type Finding } from "./lib/videoChecks";
 
@@ -66,7 +66,15 @@ step("code", `${files.length} files`);
 if (findings.some((f) => f.check.startsWith("code-"))) finish();
 
 const timelinePath = path.join(dir, "timeline.ts");
-const captions = existsSync(timelinePath) ? ((await import(pathToFileURL(timelinePath).href)) as { CAPTIONS?: Caption[] }).CAPTIONS ?? [] : [];
+let captions: Caption[] = [];
+if (existsSync(timelinePath)) {
+  try {
+    captions = (await readCaptionsSandboxed(timelinePath)) as Caption[];
+  } catch (err) {
+    fail("code-load", (err as Error).message);
+    finish();
+  }
+}
 findings.push(...checkCaptionTiming(captions, strict));
 step("caption-time", `${captions.length} captions`);
 if (spec) findings.push(...checkCaptionNumbers(spec, strict));
@@ -120,8 +128,9 @@ if (!quick) {
 
   const tempDir = path.join(outputDir(slug), "check");
   mkdirSync(tempDir, { recursive: true });
-  const serveUrl = await bundle({ entryPoint: path.join(ROOT, "src/index.ts"), rootDir: ROOT });
-  const base = { serveUrl, chromiumOptions: { gl: GL }, logLevel: "error" as const };
+  const serveUrl = await secureBundle(ROOT);
+  const browserExecutable = await guardedBrowser(ROOT);
+  const base = { serveUrl, browserExecutable, chromiumOptions: { gl: GL }, logLevel: "error" as const };
   const inputProps = { withAudio: false, audit: true };
   const composition = await selectComposition({ ...base, inputProps, id: slug });
 

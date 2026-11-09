@@ -35,6 +35,13 @@ describe("checkSource", () => {
     ["URL in a template", "export const x = `https://example.com/${1}`;", "url"],
     ["raw HTML", 'export const X = () => <div dangerouslySetInnerHTML={{ __html: "" }} />;', "raw-html"],
     ["iframe", 'export const X = () => <iframe src="/a" />;', "raw-html"],
+    ["constructor escape", 'export const x = (() => {}).constructor("return 1")();', "runtime-access"],
+    ["proto chain", "export const x = ({}).__proto__;", "runtime-access"],
+    ["built property names", 'export const x = ({})["con" + "structor"];', "runtime-access"],
+    ["template property names", "export const x = ({})[`con${1}`];", "runtime-access"],
+    ["import.meta", "export const x = import.meta.url;", "runtime-access"],
+    ["Function", 'export const x = Function("return 1");', "forbidden-global"],
+    ["Reflect", "export const x = Reflect.ownKeys({});", "forbidden-global"],
   ];
   it.each(bad)("catches %s", (_, source, rule) => {
     expect(rulesFor(source)).toContain(rule);

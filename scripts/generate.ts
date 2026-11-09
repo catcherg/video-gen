@@ -16,6 +16,7 @@ import { planSong, songHits } from "../src/core/music/plan";
 import { encodeWav } from "../src/core/audio";
 import { renderSong } from "../src/core/music/render";
 import { audioPath, loadSongPlan, outputDir, ROOT, videoDir, writeEpisodeAudio } from "./lib/episode";
+import { cleanEnv } from "./lib/sandbox";
 import { analyseSong, songProblems } from "./lib/songAnalysis";
 import { createClaudeCodeClient } from "./pipeline/claudeCode";
 import { createAnthropicClient, createScriptedClient, type ModelClient } from "./pipeline/model";
@@ -44,7 +45,7 @@ const stop = (message: string): never => {
 if (!slug || !SLUG.test(slug)) stop('Usage: npm run generate -- <slug> --brief "What the video is about" [--upload file]');
 const id = slug as string;
 
-const run = (command: string, commandArgs: string[]) => spawnSync(command, commandArgs, { cwd: ROOT, encoding: "utf8" });
+const run = (command: string, commandArgs: string[]) => spawnSync(command, commandArgs, { cwd: ROOT, encoding: "utf8", env: cleanEnv() });
 
 const registryPath = path.join(ROOT, "videos/registry.ts");
 const identifier = (s: string) => s.split("-").map((w, i) => (i === 0 ? w : w[0].toUpperCase() + w.slice(1))).join("");

@@ -1,10 +1,10 @@
 // Renders individual frames for checking. Usage: npm run stills <slug> <frame> [frame...]
 import { mkdirSync } from "node:fs";
 import path from "node:path";
-import { bundle } from "@remotion/bundler";
 import { renderStill, selectComposition } from "@remotion/renderer";
 import { GL } from "../render-settings";
 import { outputDir, requireSlug, ROOT } from "./lib/episode";
+import { guardedBrowser, secureBundle } from "./lib/sandbox";
 
 const usage = "npm run stills <slug> <frame> [frame...]";
 const slug = requireSlug(process.argv[2], usage);
@@ -17,9 +17,10 @@ if (frames.length === 0 || frames.some((f) => !Number.isInteger(f) || f < 0)) {
 const outDir = path.join(outputDir(slug), "stills");
 mkdirSync(outDir, { recursive: true });
 
-const serveUrl = await bundle({ entryPoint: path.join(ROOT, "src/index.ts"), rootDir: ROOT });
+const serveUrl = await secureBundle(ROOT);
+const browserExecutable = await guardedBrowser(ROOT);
 const inputProps = { withAudio: false };
-const opts = { serveUrl, inputProps, chromiumOptions: { gl: GL }, logLevel: "error" as const };
+const opts = { serveUrl, inputProps, browserExecutable, chromiumOptions: { gl: GL }, logLevel: "error" as const };
 const composition = await selectComposition({ ...opts, id: slug });
 for (const frame of frames) {
   if (frame >= composition.durationInFrames) {

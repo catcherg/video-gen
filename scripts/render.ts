@@ -5,6 +5,7 @@ import { mkdirSync } from "node:fs";
 import path from "node:path";
 import { FINAL_CONCURRENCY, PREVIEW_CONCURRENCY } from "../render-settings";
 import { outputDir, requireSlug, ROOT, writeEpisodeAudio } from "./lib/episode";
+import { guardedBrowser, secureBundle } from "./lib/sandbox";
 
 const args = process.argv.slice(2);
 const fast = args.includes("--fast");
@@ -14,17 +15,20 @@ await writeEpisodeAudio(slug);
 
 mkdirSync(outputDir(slug), { recursive: true });
 const output = path.relative(ROOT, path.join(outputDir(slug), fast ? `${slug}-preview.mp4` : `${slug}.mp4`));
+const serveUrl = await secureBundle(ROOT);
+const browser = await guardedBrowser(ROOT);
 const started = Date.now();
 const result = spawnSync(
   "npx",
   [
     "remotion",
     "render",
-    "src/index.ts",
+    serveUrl,
     slug,
     output,
     `--props=${JSON.stringify({ withAudio: true })}`,
     `--concurrency=${fast ? PREVIEW_CONCURRENCY : FINAL_CONCURRENCY}`,
+    ...(browser ? [`--browser-executable=${browser}`] : []),
     "--log=error",
   ],
   { cwd: ROOT, stdio: "inherit" },

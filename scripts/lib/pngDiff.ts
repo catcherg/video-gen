@@ -75,9 +75,10 @@ export const diffImages = (a: Image, b: Image): FrameDiff => {
   return { pixels, share: pixels / total, maxDelta };
 };
 
-// Set from measurements: two renders of the same code can differ on f1-v8 by up to 0.0033% of pixels, at most 13 levels.
+// Set from measurements on f1-v8: identical code can differ by up to 0.0033% of pixels. Which frames vary changes over
+// time on the same computer, and a handful of pixels in a frame can move by up to 58 levels.
 const NOISE_SHARE = 0.0001;
-const NOISE_DELTA = 20;
+const NOISE_DELTA = 64;
 
 /** "identical", "noise" for render jitter, or "changed" for a real difference. */
 export const classifyDiff = (d: FrameDiff) => (d.pixels === 0 ? "identical" : d.share <= NOISE_SHARE && d.maxDelta <= NOISE_DELTA ? "noise" : "changed");

@@ -3,10 +3,10 @@
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import path from "node:path";
-import { bundle } from "@remotion/bundler";
 import { renderStill, selectComposition } from "@remotion/renderer";
 import { GL } from "../render-settings";
 import { outputDir, requireSlug, ROOT, videoDir } from "./lib/episode";
+import { guardedBrowser, secureBundle } from "./lib/sandbox";
 import { checkSource } from "./lib/sceneChecks";
 
 const SAMPLE_FRAMES = 5;
@@ -25,9 +25,10 @@ console.log(`${findings.length === 0 ? "PASS" : "FAIL"} static checks: ${files.l
 if (findings.length > 0) process.exit(1);
 if (args.includes("--static")) process.exit(0);
 
-const serveUrl = await bundle({ entryPoint: path.join(ROOT, "src/index.ts"), rootDir: ROOT });
+const serveUrl = await secureBundle(ROOT);
+const browserExecutable = await guardedBrowser(ROOT);
 const inputProps = { withAudio: false };
-const opts = { serveUrl, inputProps, chromiumOptions: { gl: GL }, logLevel: "error" as const };
+const opts = { serveUrl, inputProps, browserExecutable, chromiumOptions: { gl: GL }, logLevel: "error" as const };
 const composition = await selectComposition({ ...opts, id: slug });
 const last = composition.durationInFrames - 1;
 const frames = [...new Set(Array.from({ length: SAMPLE_FRAMES }, (_, i) => Math.round((i * last) / (SAMPLE_FRAMES - 1))))];

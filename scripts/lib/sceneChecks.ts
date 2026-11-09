@@ -10,13 +10,23 @@ const ALLOWED_PACKAGES = [/^remotion$/, /^react$/, /^three$/, /^three\//, /^@rem
 const STATEFUL_HOOKS = new Set(["useState", "useEffect", "useLayoutEffect", "useReducer", "useRef", "useFrame", "useThree"]);
 const FORBIDDEN_CALLS = new Set(["setTimeout", "setInterval", "setImmediate", "requestAnimationFrame", "fetch", "eval", "require", "importScripts"]);
 const FORBIDDEN_CONSTRUCTORS = new Set(["Function", "XMLHttpRequest", "WebSocket", "EventSource", "Worker", "SharedWorker"]);
-const FORBIDDEN_GLOBALS = new Set(["window", "document", "globalThis", "self", "process", "navigator", "localStorage", "sessionStorage", "indexedDB", "Date", "performance"]);
+const FORBIDDEN_GLOBALS = new Set(["window", "document", "globalThis", "self", "process", "navigator", "localStorage", "sessionStorage", "indexedDB", "Date", "performance", "Function", "Reflect", "Proxy", "WebAssembly", "Buffer", "module", "exports", "__dirname", "__filename"]);
+/** Ways to climb from an ordinary value to the runtime. */
+const FORBIDDEN_MEMBERS = new Set(["constructor", "__proto__", "prototype", "getPrototypeOf", "getOwnPropertyDescriptor", "defineProperty", "getBuiltinModule", "mainModule"]);
 /** TypeScript-only wrappers that still contain real code. Every other TS node is a type and can be skipped. */
 const TS_EXPRESSIONS = new Set(["TSAsExpression", "TSSatisfiesExpression", "TSNonNullExpression"]);
 
 type Node = { type: string; loc?: { start: { line: number } }; [key: string]: unknown };
 
 const isNode = (v: unknown): v is Node => typeof v === "object" && v !== null && typeof (v as Node).type === "string";
+
+/** True for a computed key put together from words, as opposed to arithmetic or a key made only of variables. */
+const buildsTextKey = (key: Node): boolean => {
+  if (key.type === "TemplateLiteral") return (key.quasis as { value: { raw: string } }[]).some((q) => /[a-z_$]/i.test(q.value.raw));
+  if (key.type !== "BinaryExpression" || key.operator !== "+") return false;
+  const isText = (n: Node): boolean => n.type === "StringLiteral" || n.type === "TemplateLiteral" || buildsTextKey(n);
+  return isText(key.left as Node) || isText(key.right as Node);
+};
 
 /** The property name of a member expression, including computed ones written as strings. */
 const memberName = (node: Node): string | undefined => {
@@ -66,6 +76,9 @@ export const checkSource = (file: string, source: string, { videoDir, kit }: Che
         if (isNode(node.source)) checkImport(node, node.source.value as string);
         if (node.type === "ImportDeclaration") return;
         break;
+      case "MetaProperty":
+        report(node, "runtime-access", "import.meta can reach outside the video");
+        break;
       case "Import":
         report(node, "dynamic-import", "dynamic import is not allowed in a video");
         break;
@@ -73,6 +86,10 @@ export const checkSource = (file: string, source: string, { videoDir, kit }: Che
       case "OptionalMemberExpression": {
         const object = node.object as Node;
         if (object.type === "Identifier" && object.name === "Math" && memberName(node) === "random") report(node, "random", "use hash() in visuals or createRng() in audio");
+        const member = memberName(node);
+        if (member && FORBIDDEN_MEMBERS.has(member)) report(node, "runtime-access", `.${member} can reach outside the video`);
+        const key = node.property as Node;
+        if (node.computed && buildsTextKey(key)) report(node, "runtime-access", "property names built from text can reach outside the video");
         break;
       }
       case "CallExpression":

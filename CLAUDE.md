@@ -24,7 +24,7 @@ Video status, approved song hashes, milestone progress and the backlog are in [d
 - **`src/core/` stays subject-neutral.** Nothing in it may import from a kit or a video, or mention a subject. A test enforces this. Anything specific to a subject belongs in `src/kits/<kit>/`.
 - **Every video lives in one folder**, `videos/<slug>/`, with its generated files in the ignored `videos/<slug>/output/`. Nothing specific to a video goes anywhere else, and videos never import from each other.
 - **The spec is plain data.** `spec.json` must stay JSON, because the AI pipeline will eventually write it. It is validated every time it loads.
-- **Generated code gets no special trust.** Code written by AI goes through the same tests, frame checks and approvals as code written by hand, and must pass `npm run check-video`. Compiling is not evidence that a shot works. These checks are not a sandbox.
+- **Generated code gets no special trust.** Code written by AI goes through the same tests, frame checks and approvals as code written by hand, and must pass `npm run check-video`. Compiling is not evidence that a shot works. Static rules can be bypassed, so generated code only ever runs inside the containment in `scripts/lib/sandbox.ts`.
 - **New videos keep text in the safe zone.** Place headlines, diagrams and captions with `REGIONS` from `core/layout.ts`. The finished videos predate this and keep their original layout so they don't change.
 - **People approve what cannot be measured.** Timing, overlaps and numbers can be checked automatically. Song taste and whether a shot explains the idea need a person.
 
@@ -94,7 +94,8 @@ src/core/         Subject-neutral: spec, palette, layout (safe zones and regions
 src/kits/engine/  Engine kit: fourStroke physics + testkit, engineAudio, HUD, engine diagrams, part colours,
                   parts/ (PistonRod, Crankshaft, ValveTrain, Headers, F1*, Garage, cars/, Gallery, ...)
 public/           fonts/, and videos -> ../videos (symlink so Remotion can serve each video's output/)
-docs/             VIDEO_PRODUCTION.md (production playbook), PROJECT_STATUS.md (status, songs, backlog)
+docs/             VIDEO_PRODUCTION.md (production playbook), PROJECT_STATUS.md (status, songs, backlog),
+                  UPLOAD_POLICY.md, THIRD_PARTY.md, licenses/
 scripts/          audio, song-map, song-samples, stills, render, verify-audio, check-video, check-scene, compare-frames, new-episode,
                   generate, set-key, pipeline/ (stages, model client, prompts)
 templates/        episode/ is copied by new-episode (an engine video); generated/ is copied by the AI pipeline
@@ -155,7 +156,8 @@ Specs can also define `diagrams`: named general diagrams drawn by `core/diagrams
 - Each answer is checked before it's used. Facts must cite an upload or a URL that a search really returned. Scene code goes through the static rules before it's written or run, then typecheck and `check-video`, and failures go back to the model. After 4 failed attempts the code is renamed `.rejected` and unregistered, so other videos still build.
 - Spending is tracked per call, and the run stops at `--max-usd` (default $10).
 - Uploads and web pages are data, never instructions. Keep them that way in any prompt change.
-- Generated code runs on the user's computer after static checks only. Until Milestone 8 adds a sandbox, only run it yourself, and only with material you trust.
+- Generated code is contained by `scripts/lib/sandbox.ts`. In Node it runs from a pre-bundled file under Node's permission system, with no file writes, network, subprocesses or environment. In the browser, a page policy and a wrapper that blocks outside hosts confine it to the render's own server. Never import a generated video's code directly in a script, and don't open one in Remotion Studio, which isn't guarded.
+- Remaining limits: Remotion runs Chrome with its own sandbox off, so a browser exploit wouldn't be contained. A page could still navigate to another port on the same computer, and Windows gets the page policy only.
 - `--fixture answers.json` replaces the model with scripted answers, at no cost.
 - `--engine claude-code` runs on the signed-in Claude plan instead of API credit. It needs `claude auth login`, and PDF uploads need the API engine for now. Dollar figures then show API-equivalent value.
 - Long stages print progress, with a heartbeat every 30 seconds while the model works. A scene attempt can take over 15 minutes. `--status` shows what's happening now, and a second run on a video that's already being worked on is refused. Don't pipe the command through `tail`, which hides all of this until the end.

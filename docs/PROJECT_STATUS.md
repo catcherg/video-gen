@@ -15,7 +15,7 @@ The goal is an interface that turns a description and uploaded information into 
 | 5 | Non-machine videos from specs | Done | `sky-blue` and `voc-economics` are approved. Neither needed framework changes. The gaps they exposed are listed below. |
 | 6 | Automated checks | Done | `check-video` and `compare-frames`. Tested against deliberately broken layouts. They found three problems in finished videos, listed below. |
 | 7 | AI pipeline, run headless | Done | `npm run generate`. The first real run, `why-cats-purr`, went from a one-line brief to a finished video on a Max plan. Its scene code passed `check-video` on the second attempt, for about $7.34 of API-equivalent value and 24 minutes of model time, $6.62 of it on scene code. |
-| 8 | Sandboxing and licensing | Not started | Required before friends and family use it. |
+| 8 | Sandboxing and licensing | Done | Generated code is contained in Node and the browser, tested against hostile code. Credentials are stripped from child processes. Upload policy and third-party notices are written. The repository is all rights reserved, by the user's choice. |
 | 9 | Identity cleanup | Not started | At the start of interface work: README, 8-bit reel framing in `CLAUDE.md`, renames, general template. |
 | 10 | Local interface | Not started | One command starts it and prompts the user to open a local page. Renders run on the same computer. Needs simple setup, tested beyond this Mac. |
 

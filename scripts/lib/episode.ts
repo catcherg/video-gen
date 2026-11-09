@@ -32,7 +32,8 @@ export const requireSlug = (arg: string | undefined, usage: string): string => {
 export const loadMeta = async (slug: string) => (await load<{ meta: EpisodeMeta }>(slug, "meta.ts")).meta;
 /** Videos without a physics file have no tone to check. */
 export const loadToneChecks = async (slug: string): Promise<ToneCheck[]> =>
-  existsSync(path.join(videoDir(slug), "physics.ts")) ? ((await load<{ toneChecks?: ToneCheck[] }>(slug, "physics.ts")).toneChecks ?? []) : [];
+  // A generated video has no engine tone to check, and its code must not run outside the sandbox.
+  !loadSongPlan(slug) && existsSync(path.join(videoDir(slug), "physics.ts")) ? ((await load<{ toneChecks?: ToneCheck[] }>(slug, "physics.ts")).toneChecks ?? []) : [];
 
 export const audioPath = (slug: string) => path.join(outputDir(slug), "audio.wav");
 
