@@ -1,6 +1,25 @@
 # Project Status
 
-Where each episode stands, which songs are locked, and what is left to do. Update this file whenever one of those changes.
+Where each video stands, which songs are locked, and what is left to do. Update this file whenever one of those changes.
+
+## Framework milestones
+
+The goal is an interface that turns a description and uploaded information into a finished video and song, on any topic. Details are in the Roadmap section of `CLAUDE.md`.
+
+| # | Milestone | State | Notes |
+|---|---|---|---|
+| 1 | Core split, umbrella folder and spec | Done | All three videos and WAVs were byte-identical before and after. V12 is the only video on the spec so far. |
+| 2 | Generic visual library | Not started | |
+| 3 | Song generator | Not started | |
+| 4 | First non-machine video from a spec | Not started | "Why the sky is blue", then a history or finance topic. |
+| 5 | AI pipeline | Not started | |
+| 6 | Interface and render workers | Not started | |
+
+Known gaps after Milestone 1:
+
+- `f1-v8` and `v8-cross-flat` still use a hand-written `meta.ts` and captions, not a spec.
+- `new-episode` still scaffolds an engine video without a spec.
+- V12's camshaft and valve counts are marked `assumed` in `spec.json`, because no source was ever recorded for them. Find one.
 
 ## Episodes
 
@@ -16,7 +35,7 @@ These songs are approved. Do not change them without asking the user. After any 
 
 ```bash
 npm run audio v12
-shasum -a 256 public/v12/audio.wav
+shasum -a 256 videos/v12/output/audio.wav
 ```
 
 | Episode | Approved WAV SHA-256 |

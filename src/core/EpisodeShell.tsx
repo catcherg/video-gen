@@ -9,6 +9,6 @@ export const makeEpisode =
     <AbsoluteFill style={{ background: C.bg }}>
       <Scene />
       <Overlay />
-      {withAudio ? <Audio src={staticFile(`${slug}/audio.wav`)} /> : null}
+      {withAudio ? <Audio src={staticFile(`videos/${slug}/output/audio.wav`)} /> : null}
     </AbsoluteFill>
   );

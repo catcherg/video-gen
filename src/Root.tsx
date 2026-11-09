@@ -1,6 +1,6 @@
 import { Composition } from "remotion";
-import { EPISODES } from "./episodes/registry";
-import { PartsGallery } from "./parts/Gallery";
+import { EPISODES } from "../videos/registry";
+import { PartsGallery } from "./kits/engine/parts/Gallery";
 
 export const RemotionRoot: React.FC = () => (
   <>

@@ -1,12 +1,12 @@
 import { useCurrentFrame, useVideoConfig } from "remotion";
-import { PixelStage } from "../../core/PixelStage";
-import { Ground } from "../../parts/cars/common";
-import { pinFor, PlaceholderEngine } from "../../parts/PlaceholderEngine";
+import { PixelStage } from "../../src/core/PixelStage";
+import { Ground } from "../../src/kits/engine/parts/cars/common";
+import { pinFor, PlaceholderEngine } from "../../src/kits/engine/parts/PlaceholderEngine";
 import { CRANK_R, CYL_SPACING, cylX, ORIGIN, ROD_L } from "./geometry";
 import { cycleAt, CYLINDERS, FIRING_ORDER } from "./physics";
 import { cameraAt } from "./timeline";
 
-// TODO: replace PlaceholderEngine with detailed parts from src/parts.
+// TODO: replace PlaceholderEngine with detailed parts from src/kits/engine/parts.
 export const Scene: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();

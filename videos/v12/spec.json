@@ -1,0 +1,100 @@
+{
+  "version": 1,
+  "slug": "v12",
+  "title": "Why a V12 screams",
+  "description": "A 12-cylinder engine slowed down 40×, then back to real speed, where 870 bangs a second become one note.",
+  "question": "What makes a V12 scream?",
+  "kit": "engine",
+  "format": { "fps": 30, "width": 1080, "height": 1920, "durationS": 32 },
+  "song": {
+    "bpm": 150,
+    "beatsPerBar": 4,
+    "bars": 20,
+    "style": "Original A-minor chiptune rock, tuned so the engine's redline note is the tonic",
+    "lockedWavSha256": "888e4c9f260f1523857f3dddcf311369b134cc05e5cabfbaf695c3d3bf19bfd6"
+  },
+  "facts": [
+    {
+      "id": "boreMm",
+      "claim": "Cylinder bore of the Lamborghini L539 V12",
+      "value": 95,
+      "unit": "mm",
+      "confidence": "secondary",
+      "sources": ["https://en.wikipedia.org/wiki/Lamborghini_Aventador", "https://www.ultimatecarpage.com/spec/7338/Lamborghini-Aventador-SVJ.html"]
+    },
+    {
+      "id": "strokeMm",
+      "claim": "Piston stroke of the Lamborghini L539 V12",
+      "value": 76.4,
+      "unit": "mm",
+      "confidence": "secondary",
+      "sources": ["https://en.wikipedia.org/wiki/Lamborghini_Aventador", "https://www.ultimatecarpage.com/spec/7338/Lamborghini-Aventador-SVJ.html"]
+    },
+    {
+      "id": "bankAngleDeg",
+      "claim": "Angle between the cylinder banks",
+      "value": 60,
+      "unit": "degrees",
+      "confidence": "secondary",
+      "sources": ["https://en.wikipedia.org/wiki/Lamborghini_Aventador", "https://www.ultimatecarpage.com/spec/7338/Lamborghini-Aventador-SVJ.html"]
+    },
+    {
+      "id": "redlineRpm",
+      "claim": "Maximum engine speed",
+      "value": 8700,
+      "unit": "rpm",
+      "confidence": "secondary",
+      "sources": ["https://openers.jp/en/car/car_news/1662796", "https://www.autoexpress.co.uk/lamborghini/aventador/104421/new-lamborghini-aventador-svj-blasts-in-at-pebble-beach-with-759bhp"],
+      "note": "Aventador SVJ variant. Reported spec, not confirmed in factory text."
+    },
+    {
+      "id": "firingOrder",
+      "claim": "Cylinder firing order",
+      "value": [1, 12, 4, 9, 2, 11, 6, 7, 3, 10, 5, 8],
+      "confidence": "secondary",
+      "sources": ["http://www.kfz-tech.de/Engl/Buchprojekte/Lamborghini/LamborghiniV121.htm", "https://en.wikipedia.org/wiki/Lamborghini_Aventador"],
+      "note": "No factory workshop manual found, and the Wikipedia table row is uncited. Which physical bank is 1-6 is unconfirmed; the labels assume right = 1-6."
+    },
+    {
+      "id": "camshafts",
+      "claim": "Number of camshafts",
+      "value": 4,
+      "confidence": "assumed",
+      "sources": [],
+      "note": "Two per bank. No source has been recorded for this figure yet."
+    },
+    {
+      "id": "valvesPerCylinder",
+      "claim": "Valves per cylinder",
+      "value": 4,
+      "confidence": "assumed",
+      "sources": [],
+      "note": "No source has been recorded for this figure yet."
+    }
+  ],
+  "shots": [
+    { "from": 0, "to": { "bar": 2 }, "subject": "The car, at full noise" },
+    { "from": { "bar": 2 }, "to": { "beat": 16 }, "subject": "The engine rises: two banks of cylinders", "diagram": "firing" },
+    { "from": { "beat": 16 }, "to": { "beat": 28 }, "subject": "One cylinder's four strokes", "diagram": "stroke" },
+    { "from": { "beat": 28 }, "to": { "beat": 40 }, "subject": "Rods sharing crank pins", "diagram": "crank" },
+    { "from": { "beat": 40 }, "to": { "bar": 12 }, "subject": "Camshafts and valves", "diagram": "valves" },
+    { "from": { "bar": 12 }, "to": { "bar": 14 }, "subject": "The whole engine at redline", "diagram": "firing" },
+    { "from": { "bar": 14 }, "to": { "bar": 16 }, "subject": "Back to real speed", "diagram": "pulses" },
+    { "from": { "bar": 16 }, "to": { "bar": 20 }, "subject": "The car again: many bangs become one note", "diagram": "pulses" }
+  ],
+  "captions": [
+    { "from": 0.25, "to": { "bar": 2, "add": -0.08 }, "lines": ["{redline} RPM. {cylinders} CYLINDERS.", "WHAT MAKES THE SCREAM?"], "size": "big", "y": 300 },
+    { "from": { "bar": 2, "add": 0.1 }, "to": { "bar": 4, "add": -0.1 }, "lines": ["SLOWED DOWN {slow}×", "EVERY BANG IS A BEAT: {bpm} BPM"] },
+    { "from": { "bar": 4 }, "to": { "bar": 5 }, "lines": ["EACH CYLINDER RUNS 4 STROKES"] },
+    { "from": { "bar": 5 }, "to": { "beat": 26 }, "lines": ["ONLY ONE OF THEM IS A BANG"] },
+    { "from": { "bar": 7 }, "to": { "bar": 8, "add": -0.1 }, "lines": ["{cylinders} RODS ON {pins} CRANK PINS"] },
+    { "from": { "bar": 8 }, "to": { "bar": 10, "add": -0.1 }, "lines": ["= {bangsPerRev} BANGS PER REVOLUTION"] },
+    { "from": { "bar": 10 }, "to": { "bar": 11, "add": -0.1 }, "lines": ["{camshafts} CAMSHAFTS, {valves} VALVES"] },
+    { "from": { "bar": 11 }, "to": { "bar": 12, "add": -0.1 }, "lines": ["DOUBLE THE RPM,", "DOUBLE THE BANGS"] },
+    { "from": { "bar": 12 }, "to": { "bar": 13, "add": -0.05 }, "lines": ["ONE BANG EVERY {degPerBang}°", "OF ROTATION"] },
+    { "from": { "bar": 13 }, "to": { "bar": 14, "add": -0.05 }, "lines": ["REDLINE: {redline} RPM", "PISTONS AVERAGE {pistonSpeed} M/S"] },
+    { "from": { "bar": 14, "add": 0.1 }, "to": { "bar": 16, "add": -0.1 }, "lines": ["BACK TO REAL SPEED"] },
+    { "from": { "bar": 16 }, "to": { "bar": 18, "add": -0.1 }, "lines": ["{toneHz} BANGS A SECOND.", "YOUR EAR CAN'T SPLIT THEM."] },
+    { "from": { "bar": 18 }, "to": { "bar": 20, "add": -0.3 }, "lines": ["IT HEARS ONE NOTE:", "{toneHz} HZ, JUST {toneSide} {toneNote}.", "THAT'S THE SCREAM."] }
+  ]
+}

@@ -2,7 +2,7 @@
 
 How to make an engine explainer at the quality of the finished V12 reel: 1080×1920, 30 fps, about 30 seconds, generated entirely from code.
 
-`src/episodes/v12` is the reference implementation. When this document and the code disagree, trust the code and fix this document. The rules that every session must follow are summarised in [CLAUDE.md](../CLAUDE.md).
+`videos/v12` is the reference implementation. When this document and the code disagree, trust the code and fix this document. The rules that every session must follow are summarised in [CLAUDE.md](../CLAUDE.md).
 
 ## The pipeline
 
@@ -16,10 +16,10 @@ Work through the stages in order. Each one has a gate, and later stages are expe
 | 4 | Lock the beat grid | BPM, slow factor, bar map | Every slowed bang lands on the grid |
 | 5 | Write the song | `song.ts` and `audio.ts` | `verify-audio` passes and the user likes it |
 | 6 | Plan the shots | Camera keys, captions, one subject per shot | Every shot has a named subject and a bar number |
-| 7 | Model the detail | Parts in `src/parts/` | Detail is visible at the shot's camera distance |
+| 7 | Model the detail | Parts in the kit, such as `src/kits/engine/parts/` | Detail is visible at the shot's camera distance |
 | 8 | Add clarity | Focus, colour, callouts, diagrams | A viewer can tell where to look with the sound off |
 | 9 | Review frames | Stills at the busiest moments | The full checklist below is clear |
-| 10 | Render and verify | `out/<slug>.mp4` | Tests, audio check and video properties pass |
+| 10 | Render and verify | `videos/<slug>/output/<slug>.mp4` | Tests, audio check and video properties pass |
 | 11 | Publish | Commit and push | Secret scan is clean |
 
 ## 1. Pick one idea
@@ -69,7 +69,7 @@ Grid rules:
 - Change slowed RPM only on bar lines, and in steps. A ramp drifts every later bang off the grid.
 - Lock the crank phase to a downbeat with `phaseLockT`.
 - Express times with `beatT` and `barT` as a single division, so they match the crank table exactly.
-- Add tests that every slowed bang is on the grid. See `src/episodes/v12/physics.test.ts`.
+- Add tests that every slowed bang is on the grid. See `videos/v12/physics.test.ts`.
 
 On an engine with even firing and alternating banks, bank A falls on beats 1 and 3 and bank B on beats 2 and 4, which gives a natural kick and snare. For odd-fire engines, voice the real bangs and keep only the rest of the kit on the grid.
 
@@ -92,7 +92,7 @@ The computer cannot hear the result. Timing, tuning and balance can be measured,
 **Once a song is approved, lock it.** Record its hash in [PROJECT_STATUS.md](PROJECT_STATUS.md) before touching anything else, and compare afterwards:
 
 ```bash
-shasum -a 256 public/<slug>/audio.wav
+shasum -a 256 videos/<slug>/output/audio.wav
 ```
 
 ## 6. Plan the shots
@@ -127,7 +127,7 @@ art pixels per unit ≈ 960 / (0.73 × camera distance)
 
 At 20 units that is about 66 per unit, so a 0.05-unit part is roughly 3 art pixels, about the smallest that reads. Spend modelling effort on parts the camera gets close to.
 
-- Build reusable parts in `src/parts/`, not inside an episode.
+- Build reusable parts in the kit, such as `src/kits/engine/parts/`, not inside a video.
 - Give moving parts real motion from physics: pistons, rods, crank, cams at half speed, valves, chain, pulleys.
 - Add layers in order of explanatory value. Things that show the process, such as gas, sparks, fuel and exhaust, matter more than decoration.
 - Environment props belong on the far side of the car from the camera.
@@ -141,7 +141,7 @@ Detail without hierarchy is noise. The clearest version of the V12 came from the
 - **Colour means a job.** Part and stroke colours are defined once in `src/core/theme.ts` and used in 3D, callouts and diagrams alike. Intake is blue, exhaust is red, the crank is gold, and each bank has its own rod colour.
 - **Show what is invisible.** The gas in the cylinder is coloured by stroke and gets denser under compression.
 - **Name the parts.** `src/core/Callout.tsx` draws a label in a fixed screen column with a leader line to the part. Bring labels in one per beat.
-- **Explain with a live diagram.** `src/core/diagrams.tsx` panels sit below the captions and take their values from the same physics as the scene.
+- **Explain with a live diagram.** `src/kits/engine/diagrams.tsx` panels sit below the captions and take their values from the same physics as the scene.
 - **Sharpen the image.** The V12 uses `pixelSize={2}` with stronger outline settings than the default.
 
 Callout layout rules:

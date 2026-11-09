@@ -4,7 +4,7 @@ import path from "node:path";
 import { bundle } from "@remotion/bundler";
 import { renderStill, selectComposition } from "@remotion/renderer";
 import { GL } from "../render-settings";
-import { requireSlug, ROOT } from "./lib/episode";
+import { outputDir, requireSlug, ROOT } from "./lib/episode";
 
 const usage = "npm run stills <slug> <frame> [frame...]";
 const slug = requireSlug(process.argv[2], usage);
@@ -14,7 +14,7 @@ if (frames.length === 0 || frames.some((f) => !Number.isInteger(f) || f < 0)) {
   process.exit(2);
 }
 
-const outDir = path.join(ROOT, "out", slug, "stills");
+const outDir = path.join(outputDir(slug), "stills");
 mkdirSync(outDir, { recursive: true });
 
 const serveUrl = await bundle({ entryPoint: path.join(ROOT, "src/index.ts"), rootDir: ROOT });

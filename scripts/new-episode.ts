@@ -1,4 +1,4 @@
-// Scaffolds src/episodes/<slug> from templates/episode and registers it.
+// Scaffolds videos/<slug> from templates/episode and registers it.
 // Usage: npm run new-episode <slug> [-- --title "Episode title"]
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
@@ -25,10 +25,10 @@ const safeSlug = slug as string;
 if (!SLUG.test(safeSlug)) fail(`Bad slug "${safeSlug}". Use lowercase letters, digits and hyphens, starting with a letter.`);
 if (RESERVED.has(safeSlug)) fail(`"${safeSlug}" is reserved.`);
 
-const target = path.join(ROOT, "src/episodes", safeSlug);
-if (existsSync(target)) fail(`src/episodes/${safeSlug} already exists.`);
+const target = path.join(ROOT, "videos", safeSlug);
+if (existsSync(target)) fail(`videos/${safeSlug} already exists.`);
 
-const registryPath = path.join(ROOT, "src/episodes/registry.ts");
+const registryPath = path.join(ROOT, "videos/registry.ts");
 const registry = readFileSync(registryPath, "utf8");
 if (!registry.includes(IMPORT_MARK) || !registry.includes(ENTRY_MARK)) fail("registry.ts is missing its new-episode markers.");
 
@@ -52,6 +52,6 @@ writeFileSync(
     .replace(ENTRY_MARK, `  { meta: ${identifier}, load: () => import("./${safeSlug}") },\n${ENTRY_MARK}`),
 );
 
-console.log(`Created src/episodes/${safeSlug} and registered it.`);
+console.log(`Created videos/${safeSlug} and registered it.`);
 console.log("Next: replace the TODOs in physics.ts (with sources), timeline.ts and scene.tsx, then run:");
 console.log(`  npm test && npm run stills ${safeSlug} 15 150 750`);

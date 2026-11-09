@@ -1,5 +1,5 @@
 export type EpisodeMeta = {
-  /** Folder name under src/episodes, the Remotion composition id, and the public/ audio folder. */
+  /** Folder name under videos/, and the Remotion composition id. */
   slug: string;
   title: string;
   description: string;
@@ -12,8 +12,8 @@ export type EpisodeMeta = {
 export type EpisodeProps = { withAudio?: boolean };
 
 /**
- * One real-speed section the audio must match. Picked to avoid rev ramps and whooshes.
- * `channel` analyses one stereo side, for episodes that pan each bank to its own side. Default is mono.
- * `minHz` and `maxHz` narrow the search when music shares the mix, so the check measures the engine.
+ * One section of the finished audio whose dominant pitch must match a prediction.
+ * `channel` analyses one stereo side. Default is mono.
+ * `minHz` and `maxHz` narrow the search when music shares the mix, so the check measures the right sound.
  */
 export type ToneCheck = { label: string; from: number; to: number; expectedHz: number; channel?: "left" | "right"; minHz?: number; maxHz?: number };

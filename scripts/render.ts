@@ -4,7 +4,7 @@ import { spawnSync } from "node:child_process";
 import { mkdirSync } from "node:fs";
 import path from "node:path";
 import { FINAL_CONCURRENCY, PREVIEW_CONCURRENCY } from "../render-settings";
-import { requireSlug, ROOT, writeEpisodeAudio } from "./lib/episode";
+import { outputDir, requireSlug, ROOT, writeEpisodeAudio } from "./lib/episode";
 
 const args = process.argv.slice(2);
 const fast = args.includes("--fast");
@@ -12,8 +12,8 @@ const slug = requireSlug(args.find((a) => !a.startsWith("--")), "npm run render 
 
 await writeEpisodeAudio(slug);
 
-mkdirSync(path.join(ROOT, "out"), { recursive: true });
-const output = path.join("out", fast ? `${slug}-preview.mp4` : `${slug}.mp4`);
+mkdirSync(outputDir(slug), { recursive: true });
+const output = path.relative(ROOT, path.join(outputDir(slug), fast ? `${slug}-preview.mp4` : `${slug}.mp4`));
 const started = Date.now();
 const result = spawnSync(
   "npx",
