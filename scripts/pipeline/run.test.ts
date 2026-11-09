@@ -1,11 +1,11 @@
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ROOT } from "../lib/episode";
 import { assembleSpec, factProblems, storyProblems, type RawFact, type Story } from "./assemble";
 import { costOf, createScriptedClient, type ModelClient } from "./model";
-import { pipelineDir, approve, newState, nextStep, revise, totalUsd } from "./state";
+import { pipelineDir, approve, isRunning, loadState, newState, nextStep, revise, totalUsd } from "./state";
 import { runPipeline, videoPath, type CheckResult, type Deps } from "./run";
 
 const URL = "https://example.org/source";
@@ -193,6 +193,57 @@ describe("retries", () => {
   it("reports a model failure as a block rather than crashing", async () => {
     const after = await runPipeline(deps({ ask: async () => { throw new Error("rate limited"); } }), start());
     expect(after.blocked).toBe("facts: rate limited");
+  });
+});
+
+describe("progress", () => {
+  afterEach(() => vi.useRealTimers());
+
+  it("says what it's doing, and keeps saying so while the model works", async () => {
+    vi.useFakeTimers();
+    const lines: string[] = [];
+    let now = 0;
+    const slow: ModelClient = {
+      ask: async () => {
+        now = 95000;
+        vi.advanceTimersByTime(95000);
+        return { json: FACTS, usage: { inputTokens: 1, outputTokens: 1, cacheReadTokens: 0, cacheWriteTokens: 0, webSearches: 0 }, content: [], seenUrls: [URL] };
+      },
+    };
+    await runPipeline(deps(slow, { log: (l) => lines.push(l), now: () => now }), start());
+    expect(lines).toContain("facts: attempt 1 of 3: waiting on the model");
+    expect(lines.filter((l) => l.startsWith("facts: still waiting"))).toHaveLength(3);
+    expect(lines).toContain("facts: the model answered after 1m 35s");
+  });
+
+  it("stops the heartbeat when the model fails", async () => {
+    vi.useFakeTimers();
+    const lines: string[] = [];
+    await runPipeline(deps({ ask: async () => { throw new Error("nope"); } }, { log: (l) => lines.push(l) }), start());
+    vi.advanceTimersByTime(120000);
+    expect(lines.filter((l) => l.includes("still waiting"))).toEqual([]);
+  });
+
+  it("records the current step while running, and clears it after", async () => {
+    let state = await runPipeline(deps(scripted()), start());
+    state = await runPipeline(deps(scripted([ALL[1]])), approve(state, "facts"));
+    state = approve(state, "song");
+    const seen: (string | undefined)[] = [];
+    const after = await runPipeline(deps(scripted([FILES]), { checkVideo: async () => (seen.push(loadState(root, "demo")?.activity?.detail), GOOD) }), state);
+    expect(seen).toEqual(["attempt 1 of 4: running the full checks, about a minute"]);
+    expect(after.activity).toBeUndefined();
+    expect(loadState(root, "demo")?.activity).toBeUndefined();
+  });
+
+  it("clears the current step when a stage fails", async () => {
+    const after = await runPipeline(deps({ ask: async () => { throw new Error("nope"); } }), start());
+    expect(after.activity).toBeUndefined();
+  });
+
+  it("can tell a live process from a dead one", () => {
+    const activity = { stage: "scene" as const, detail: "d", since: 0, pid: process.pid };
+    expect(isRunning(activity)).toBe(true);
+    expect(isRunning({ ...activity, pid: 999999 })).toBe(false);
   });
 });
 

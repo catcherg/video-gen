@@ -14,7 +14,7 @@ The goal is an interface that turns a description and uploaded information into 
 | 4 | Song generator | Done | Deep bass house by default, dubstep as the option for slower, dramatic videos. The user approved six samples; their hashes are under Locked songs. |
 | 5 | Non-machine videos from specs | Done | `sky-blue` and `voc-economics` are approved. Neither needed framework changes. The gaps they exposed are listed below. |
 | 6 | Automated checks | Done | `check-video` and `compare-frames`. Tested against deliberately broken layouts. They found three problems in finished videos, listed below. |
-| 7 | AI pipeline, run headless | Built, waiting on a real run | `npm run generate`. Dry-run end to end with scripted answers. It has never called the real model, because that needs a key and spends money. Each person uses their own key. |
+| 7 | AI pipeline, run headless | Done | `npm run generate`. The first real run, `why-cats-purr`, went from a one-line brief to a finished video on a Max plan. Its scene code passed `check-video` on the second attempt, for about $7.34 of API-equivalent value and 24 minutes of model time, $6.62 of it on scene code. |
 | 8 | Sandboxing and licensing | Not started | Required before friends and family use it. |
 | 9 | Identity cleanup | Not started | At the start of interface work: README, 8-bit reel framing in `CLAUDE.md`, renames, general template. |
 | 10 | Local interface | Not started | One command starts it and prompts the user to open a local page. Renders run on the same computer. Needs simple setup, tested beyond this Mac. |
@@ -57,6 +57,7 @@ Found while making `sky-blue`. None blocked the video, but each is manual work t
 | `f1-v8` | Finished | Honda RA808E, 2008 F1 2.4 L V8, sourced from the Honda R&D Technical Review F1 special. Deep bass house song, approved and locked. Stroke, crank type and firing order are not in the Honda papers: see the source notes in `physics.ts`. |
 | `sky-blue` | Finished | Approved by the user. "Why the sky is blue". First video with no engine code, built from core tools only, with a generated song. The blue and red wavelengths are representative picks, so the ratio is worded as "about". |
 | `voc-economics` | Finished | Approved by the user. The Dutch East India Company's rise and collapse, with a generated dubstep song. Mostly secondary sources; see the source notes in `spec.json`. Spice markups are left out because published figures conflict. |
+| `why-cats-purr` | Finished | First video made by the AI pipeline, with no hand edits. Facts, song, frames and the final video approved by the user. |
 | `v8-cross-flat` | Stub | Physics, camera, captions and audio checks are wired up. Geometry is still `PlaceholderEngine`, and its audio is not a full song yet. |
 
 ## Locked songs
@@ -74,6 +75,7 @@ shasum -a 256 videos/v12/output/audio.wav
 | `f1-v8` | `db3c0a963368a75578b9fedf9f24b8a906f91133c34deb56688adb10e52dad1f` |
 | `sky-blue` | `5478366b55088680e020746cb84f25bbc40d7846b3b5106e4d58d40ac7757b42` (the approved `house-seed2` sample) |
 | `voc-economics` | `ccbe26888eb19cf0e0ecd0ea5762eec2fe94f6b689e2e4079dad56f460a8befd` (the approved `dubstep-seed1` sample) |
+| `why-cats-purr` | `4eb25f180e2594c867696eb68bb53069b23ce90ba1e8620c21f9e002d205f004` |
 
 ### Approved generator samples
 

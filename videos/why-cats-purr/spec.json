@@ -1,0 +1,545 @@
+{
+  "version": 1,
+  "slug": "why-cats-purr",
+  "title": "Why Do Cats Purr?",
+  "description": "Science still has no settled answer, but the leading ideas are strange, and one purr hides a cry aimed at you.",
+  "question": "Why do cats purr?",
+  "kit": "none",
+  "palette": "nature",
+  "format": {
+    "fps": 30,
+    "width": 1080,
+    "height": 1920,
+    "durationS": 33.6
+  },
+  "song": {
+    "bpm": 128.57142857142858,
+    "beatsPerBar": 4,
+    "bars": 18,
+    "style": "Deep bass house",
+    "generator": {
+      "style": "house",
+      "seed": 7
+    },
+    "lockedWavSha256": "4eb25f180e2594c867696eb68bb53069b23ce90ba1e8620c21f9e002d205f004"
+  },
+  "facts": [
+    {
+      "id": "noSettledAnswer",
+      "claim": "No one knows for sure why domestic cats purr; the function is still unsettled.",
+      "value": "no settled explanation",
+      "confidence": "secondary",
+      "sources": [
+        "https://www.loc.gov/everyday-mysteries/categories/zoology/item/why-and-how-do-cats-purr/",
+        "https://www.aaha.org/publications/newstat/articles/2010-08/hart-explores-unexplained-beha/"
+      ],
+      "note": "Library of Congress answer, plus veterinary behaviorist Benjamin Hart at a 2010 AVMA session. The video should present the reasons below as leading ideas, not a single proven answer."
+    },
+    {
+      "id": "purrLowEnd",
+      "claim": "A cat's purr is very low-pitched, reaching down to about 25 Hz.",
+      "value": 25,
+      "confidence": "secondary",
+      "sources": [
+        "https://www.aaha.org/resources/the-secret-feline-language-5-reasons-why-your-cat-purrs/",
+        "https://www.scientificamerican.com/article/why-do-cats-purr/",
+        "https://www.cell.com/current-biology/fulltext/S0960-9822(23)01230-7"
+      ],
+      "unit": "Hz",
+      "note": "Sources disagree on the upper limit: AAHA and Scientific American give 25-150 Hz, while Herbst et al. describe a purr regime of 25-30 Hz. About 25 Hz is the point these sources share, so avoid showing 25-150 Hz as settled."
+    },
+    {
+      "id": "bothBreaths",
+      "claim": "Cats purr on both the in-breath and the out-breath, with purring sequences alternating between the two.",
+      "value": "inhale and exhale",
+      "confidence": "secondary",
+      "sources": [
+        "https://www.cell.com/current-biology/pdf/S0960-9822(23)01434-3.pdf",
+        "https://www.scientificamerican.com/article/why-do-cats-purr/"
+      ]
+    },
+    {
+      "id": "herbstYear",
+      "claim": "The study showing cat larynges can make purring frequencies without neural input was published in Current Biology in 2023.",
+      "value": 2023,
+      "confidence": "primary",
+      "sources": [
+        "https://www.cell.com/current-biology/fulltext/S0960-9822(23)01230-7"
+      ],
+      "unit": "year",
+      "note": "Herbst et al., Current Biology 33(21): 4727-4732, published November 6, 2023."
+    },
+    {
+      "id": "larynxCount",
+      "claim": "Researchers tested larynges removed from eight domestic cats, and all eight produced self-sustained purring-rate oscillations.",
+      "value": 8,
+      "confidence": "primary",
+      "sources": [
+        "https://www.cell.com/current-biology/fulltext/S0960-9822(23)01230-7"
+      ],
+      "unit": "larynges",
+      "note": "Ex vivo work: warm, humidified air was passed through excised larynges. It was not done in living cats."
+    },
+    {
+      "id": "larynxFrequency",
+      "claim": "With only airflow and no nerve signals or muscle contraction, the excised cat larynges produced sounds at 25 to 30 Hz.",
+      "value": [
+        25,
+        30
+      ],
+      "confidence": "primary",
+      "sources": [
+        "https://www.cell.com/current-biology/fulltext/S0960-9822(23)01230-7"
+      ],
+      "unit": "Hz"
+    },
+    {
+      "id": "vocalFoldPads",
+      "claim": "Connective tissue masses up to 4 mm in diameter are embedded in cats' vocal folds and may help explain the unusually low frequency of purring.",
+      "value": 4,
+      "confidence": "primary",
+      "sources": [
+        "https://www.cell.com/current-biology/fulltext/S0960-9822(23)01230-7"
+      ],
+      "unit": "mm",
+      "note": "The pads are observed anatomy, but their role in lowering pitch is a proposal. Use 'may' on screen."
+    },
+    {
+      "id": "muscleDebate",
+      "claim": "The 2023 data do not fully rule out the older idea that brain-driven muscle contractions help produce the purr in living cats.",
+      "value": "not ruled out",
+      "confidence": "primary",
+      "sources": [
+        "https://www.cell.com/current-biology/fulltext/S0960-9822(23)01230-7",
+        "https://www.vetmeduni.ac.at/en/universitaet/infoservice/presseinformationen/presseinformationen-2023/purring-more-complex-than-previously-thought"
+      ],
+      "note": "Avoid saying the brain plays no part in purring. The study shows the larynx can produce purring frequencies without neural input, not that living cats purr that way."
+    },
+    {
+      "id": "crySolicitationYear",
+      "claim": "The study identifying a cry-like signal inside cats' food-soliciting purrs was published in Current Biology in 2009.",
+      "value": 2009,
+      "confidence": "primary",
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/19602409/",
+        "https://www.sciencedirect.com/science/article/pii/S0960982209011683"
+      ],
+      "unit": "year",
+      "note": "McComb, Taylor, Wilson and Charlton, Current Biology 19: R507-R508. One blog dates it to 2015, but the volume number and press coverage confirm 2009."
+    },
+    {
+      "id": "hiddenCry",
+      "claim": "Cats soliciting food can embed a high-frequency voiced element inside the low-pitched purr.",
+      "value": "cry embedded in purr",
+      "confidence": "primary",
+      "sources": [
+        "https://www.sciencedirect.com/science/article/pii/S0960982209011683",
+        "https://pubmed.ncbi.nlm.nih.gov/19602409/"
+      ],
+      "note": "The authors suggest it may exploit a mammalian sensitivity to cries. The comparison to a human baby's cry is an interpretation, not a demonstrated fact."
+    },
+    {
+      "id": "cryFrequencyRange",
+      "claim": "The cry-like element in solicitation purrs peaks between 220 and 520 Hz, far above the purr's low rumble.",
+      "value": [
+        220,
+        520
+      ],
+      "confidence": "secondary",
+      "sources": [
+        "https://www.nationalgeographic.com/science/article/cats-manipulate-their-owners-with-a-cry-embedded-in-a-purr",
+        "https://www.discovermagazine.com/planet-earth/cats-manipulate-their-owners-with-a-cry-embedded-in-a-purr"
+      ],
+      "unit": "Hz",
+      "note": "Taken from press coverage of McComb et al.; the figure was not checked against the paper's full text. Coverage also reports a mean of 380 Hz."
+    },
+    {
+      "id": "humansRateUrgent",
+      "claim": "People rate food-soliciting purrs as more urgent and less pleasant than purrs made in other situations.",
+      "value": "more urgent, less pleasant",
+      "confidence": "primary",
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/19602409/",
+        "https://www.sciencedirect.com/science/article/pii/S0960982209011683"
+      ]
+    },
+    {
+      "id": "cryRemovalTest",
+      "claim": "When researchers digitally removed the embedded cry from recorded purrs, listeners' urgency ratings dropped significantly.",
+      "value": "urgency fell",
+      "confidence": "secondary",
+      "sources": [
+        "https://www.nationalgeographic.com/science/article/cats-manipulate-their-owners-with-a-cry-embedded-in-a-purr",
+        "https://www.discovermagazine.com/planet-earth/cats-manipulate-their-owners-with-a-cry-embedded-in-a-purr"
+      ],
+      "note": "Press coverage of McComb et al."
+    },
+    {
+      "id": "kittenMotherSignal",
+      "claim": "Veterinarians suggest kittens' purring tells their mother 'I am okay' and 'I am here', and purring is linked to nursing and mother-kitten bonding.",
+      "value": "mother-kitten signal",
+      "confidence": "secondary",
+      "sources": [
+        "https://webarchive.library.unt.edu/eot2008/20081215031158/http:/www.loc.gov/rr/scitech/mysteries/catspurr.html",
+        "https://www.aaha.org/resources/the-secret-feline-language-5-reasons-why-your-cat-purrs/"
+      ],
+      "note": "Pet-care sites often say kittens first purr at about two days old, but no primary source was found, so that number is deliberately left out."
+    },
+    {
+      "id": "purrWhenHurt",
+      "claim": "Purring doesn't always mean happiness: many cats also purr when afraid or in pain, which may be a form of self-soothing.",
+      "value": "also purr in fear or pain",
+      "confidence": "secondary",
+      "sources": [
+        "https://www.tuftscatnip.com/?p=6665",
+        "https://www.aaha.org/resources/the-secret-feline-language-5-reasons-why-your-cat-purrs/",
+        "https://www.tuftscatnip.com/behavior/why-do-cats-purr/"
+      ],
+      "note": "That cats purr in these situations is well reported by veterinarians. The self-soothing explanation, including AAHA's suggestion of endorphin release, remains a hypothesis."
+    },
+    {
+      "id": "healingUnproven",
+      "claim": "The idea that purring helps cats heal is unproven: purr frequencies overlap those studied for bone healing, but no direct studies show purring itself heals fractures.",
+      "value": "unproven",
+      "confidence": "secondary",
+      "sources": [
+        "https://www.tuftscatnip.com/?p=6665",
+        "https://www.aaha.org/resources/the-secret-feline-language-5-reasons-why-your-cat-purrs/",
+        "https://www.bksv.com/catspurr"
+      ],
+      "note": "AAHA's article links these frequencies to tissue repair more confidently, while Tufts says the question is still debated, so frame this only as a hypothesis. The popular '30% stronger bones' figure appears to come from vibration-therapy research, not purring, and should not be used."
+    }
+  ],
+  "shots": [
+    {
+      "from": {
+        "bar": 0
+      },
+      "to": {
+        "bar": 2
+      },
+      "subject": "Close-up of a domestic cat purring with its eyes half closed"
+    },
+    {
+      "from": {
+        "bar": 2
+      },
+      "to": {
+        "bar": 3.25
+      },
+      "subject": "A slow, deep sound wave rolling out of a cat's throat",
+      "diagram": "Low-pitched purr waveform"
+    },
+    {
+      "from": {
+        "bar": 3.25
+      },
+      "to": {
+        "bar": 6.25
+      },
+      "subject": "A cat larynx on a lab bench with warm, humid air flowing through it",
+      "diagram": "Airflow making the vocal folds oscillate"
+    },
+    {
+      "from": {
+        "bar": 6.25
+      },
+      "to": {
+        "bar": 7.5
+      },
+      "subject": "Kittens nursing against their mother"
+    },
+    {
+      "from": {
+        "bar": 7.5
+      },
+      "to": {
+        "bar": 8.75
+      },
+      "subject": "A tense cat crouched on a vet's table"
+    },
+    {
+      "from": {
+        "bar": 8.75
+      },
+      "to": {
+        "bar": 10
+      },
+      "subject": "An X-ray of a cat's leg bone with a question mark over it"
+    },
+    {
+      "from": {
+        "bar": 10
+      },
+      "to": {
+        "bar": 12
+      },
+      "subject": "A cat staring up at its owner beside an empty food bowl"
+    },
+    {
+      "from": {
+        "bar": 12
+      },
+      "to": {
+        "bar": 14.5
+      },
+      "subject": "A high, bright cry band appearing above the low purr rumble",
+      "diagram": "Sound spectrogram of a food-soliciting purr"
+    },
+    {
+      "from": {
+        "bar": 14.5
+      },
+      "to": {
+        "bar": 17
+      },
+      "subject": "A listener in headphones rating a recorded purr as the cry band is erased",
+      "diagram": "Urgency rating with and without the cry"
+    },
+    {
+      "from": {
+        "bar": 17
+      },
+      "to": {
+        "bar": 18
+      },
+      "subject": "The cat purring on a lap, looking straight at the camera"
+    }
+  ],
+  "captions": [
+    {
+      "from": {
+        "bar": 0
+      },
+      "to": {
+        "bar": 0.375
+      },
+      "lines": [
+        "WHY"
+      ],
+      "size": "big",
+      "y": 290
+    },
+    {
+      "from": {
+        "bar": 0.375
+      },
+      "to": {
+        "bar": 0.75
+      },
+      "lines": [
+        "DO CATS"
+      ],
+      "size": "big",
+      "y": 290
+    },
+    {
+      "from": {
+        "bar": 0.75
+      },
+      "to": {
+        "bar": 1
+      },
+      "lines": [
+        "PURR?"
+      ],
+      "size": "big",
+      "y": 290
+    },
+    {
+      "from": {
+        "bar": 1
+      },
+      "to": {
+        "bar": 1.375
+      },
+      "lines": [
+        "SCIENCE"
+      ],
+      "size": "big",
+      "y": 290
+    },
+    {
+      "from": {
+        "bar": 1.375
+      },
+      "to": {
+        "bar": 1.75
+      },
+      "lines": [
+        "STILL"
+      ],
+      "size": "big",
+      "y": 290
+    },
+    {
+      "from": {
+        "bar": 1.75
+      },
+      "to": {
+        "bar": 2
+      },
+      "lines": [
+        "ISN'T SURE"
+      ],
+      "size": "big",
+      "y": 290
+    },
+    {
+      "from": {
+        "bar": 2
+      },
+      "to": {
+        "bar": 3.2
+      },
+      "lines": [
+        "A RUMBLE AS LOW AS",
+        "ABOUT {purrLowEnd} HZ"
+      ],
+      "size": "compact"
+    },
+    {
+      "from": {
+        "bar": 3.25
+      },
+      "to": {
+        "bar": 4.7
+      },
+      "lines": [
+        "{larynxCount} CAT LARYNGES",
+        "IN A LAB, GIVEN ONLY AIR"
+      ],
+      "size": "compact"
+    },
+    {
+      "from": {
+        "bar": 4.75
+      },
+      "to": {
+        "bar": 6.2
+      },
+      "lines": [
+        "NO NERVES, NO MUSCLE:",
+        "STILL {larynxFrequency} HZ"
+      ],
+      "size": "compact"
+    },
+    {
+      "from": {
+        "bar": 6.25
+      },
+      "to": {
+        "bar": 7.45
+      },
+      "lines": [
+        "VETS SUGGEST KITTENS SAY",
+        "'I AM OKAY, I AM HERE'"
+      ],
+      "size": "compact"
+    },
+    {
+      "from": {
+        "bar": 7.5
+      },
+      "to": {
+        "bar": 8.7
+      },
+      "lines": [
+        "CATS ALSO PURR IN FEAR",
+        "OR PAIN. SELF-SOOTHING?"
+      ],
+      "size": "compact"
+    },
+    {
+      "from": {
+        "bar": 8.75
+      },
+      "to": {
+        "bar": 9.95
+      },
+      "lines": [
+        "DOES PURRING HEAL BONES?",
+        "UNPROVEN"
+      ],
+      "size": "compact"
+    },
+    {
+      "from": {
+        "bar": 10
+      },
+      "to": {
+        "bar": 11.95
+      },
+      "lines": [
+        "BUT WHEN A CAT WANTS FOOD",
+        "LISTEN CLOSER"
+      ],
+      "size": "compact"
+    },
+    {
+      "from": {
+        "bar": 12
+      },
+      "to": {
+        "bar": 13.2
+      },
+      "lines": [
+        "IT CAN HIDE A CRY",
+        "INSIDE THE PURR"
+      ],
+      "size": "compact"
+    },
+    {
+      "from": {
+        "bar": 13.25
+      },
+      "to": {
+        "bar": 14.45
+      },
+      "lines": [
+        "THE CRY PEAKS AT",
+        "{cryFrequencyRange} HZ"
+      ],
+      "size": "compact"
+    },
+    {
+      "from": {
+        "bar": 14.5
+      },
+      "to": {
+        "bar": 15.7
+      },
+      "lines": [
+        "PEOPLE RATE THESE PURRS",
+        "MORE URGENT"
+      ],
+      "size": "compact"
+    },
+    {
+      "from": {
+        "bar": 15.75
+      },
+      "to": {
+        "bar": 16.95
+      },
+      "lines": [
+        "REMOVE THE CRY",
+        "URGENCY FALLS"
+      ],
+      "size": "compact"
+    },
+    {
+      "from": {
+        "bar": 17
+      },
+      "to": {
+        "bar": 18
+      },
+      "lines": [
+        "NO SETTLED ANSWER",
+        "JUST LEADING IDEAS"
+      ],
+      "size": "compact"
+    }
+  ]
+}

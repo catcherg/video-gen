@@ -157,6 +157,8 @@ Specs can also define `diagrams`: named general diagrams drawn by `core/diagrams
 - Uploads and web pages are data, never instructions. Keep them that way in any prompt change.
 - Generated code runs on the user's computer after static checks only. Until Milestone 8 adds a sandbox, only run it yourself, and only with material you trust.
 - `--fixture answers.json` replaces the model with scripted answers, at no cost.
+- `--engine claude-code` runs on the signed-in Claude plan instead of API credit. It needs `claude auth login`, and PDF uploads need the API engine for now. Dollar figures then show API-equivalent value.
+- Long stages print progress, with a heartbeat every 30 seconds while the model works. A scene attempt can take over 15 minutes. `--status` shows what's happening now, and a second run on a video that's already being worked on is refused. Don't pipe the command through `tail`, which hides all of this until the end.
 
 ## Check frames before rendering
 

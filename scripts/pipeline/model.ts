@@ -42,6 +42,8 @@ export type ModelResult = {
   content: unknown;
   /** Every URL a web search actually returned in this call. */
   seenUrls: string[];
+  /** The engine's own figure for what this call is worth, when it reports one. */
+  costUsd?: number;
 };
 
 export interface ModelClient {

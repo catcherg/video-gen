@@ -11,6 +11,7 @@ import { nextStep, pipelineDir, saveState, totalUsd, type PipelineState, type St
 
 const MAX_ATTEMPTS: Record<"facts" | "story" | "scene", number> = { facts: 3, story: 3, scene: 4 };
 const MAX_SEED_TRIES = 5;
+const HEARTBEAT_MS = 30000;
 const FILES = { physics: "physics.ts", timeline: "timeline.ts", scene: "scene.tsx" } as const;
 
 export type CheckResult = { passed: boolean; problems: string[] };
@@ -51,12 +52,24 @@ const writeJson = (file: string, value: unknown) => {
 
 const withNote = (text: string, note?: string) => (note ? `${text}\n\nThe person reviewing this asked for these changes: ${note}` : text);
 
+/** Says what's happening now, on screen and in the saved state, so a long stage never looks frozen. */
+const setActivity = (deps: Deps, state: PipelineState, stage: Stage, detail: string) => {
+  state.activity = { stage, detail, since: deps.now(), pid: process.pid };
+  saveState(deps.root, state);
+  deps.log(`${stage}: ${detail}`);
+};
+
+const formatElapsed = (ms: number) => `${Math.floor(ms / 60000)}m ${String(Math.floor(ms / 1000) % 60).padStart(2, "0")}s`;
+
 /** Calls the model, stopping first if the budget is spent, and records the cost and time of every call. */
-const ask = async (deps: Deps, state: PipelineState, stage: Stage, request: ModelRequest): Promise<ModelResult> => {
+const ask = async (deps: Deps, state: PipelineState, stage: Stage, request: ModelRequest, detail: string): Promise<ModelResult> => {
   if (totalUsd(state) >= state.maxUsd) throw new BudgetExceeded(`spent $${totalUsd(state).toFixed(2)}, which reaches the $${state.maxUsd.toFixed(2)} limit`);
+  setActivity(deps, state, stage, detail);
   const started = deps.now();
-  const result = await deps.model.ask(request);
-  state.usage.push({ stage, model: MODEL, ...result.usage, costUsd: costOf(result.usage), seconds: (deps.now() - started) / 1000 });
+  const heartbeat = setInterval(() => deps.log(`${stage}: still waiting on the model (${formatElapsed(deps.now() - started)})`), HEARTBEAT_MS);
+  const result = await deps.model.ask(request).finally(() => clearInterval(heartbeat));
+  deps.log(`${stage}: the model answered after ${formatElapsed(deps.now() - started)}`);
+  state.usage.push({ stage, model: MODEL, ...result.usage, costUsd: result.costUsd ?? costOf(result.usage), seconds: (deps.now() - started) / 1000 });
   saveState(deps.root, state);
   return result;
 };
@@ -66,7 +79,7 @@ const askUntilValid = async <T,>(deps: Deps, state: PipelineState, stage: "facts
   const turns: Turn[] = [{ role: "user", text: first }];
   let problems: string[] = [];
   for (let attempt = 1; attempt <= MAX_ATTEMPTS[stage]; attempt++) {
-    const result = await ask(deps, state, stage, { ...request, turns: [...turns] });
+    const result = await ask(deps, state, stage, { ...request, turns: [...turns] }, `attempt ${attempt} of ${MAX_ATTEMPTS[stage]}: waiting on the model`);
     const value = result.json as T;
     problems = validate(value, result);
     if (problems.length === 0) return value;
@@ -116,6 +129,7 @@ const runSong = async (deps: Deps, state: PipelineState) => {
   if (!generator) throw new Error("the spec has no song generator");
   let problems: string[] = [];
   for (let i = 0; i < MAX_SEED_TRIES; i++) {
+    setActivity(deps, state, "song", `generating and measuring seed ${generator.seed}`);
     problems = await deps.makeSong(state.slug);
     if (problems.length === 0) return;
     deps.log(`song: seed ${generator.seed} failed its measurements: ${problems.join("; ")}`);
@@ -149,7 +163,8 @@ const runScene = async (deps: Deps, state: PipelineState) => {
   const turns: Turn[] = [{ role: "user", text: withNote(`Write the three files for this video. Its slug is "${slug}".\n\nThe spec:\n${spec}`, state.notes.scene) }];
   let problems: string[] = [];
   for (let attempt = 1; attempt <= MAX_ATTEMPTS.scene; attempt++) {
-    const result = await ask(deps, state, "scene", { system: SCENE_SYSTEM, reference: sceneReference(root), schema: SCENE_SCHEMA, effort: "xhigh", turns: [...turns] });
+    const label = `attempt ${attempt} of ${MAX_ATTEMPTS.scene}`;
+    const result = await ask(deps, state, "scene", { system: SCENE_SYSTEM, reference: sceneReference(root), schema: SCENE_SCHEMA, effort: "xhigh", turns: [...turns] }, `${label}: waiting on the model, which can take over 15 minutes`);
     const answer = result.json as Record<keyof typeof FILES, string>;
     const files = Object.fromEntries((Object.keys(FILES) as (keyof typeof FILES)[]).map((key) => [FILES[key], answer[key]]));
 
@@ -157,10 +172,12 @@ const runScene = async (deps: Deps, state: PipelineState) => {
     problems = staticProblems(root, slug, files);
     if (problems.length === 0) {
       for (const [file, source] of Object.entries(files)) writeFileSync(videoPath(root, slug, file), source);
+      setActivity(deps, state, "scene", `${label}: typechecking the code`);
       problems = await deps.typecheck(slug);
     }
     if (problems.length === 0) {
       deps.register(slug);
+      setActivity(deps, state, "scene", `${label}: running the full checks, about a minute`);
       const check = await deps.checkVideo(slug);
       if (check.passed) return;
       problems = check.problems;
@@ -179,10 +196,12 @@ const runStage = async (deps: Deps, state: PipelineState, stage: Stage) => {
   if (stage === "song") return runSong(deps, state);
   if (stage === "scene") return runScene(deps, state);
   if (stage === "frames") {
+    setActivity(deps, state, "frames", "rendering a frame from each shot");
     const stills = await deps.renderReview(state.slug);
     writeJson(artifact(deps.root, state.slug, "review.json"), stills);
     return;
   }
+  setActivity(deps, state, "render", "rendering the final video and checking it, a few minutes");
   const result = await deps.renderFinal(state.slug);
   if (!result.passed) throw new Error(`the final video failed its checks: ${result.problems.slice(0, 5).join("; ")}`);
 };
@@ -199,9 +218,11 @@ export const runPipeline = async (deps: Deps, state: PipelineState): Promise<Pip
       await runStage(deps, state, step.stage);
     } catch (err) {
       state.blocked = `${step.stage}: ${(err as Error).message}`;
+      delete state.activity;
       saveState(deps.root, state);
       return state;
     }
+    delete state.activity;
     state.completed[step.stage] = true;
     saveState(deps.root, state);
   }

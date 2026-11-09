@@ -9,6 +9,8 @@ export type Stage = (typeof STAGES)[number];
 export const GATES = ["facts", "song", "frames"] as const;
 export type Gate = (typeof GATES)[number];
 
+export type Engine = "api" | "claude-code";
+
 export type UsageRecord = { stage: Stage; model: string; inputTokens: number; outputTokens: number; cacheReadTokens: number; cacheWriteTokens: number; webSearches: number; costUsd: number; seconds: number };
 
 export type PipelineState = {
@@ -23,6 +25,22 @@ export type PipelineState = {
   blocked?: string;
   usage: UsageRecord[];
   maxUsd: number;
+  /** "api" bills an API key. "claude-code" uses the signed-in Claude plan. */
+  engine?: Engine;
+  /** What the pipeline is doing right now. Only present while a stage is in progress. */
+  activity?: Activity;
+};
+
+export type Activity = { stage: Stage; detail: string; since: number; pid: number };
+
+/** Whether the process that recorded this activity is still alive. */
+export const isRunning = (activity: Activity) => {
+  try {
+    process.kill(activity.pid, 0);
+    return true;
+  } catch {
+    return false;
+  }
 };
 
 export type NextStep = { kind: "run"; stage: Stage } | { kind: "wait"; gate: Gate } | { kind: "blocked"; reason: string } | { kind: "done" };

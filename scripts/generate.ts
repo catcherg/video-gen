@@ -6,6 +6,8 @@
 //   npm run generate -- <slug> --revise facts|story|song|scene --note "What to change"
 //   npm run generate -- <slug> --status
 //   npm run generate -- <slug> --fixture answers.json          use scripted answers instead of Claude (no cost)
+//
+// Add --engine claude-code to use your signed-in Claude plan instead of API credit. It's remembered for the run.
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -15,9 +17,10 @@ import { encodeWav } from "../src/core/audio";
 import { renderSong } from "../src/core/music/render";
 import { audioPath, loadSongPlan, outputDir, ROOT, videoDir, writeEpisodeAudio } from "./lib/episode";
 import { analyseSong, songProblems } from "./lib/songAnalysis";
+import { createClaudeCodeClient } from "./pipeline/claudeCode";
 import { createAnthropicClient, createScriptedClient, type ModelClient } from "./pipeline/model";
 import { runPipeline, type CheckResult, type Deps } from "./pipeline/run";
-import { approve, GATES, loadState, newState, nextStep, pipelineDir, revise, saveState, STAGES, totalUsd, type Gate, type PipelineState, type Stage } from "./pipeline/state";
+import { approve, GATES, isRunning, loadState, type Engine, newState, nextStep, pipelineDir, revise, saveState, STAGES, totalUsd, type Gate, type PipelineState, type Stage } from "./pipeline/state";
 
 const SLUG = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
 const DEFAULT_MAX_USD = 10;
@@ -30,7 +33,7 @@ const option = (name: string) => {
   return i >= 0 ? args[i + 1] : undefined;
 };
 const options = (name: string) => args.flatMap((a, i) => (a === `--${name}` ? [args[i + 1]] : []));
-const VALUE_FLAGS = new Set(["brief", "upload", "max-usd", "approve", "revise", "note", "fixture"]);
+const VALUE_FLAGS = new Set(["brief", "upload", "max-usd", "approve", "revise", "note", "fixture", "engine"]);
 const slug = args.find((a, i) => !a.startsWith("--") && !(i > 0 && VALUE_FLAGS.has(args[i - 1].slice(2))));
 
 const stop = (message: string): never => {
@@ -106,10 +109,15 @@ const writeRegistry = (text: string) => writeFileSync(registryPath, text);
 
 const report = (state: PipelineState) => {
   const seconds = state.usage.reduce((sum, u) => sum + u.seconds, 0);
-  console.log(`\nSpent so far: $${totalUsd(state).toFixed(2)} of the $${state.maxUsd.toFixed(2)} limit, ${state.usage.length} model calls, ${seconds.toFixed(0)} s of model time`);
+  console.log(`\n${state.engine === "claude-code" ? "Used on your plan, in API-equivalent value" : "Spent so far"}: $${totalUsd(state).toFixed(2)} of the $${state.maxUsd.toFixed(2)} limit, ${state.usage.length} model calls, ${seconds.toFixed(0)} s of model time`);
   for (const stage of STAGES) {
     const records = state.usage.filter((u) => u.stage === stage);
     if (records.length > 0) console.log(`  ${stage}: $${records.reduce((s, u) => s + u.costUsd, 0).toFixed(2)}, ${records.length} calls`);
+  }
+  if (state.activity) {
+    const elapsed = Math.round((Date.now() - state.activity.since) / 1000);
+    if (isRunning(state.activity)) console.log(`\nWorking now, for ${Math.floor(elapsed / 60)}m ${elapsed % 60}s: ${state.activity.stage}: ${state.activity.detail}`);
+    else console.log(`\nThe last run stopped unexpectedly during ${state.activity.stage}: ${state.activity.detail}\nTo pick it up again: npm run generate -- ${id}`);
   }
   const step = nextStep(state);
   if (step.kind === "wait") {
@@ -142,6 +150,8 @@ if (args.includes("--status")) {
   process.exit(0);
 }
 
+if (state.activity && isRunning(state.activity)) stop(`This video is already being worked on (${state.activity.stage}: ${state.activity.detail}).\nCheck on it with: npm run generate -- ${id} --status`);
+
 const toApprove = option("approve");
 if (toApprove) {
   if (!(GATES as readonly string[]).includes(toApprove)) stop(`--approve must be one of ${GATES.join(", ")}`);
@@ -158,8 +168,12 @@ if (toRevise) {
   state = revise(state, toRevise as Stage, option("note") ?? "");
 }
 
+const engineChoice = option("engine");
+if (engineChoice && engineChoice !== "api" && engineChoice !== "claude-code") stop("--engine must be api or claude-code");
+if (engineChoice) state = { ...state, engine: engineChoice as Engine };
+
 const fixture = option("fixture");
-const model = fixture ? createScriptedClient(JSON.parse(readFileSync(fixture, "utf8")) as unknown[]) : createAnthropicClient();
+const model = fixture ? createScriptedClient(JSON.parse(readFileSync(fixture, "utf8")) as unknown[]) : state.engine === "claude-code" ? createClaudeCodeClient() : createAnthropicClient();
 
 state = await runPipeline(realDeps(model), state);
 report(state);
