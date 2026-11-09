@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "slug": "sky-blue",
+  "title": "Why the sky is blue",
+  "description": "Sunlight scatters off air molecules, blue far more than red. At sunset the same light crosses far more air, and the blue is gone.",
+  "question": "Why is the sky blue?",
+  "kit": "none",
+  "palette": "science",
+  "format": { "fps": 30, "width": 1080, "height": 1920, "durationS": 33.6 },
+  "song": {
+    "bpm": 128.57142857142858,
+    "beatsPerBar": 4,
+    "bars": 18,
+    "style": "Deep bass house",
+    "lockedWavSha256": "5478366b55088680e020746cb84f25bbc40d7846b3b5106e4d58d40ac7757b42",
+    "generator": { "style": "house", "seed": 2 }
+  },
+  "facts": [
+    {
+      "id": "scatterExponent",
+      "claim": "Rayleigh scattering grows with the inverse fourth power of wavelength",
+      "value": 4,
+      "confidence": "secondary",
+      "sources": ["https://wtamu.edu/~cbaird/sq/2013/03/28/why-is-the-sky-blue/", "https://metoffice.gov.uk/learning/optics/why-is-the-sky-blue"]
+    },
+    {
+      "id": "blueNm",
+      "claim": "A representative wavelength for blue light",
+      "value": 450,
+      "unit": "nm",
+      "confidence": "illustrative",
+      "sources": [],
+      "note": "Blue is a band, not one wavelength. The ratio on screen depends on this choice, so it is shown as an approximation."
+    },
+    {
+      "id": "redNm",
+      "claim": "A representative wavelength for red light",
+      "value": 650,
+      "unit": "nm",
+      "confidence": "illustrative",
+      "sources": [],
+      "note": "Red is a band, not one wavelength. The ratio on screen depends on this choice, so it is shown as an approximation."
+    },
+    {
+      "id": "sunMakesLessViolet",
+      "claim": "Sunlight contains less violet light than blue light",
+      "value": "less violet than blue",
+      "confidence": "secondary",
+      "sources": ["https://www.rmg.co.uk/stories/topics/why-sky-blue", "https://wtamu.edu/~cbaird/sq/2013/03/28/why-is-the-sky-blue/"]
+    },
+    {
+      "id": "eyesLessSensitiveToViolet",
+      "claim": "Human eyes are much less sensitive to violet than to blue",
+      "value": "less sensitive to violet",
+      "confidence": "secondary",
+      "sources": ["https://www.rmg.co.uk/stories/topics/why-sky-blue", "https://wtamu.edu/~cbaird/sq/2013/03/28/why-is-the-sky-blue/"]
+    },
+    {
+      "id": "horizonAirMass",
+      "claim": "Sunlight at the horizon crosses about this many times more air than sunlight from directly overhead",
+      "value": 38,
+      "unit": "times",
+      "confidence": "secondary",
+      "sources": ["https://en.wikipedia.org/wiki/Air_mass_(astronomy)"],
+      "note": "Kasten and Young's formula gives about 38 at sea level. Other models give about 38.9 to 40."
+    }
+  ],
+  "shots": [
+    { "from": 0, "to": { "bar": 2 }, "subject": "Earth from space, and the white sun" },
+    { "from": { "bar": 2 }, "to": { "bar": 4 }, "subject": "White light fanning out into colours" },
+    { "from": { "bar": 4 }, "to": { "bar": 6 }, "subject": "Light meeting air molecules" },
+    { "from": { "bar": 6 }, "to": { "bar": 8 }, "subject": "Blue scattering far more than red", "diagram": "scatter" },
+    { "from": { "bar": 8 }, "to": { "bar": 10 }, "subject": "An eye, and why violet loses", "diagram": "violet" },
+    { "from": { "bar": 10 }, "to": { "bar": 12 }, "subject": "Blue arriving from every direction" },
+    { "from": { "bar": 12 }, "to": { "bar": 14 }, "subject": "The sky turns at sunset", "diagram": "airMass" },
+    { "from": { "bar": 14 }, "to": { "bar": 16 }, "subject": "The long path through the air", "diagram": "airMass" },
+    { "from": { "bar": 16 }, "to": { "bar": 18 }, "subject": "The sunset that is left" }
+  ],
+  "captions": [
+    { "from": { "beat": 0 }, "to": { "beat": 1.5 }, "lines": ["THE SUN IS"], "size": "big", "y": 290 },
+    { "from": { "beat": 1.5 }, "to": { "beat": 3 }, "lines": ["WHITE."], "size": "big", "y": 290 },
+    { "from": { "beat": 3 }, "to": { "beat": 4 }, "lines": ["SPACE IS"], "size": "big", "y": 290 },
+    { "from": { "beat": 4 }, "to": { "beat": 5.5 }, "lines": ["BLACK."], "size": "big", "y": 290 },
+    { "from": { "beat": 5.5 }, "to": { "beat": 7 }, "lines": ["SO WHY IS"], "size": "big", "y": 290 },
+    { "from": { "beat": 7 }, "to": { "beat": 8 }, "lines": ["THE SKY BLUE?"], "size": "big", "y": 290 },
+    { "from": { "bar": 2 }, "to": { "bar": 4, "add": -0.1 }, "lines": ["SUNLIGHT IS EVERY COLOUR", "MIXED TOGETHER"], "size": "compact" },
+    { "from": { "bar": 4 }, "to": { "bar": 6, "add": -0.1 }, "lines": ["AIR MOLECULES ARE FAR", "SMALLER THAN LIGHT WAVES"], "size": "compact" },
+    { "from": { "bar": 6 }, "to": { "bar": 8, "add": -0.1 }, "lines": ["BLUE SCATTERS ABOUT {ratio}×", "MORE THAN RED"], "size": "compact" },
+    { "from": { "bar": 8 }, "to": { "bar": 9, "add": -0.1 }, "lines": ["VIOLET SCATTERS EVEN MORE"], "size": "compact" },
+    { "from": { "bar": 9 }, "to": { "bar": 10, "add": -0.1 }, "lines": ["BUT THE SUN MAKES LESS OF IT", "AND OUR EYES BARELY SEE IT"], "size": "compact" },
+    { "from": { "bar": 10 }, "to": { "bar": 12, "add": -0.1 }, "lines": ["SCATTERED BLUE REACHES YOU", "FROM EVERY DIRECTION"], "size": "compact" },
+    { "from": { "bar": 12 }, "to": { "bar": 14, "add": -0.1 }, "lines": ["AT SUNSET, LIGHT CROSSES", "ABOUT {airMass}× MORE AIR"], "size": "compact" },
+    { "from": { "bar": 14 }, "to": { "bar": 16, "add": -0.1 }, "lines": ["THE BLUE IS SCATTERED AWAY", "ON THE LONG WAY TO YOU"], "size": "compact" },
+    { "from": { "bar": 16 }, "to": { "bar": 17, "add": -0.1 }, "lines": ["ONLY ORANGE AND RED", "MAKE IT THROUGH"], "size": "compact" },
+    { "from": { "bar": 17 }, "to": { "bar": 18, "add": -0.3 }, "lines": ["SAME SUNLIGHT.", "MORE AIR."], "size": "compact" }
+  ]
+}

@@ -12,7 +12,7 @@ The goal is an interface that turns a description and uploaded information into 
 | 2 | Product decisions | Done | Recorded in `CLAUDE.md`. Everyone installs it on their own computer. |
 | 3 | Generic visual library | Done | Palettes, safe zones, motion, 3D shapes, six diagram types and `check-scene`. Only the gallery uses them so far; Milestone 5 is the first real test. |
 | 4 | Song generator | Done | Deep bass house by default, dubstep as the option for slower, dramatic videos. The user approved six samples; their hashes are under Locked songs. |
-| 5 | Non-machine videos from specs | Not started | "Why the sky is blue", then a history or finance topic. |
+| 5 | Non-machine videos from specs | In progress | `sky-blue` is finished and approved, and needed no framework changes. A history or finance video is still to come. |
 | 6 | Automated checks | Not started | Includes the sync and frame-comparison scripts from the backlog. |
 | 7 | AI pipeline, run headless | Not started | Must settle how each person gets AI access without sharing the owner's key. |
 | 8 | Sandboxing and licensing | Not started | Required before friends and family use it. |
@@ -32,12 +32,21 @@ Known gaps after Milestone 3:
 - The tile map draws tiles it is given. There is no built-in world or country map yet.
 - `check-scene` doesn't detect hard-coded on-screen numbers, and it is not a sandbox (Milestone 8).
 
+Found while making `sky-blue`. None blocked the video, but each is manual work the AI pipeline (Milestone 7) will trip over:
+
+- Spec diagrams can only read facts, not computed values, so this video builds its diagrams in `timeline.ts`.
+- `new-episode` only makes engine videos, so the files were written by hand.
+- Placing a subject inside the safe zone needs a manual camera offset, and callout positions are tuned by eye. A core helper for aiming a subject into a region would remove the first.
+- Shot titles aren't part of the spec.
+- A video with no `toneChecks` passes `verify-audio` without checking anything.
+
 ## Episodes
 
 | Episode | State | Notes |
 |---|---|---|
 | `v12` | Finished | The reference for quality. Song approved by the user. |
 | `f1-v8` | Finished | Honda RA808E, 2008 F1 2.4 L V8, sourced from the Honda R&D Technical Review F1 special. Deep bass house song, approved and locked. Stroke, crank type and firing order are not in the Honda papers: see the source notes in `physics.ts`. |
+| `sky-blue` | Finished | Approved by the user. "Why the sky is blue". First video with no engine code, built from core tools only, with a generated song. The blue and red wavelengths are representative picks, so the ratio is worded as "about". |
 | `v8-cross-flat` | Stub | Physics, camera, captions and audio checks are wired up. Geometry is still `PlaceholderEngine`, and its audio is not a full song yet. |
 
 ## Locked songs
@@ -53,6 +62,7 @@ shasum -a 256 videos/v12/output/audio.wav
 |---|---|
 | `v12` | `888e4c9f260f1523857f3dddcf311369b134cc05e5cabfbaf695c3d3bf19bfd6` |
 | `f1-v8` | `db3c0a963368a75578b9fedf9f24b8a906f91133c34deb56688adb10e52dad1f` |
+| `sky-blue` | `5478366b55088680e020746cb84f25bbc40d7846b3b5106e4d58d40ac7757b42` (the approved `house-seed2` sample) |
 
 ### Approved generator samples
 
