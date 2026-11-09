@@ -14,7 +14,7 @@ import { songHits } from "../src/core/music/plan";
 import { loadSpec, resolveTime, validateSpec, type VideoSpec } from "../src/core/spec";
 import { GL } from "../render-settings";
 import { audioLagS, makeAudibleDelay } from "./lib/audible";
-import { audioPath, loadMeta, loadSongPlan, outputDir, requireSlug, ROOT, videoDir } from "./lib/episode";
+import { audioPath, loadMeta, loadSongPlan, outputDir, requireSlug, ROOT, videoDir } from "./lib/video";
 import { dominantShare, readPng } from "./lib/pngDiff";
 import { guardedBrowser, readCaptionsSandboxed, secureBundle } from "./lib/sandbox";
 import { checkSource } from "./lib/sceneChecks";

@@ -4,14 +4,14 @@ import { spawnSync } from "node:child_process";
 import { mkdirSync } from "node:fs";
 import path from "node:path";
 import { FINAL_CONCURRENCY, PREVIEW_CONCURRENCY } from "../render-settings";
-import { outputDir, requireSlug, ROOT, writeEpisodeAudio } from "./lib/episode";
+import { outputDir, requireSlug, ROOT, writeVideoAudio } from "./lib/video";
 import { guardedBrowser, secureBundle } from "./lib/sandbox";
 
 const args = process.argv.slice(2);
 const fast = args.includes("--fast");
 const slug = requireSlug(args.find((a) => !a.startsWith("--")), "npm run render <slug> [-- --fast]");
 
-await writeEpisodeAudio(slug);
+await writeVideoAudio(slug);
 
 mkdirSync(outputDir(slug), { recursive: true });
 const output = path.relative(ROOT, path.join(outputDir(slug), fast ? `${slug}-preview.mp4` : `${slug}.mp4`));

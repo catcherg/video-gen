@@ -1,0 +1,54 @@
+// Camera keys, shot titles, diagrams and every hit the picture follows.
+import { makeCameraRig, type CameraFn, type CameraKey, type V3 } from "../../src/core/camera";
+import type { Caption } from "../../src/core/Captions";
+import type { DiagramSpec } from "../../src/core/diagrams/spec";
+import { hitPulse } from "../../src/core/motion";
+import { resolveCaptions, resolveTime } from "../../src/core/spec";
+import { meta, spec } from "./meta";
+import { barT, EXAMPLE_COUNT } from "./physics";
+import { SONG_MAP } from "./songMap";
+
+const seconds = (frames: number[]) => frames.map((f) => f / SONG_MAP.fps);
+
+export const KICKS = seconds(SONG_MAP.kickFrames);
+export const STABS = seconds(SONG_MAP.stabFrames);
+export const IMPACTS = seconds(SONG_MAP.impactFrames ?? []);
+
+export const CAPTIONS: Caption[] = resolveCaptions(spec, { count: EXAMPLE_COUNT });
+
+const CUT = 1 / 30;
+/** Share of the camera distance to aim below a subject, which lifts it into the top half of the frame, above the captions. */
+const LIFT = 0.13;
+
+const hold = (from: number, to: number, pos0: V3, pos1: V3, subject: V3): CameraKey[] => {
+  const aim = (pos: V3): V3 => [subject[0], subject[1] - LIFT * Math.hypot(pos[0] - subject[0], pos[1] - subject[1], pos[2] - subject[2]), subject[2]];
+  return [
+    { t: from, pos: pos0, target: aim(pos0), fov: 40 },
+    { t: to - CUT, pos: pos1, target: aim(pos1), fov: 40 },
+  ];
+};
+
+const rig = makeCameraRig([...hold(0, barT(12), [0, 8, 62], [0, 8, 50], [0, 6, 0]), ...hold(barT(12), barT(18) + 0.2, [14, 12, 52], [10, 10, 42], [0, 6, 0])]);
+
+const KICK_ZOOM_DEG = 1.2;
+
+/** The camera, with a punch on every kick. The scene and the overlay must both use this. */
+export const cameraAt: CameraFn = (t) => {
+  const pose = rig(t);
+  pose.fov -= KICK_ZOOM_DEG * hitPulse(t, KICKS);
+  return pose;
+};
+
+export const TITLES: { from: number; to: number; text: string }[] = [
+  { from: barT(2), to: barT(12), text: "THE IDEA" },
+  { from: barT(12), to: barT(17), text: "THE PAYOFF" },
+];
+
+/** One diagram for each one a shot names in spec.json. */
+export const DIAGRAMS: Record<string, DiagramSpec> = {
+  example: { type: "bar", title: "TODO: A DIAGRAM OF THE FACTS", bars: [{ label: "EXAMPLE", value: EXAMPLE_COUNT }] },
+};
+
+export const SHOT_WINDOWS = spec.shots.map((shot) => ({ from: resolveTime(spec, shot.from), to: resolveTime(spec, shot.to), diagram: shot.diagram }));
+
+export const END_FADE_FROM = meta.durationS - 0.7;

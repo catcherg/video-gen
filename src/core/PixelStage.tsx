@@ -38,7 +38,7 @@ const CameraRig: React.FC<{ t: number; cameraAt: CameraFn }> = ({ t, cameraAt })
   return null;
 };
 
-/** The standard 3D setup: canvas, lights, camera rig and pixel pass around an episode's models. */
+/** The standard 3D setup: canvas, lights, camera rig and pixel pass around a video's models. */
 export const PixelStage: React.FC<{ t: number; cameraAt: CameraFn; children: React.ReactNode; pixelSize?: number; normalEdge?: number; depthEdge?: number }> = ({
   t,
   cameraAt,

@@ -102,7 +102,7 @@ const runFacts = async (deps: Deps, state: PipelineState) => {
 };
 
 const copyTemplates = (root: string, slug: string) => {
-  for (const file of ["meta.ts", "index.tsx", "overlay.tsx"]) writeFileSync(videoPath(root, slug, file), readFileSync(path.join(root, "templates/generated", `${file}.tmpl`), "utf8"));
+  for (const file of ["meta.ts", "index.tsx", "overlay.tsx"]) writeFileSync(videoPath(root, slug, file), readFileSync(path.join(root, "templates/video", `${file}.tmpl`), "utf8"));
 };
 
 const runStory = async (deps: Deps, state: PipelineState) => {

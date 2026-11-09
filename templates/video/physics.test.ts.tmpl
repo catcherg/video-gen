@@ -1,0 +1,19 @@
+import { describe, expect, it } from "vitest";
+import { validateDiagram } from "../../src/core/diagrams/spec";
+import { validateSpec } from "../../src/core/spec";
+import rawSpec from "./spec.json";
+import { CAPTIONS, DIAGRAMS, SHOT_WINDOWS } from "./timeline";
+
+describe("__SLUG__", () => {
+  it("has a valid spec", () => {
+    expect(validateSpec(rawSpec)).toEqual([]);
+  });
+
+  it("fills every caption token", () => {
+    expect(CAPTIONS.flatMap((c) => c.lines).filter((line) => /[{}]/.test(line))).toEqual([]);
+  });
+
+  it("has a valid diagram for every shot that names one", () => {
+    for (const shot of SHOT_WINDOWS) if (shot.diagram) expect(validateDiagram(DIAGRAMS[shot.diagram], shot.diagram)).toEqual([]);
+  });
+});

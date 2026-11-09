@@ -2,7 +2,7 @@
 // It is plain JSON, so that a person, a form or an AI can write it, and it is validated every time it loads.
 import type { Caption } from "./Captions";
 import { validateDiagram, type DiagramSpec } from "./diagrams/spec";
-import type { EpisodeMeta } from "./episode";
+import type { VideoMeta } from "./video";
 import { captionFits } from "./layout";
 import { validateSongRequest, type SongRequest, type SongSection, type SongStyle } from "./music/plan";
 import { DEFAULT_PALETTE, paletteProblems, PALETTES, resolvePalette, type Palette, type PaletteRef } from "./palette";
@@ -208,7 +208,7 @@ export const loadSpec = (raw: unknown): VideoSpec => {
   return raw as VideoSpec;
 };
 
-export const specToMeta = ({ slug, title, description, format }: VideoSpec): EpisodeMeta => ({ slug, title, description, ...format });
+export const specToMeta = ({ slug, title, description, format }: VideoSpec): VideoMeta => ({ slug, title, description, ...format });
 
 const findFact = (spec: VideoSpec, id: string): Fact => {
   const fact = spec.facts.find((f) => f.id === id);
@@ -246,7 +246,7 @@ export const listFact = (spec: VideoSpec, id: string): number[] => {
 };
 
 /** Timed captions with every {token} filled in. Throws on a missing or unused value, so text can't silently go wrong. */
-export const resolveCaptions = (spec: VideoSpec, values: Record<string, string | number>): Caption[] => {
+export const resolveCaptions = (spec: VideoSpec, values: Record<string, string | number>, time: (ref: TimeRef) => number = (ref) => resolveTime(spec, ref)): Caption[] => {
   const used = new Set<string>();
   const fill = (line: string) =>
     line.replace(/\{(\w+)\}/g, (_, token: string) => {
@@ -255,8 +255,8 @@ export const resolveCaptions = (spec: VideoSpec, values: Record<string, string |
       return String(values[token]);
     });
   const captions = spec.captions.map(({ from, to, lines, size, y }) => ({
-    from: resolveTime(spec, from),
-    to: resolveTime(spec, to),
+    from: time(from),
+    to: time(to),
     lines: lines.map(fill),
     ...(size === undefined ? {} : { size }),
     ...(y === undefined ? {} : { y }),

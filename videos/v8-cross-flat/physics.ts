@@ -1,4 +1,4 @@
-// Single source of truth for this episode: scene, HUD, labels, captions and audio all read from here.
+// Single source of truth for this video: scene, HUD, labels, captions and audio all read from here.
 //
 // Two real engines, shown as generic V8s (no badges or brand names on screen):
 //
@@ -21,11 +21,12 @@
 // Both are shown at the same RPM so only the crank differs. 6,000 rpm is within both redlines.
 
 import { createFourStroke, dominantPulseHz } from "../../src/kits/engine/fourStroke";
-import type { ToneCheck } from "../../src/core/episode";
-import { meta } from "./meta";
+import type { ToneCheck } from "../../src/core/video";
+import { listFact, numberFact } from "../../src/core/spec";
+import { meta, spec as videoSpec } from "./meta";
 
-export const BANK_ANGLE_DEG = 90;
-export const SHOW_RPM = 6000;
+export const BANK_ANGLE_DEG = numberFact(videoSpec, "bankAngleDeg");
+export const SHOW_RPM = numberFact(videoSpec, "showRpm");
 export const SLOW_RPM = 1500;
 export const TACH_MAX = 7000;
 export const TACH_RED_FROM = 6500;
@@ -62,9 +63,9 @@ export type V8 = ReturnType<typeof makeV8>;
 
 export const CROSS = makeV8({
   label: "CROSS-PLANE",
-  boreMm: 103.25,
-  strokeMm: 92,
-  firingOrder: [1, 8, 7, 2, 6, 5, 4, 3],
+  boreMm: numberFact(videoSpec, "crossBoreMm"),
+  strokeMm: numberFact(videoSpec, "crossStrokeMm"),
+  firingOrder: listFact(videoSpec, "crossFiringOrder"),
   isRight: (cyl) => cyl % 2 === 0,
   row: (cyl) => Math.floor((cyl - 1) / 2),
   pins: [
@@ -78,9 +79,9 @@ export const CROSS = makeV8({
 
 export const FLAT = makeV8({
   label: "FLAT-PLANE",
-  boreMm: 94,
-  strokeMm: 81,
-  firingOrder: [1, 5, 3, 7, 4, 8, 2, 6],
+  boreMm: numberFact(videoSpec, "flatBoreMm"),
+  strokeMm: numberFact(videoSpec, "flatStrokeMm"),
+  firingOrder: listFact(videoSpec, "flatFiringOrder"),
   isRight: (cyl) => cyl <= 4,
   row: (cyl) => (cyl <= 4 ? cyl - 1 : cyl - 5),
   pins: [

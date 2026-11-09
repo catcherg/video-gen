@@ -1,6 +1,6 @@
-// Shared physics tests. Each episode's physics.test.ts calls describeFourStroke once.
+// Shared physics tests. Each video's physics.test.ts calls describeFourStroke once.
 import { describe, expect, it } from "vitest";
-import type { ToneCheck } from "../../core/episode";
+import type { ToneCheck } from "../../core/video";
 import type { FourStroke } from "./fourStroke";
 
 export type FourStrokeTestConfig = {

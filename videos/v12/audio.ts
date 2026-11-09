@@ -1,6 +1,6 @@
 // The soundtrack: an original chiptune-rock song in A minor at the engine's own tempo and tuning.
 // While slowed, every firing event is a drum hit, so the song's rhythm is the engine.
-import { SAMPLE_RATE, type EpisodeAudio, type Rng } from "../../src/core/audio";
+import { SAMPLE_RATE, type VideoAudio, type Rng } from "../../src/core/audio";
 import { defaultEngineAudio, renderEngineAudio, type EngineAudioSettings, type SongTrack } from "../../src/kits/engine/engineAudio";
 import { crash, hat, kick, midiHz, mixInto, newBus, pingPongDelay, playNote, riser, snare, tom, type Bus, type Voice } from "../../src/core/synth";
 import { meta } from "./meta";
@@ -239,7 +239,7 @@ export const settings: EngineAudioSettings = {
   mix: { ...defaultEngineAudio.mix, pulseGain: 0.5, thumpGain: 0.3, masterDrive: 0.85, targetPeak: 0.9 },
 };
 
-const audio: EpisodeAudio = {
+const audio: VideoAudio = {
   render: () => renderEngineAudio({ durationS: meta.durationS, bangs: BANGS, isSlowed, settings, song: buildSong }),
 };
 

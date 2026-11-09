@@ -4,7 +4,7 @@
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, rmSync } from "node:fs";
 import path from "node:path";
-import { outputDir, requireSlug, ROOT } from "./lib/episode";
+import { outputDir, requireSlug, ROOT } from "./lib/video";
 import { guardedBrowser, secureBundle } from "./lib/sandbox";
 import { classifyDiff, diffImages, readPng } from "./lib/pngDiff";
 

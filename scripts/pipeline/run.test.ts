@@ -2,7 +2,7 @@ import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, write
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { ROOT } from "../lib/episode";
+import { ROOT } from "../lib/video";
 import { assembleSpec, factProblems, storyProblems, type RawFact, type Story } from "./assemble";
 import { costOf, createScriptedClient, type ModelClient } from "./model";
 import { pipelineDir, approve, isRunning, loadState, newState, nextStep, revise, totalUsd } from "./state";
@@ -55,7 +55,7 @@ const scripted = (answers: unknown[] = ALL) => createScriptedClient(answers, { i
 
 beforeEach(() => {
   root = mkdtempSync(path.join(os.tmpdir(), "pipeline-"));
-  cpSync(path.join(ROOT, "templates/generated"), path.join(root, "templates/generated"), { recursive: true });
+  cpSync(path.join(ROOT, "templates/video"), path.join(root, "templates/video"), { recursive: true });
   for (const f of ["src/core/shapes.tsx", "src/core/motion.ts", "src/core/layout.ts", "src/core/camera.ts", "src/core/diagrams/spec.ts", "src/core/spec.ts", "videos/sky-blue/physics.ts", "videos/sky-blue/timeline.ts", "videos/sky-blue/scene.tsx", "videos/sky-blue/overlay.tsx"]) {
     mkdirSync(path.dirname(path.join(root, f)), { recursive: true });
     cpSync(path.join(ROOT, f), path.join(root, f));

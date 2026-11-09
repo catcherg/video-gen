@@ -1,4 +1,4 @@
-export type EpisodeMeta = {
+export type VideoMeta = {
   /** Folder name under videos/, and the Remotion composition id. */
   slug: string;
   title: string;
@@ -9,7 +9,7 @@ export type EpisodeMeta = {
   height: number;
 };
 
-export type EpisodeProps = { withAudio?: boolean; /** Reports text positions for automated checks. Draws nothing. */ audit?: boolean };
+export type VideoProps = { withAudio?: boolean; /** Reports text positions for automated checks. Draws nothing. */ audit?: boolean };
 
 /**
  * One section of the finished audio whose dominant pitch must match a prediction.

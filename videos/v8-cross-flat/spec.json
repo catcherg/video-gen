@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "slug": "v8-cross-flat",
+  "title": "Cross-plane vs flat-plane V8",
+  "description": "Two V8s fire equally often, yet one burbles and one shrieks. The difference is how each exhaust bank's pulses are spaced.",
+  "question": "Why do two V8s that fire equally often sound so different?",
+  "kit": "engine",
+  "palette": "machines",
+  "format": { "fps": 30, "width": 1080, "height": 1920, "durationS": 30 },
+  "song": { "bpm": 120, "beatsPerBar": 4, "bars": 15, "style": "Placeholder music bed. This video is still a stub and has no approved song." },
+  "facts": [
+    { "id": "crossBoreMm", "claim": "Cross-plane example (GM LS3) cylinder bore", "value": 103.25, "unit": "mm", "confidence": "secondary", "sources": ["https://gmauthority.com/blog/gm/gm-engines/ls3/", "https://gmspecialtyvehicles.com/chevrolet-performance/powertrain/engines/ls3"] },
+    { "id": "crossStrokeMm", "claim": "Cross-plane example (GM LS3) piston stroke", "value": 92, "unit": "mm", "confidence": "secondary", "sources": ["https://gmauthority.com/blog/gm/gm-engines/ls3/", "https://gmspecialtyvehicles.com/chevrolet-performance/powertrain/engines/ls3"] },
+    { "id": "crossFiringOrder", "claim": "Cross-plane example (GM LS3) firing order", "value": [1, 8, 7, 2, 6, 5, 4, 3], "confidence": "secondary", "sources": ["https://gmauthority.com/blog/gm/gm-engines/ls3/", "https://gmspecialtyvehicles.com/chevrolet-performance/powertrain/engines/ls3"] },
+    { "id": "flatBoreMm", "claim": "Flat-plane example (Ferrari F136) cylinder bore", "value": 94, "unit": "mm", "confidence": "secondary", "sources": ["https://www.whichcar.com.au/features/great-v8s-ferrari-f136"] },
+    { "id": "flatStrokeMm", "claim": "Flat-plane example (Ferrari F136) piston stroke", "value": 81, "unit": "mm", "confidence": "secondary", "sources": ["https://www.whichcar.com.au/features/great-v8s-ferrari-f136"] },
+    { "id": "flatFiringOrder", "claim": "Flat-plane example (Ferrari F136) firing order", "value": [1, 5, 3, 7, 4, 8, 2, 6], "confidence": "single-source", "sources": ["https://www.corvetteforum.com/forums/c8-z06-discussion/4611352-c8-z06-firing-order.html", "https://www.homemodelenginemachinist.com/threads/flat-plane-crank-firing-order.25168/"], "note": "From enthusiast forums only. No factory manual was found." },
+    { "id": "bankAngleDeg", "claim": "Angle between the cylinder banks of both engines", "value": 90, "unit": "degrees", "confidence": "secondary", "sources": ["https://gmauthority.com/blog/gm/gm-engines/ls3/", "https://www.whichcar.com.au/features/great-v8s-ferrari-f136"] },
+    { "id": "showRpm", "claim": "Speed both engines are shown at, chosen to be within both redlines", "value": 6000, "unit": "rpm", "confidence": "illustrative", "sources": [] }
+  ],
+  "shots": [
+    { "from": 0, "to": 6, "subject": "Both engines, the hook" },
+    { "from": 6, "to": 12.5, "subject": "Cross-plane crank, slowed" },
+    { "from": 12.5, "to": 19, "subject": "Flat-plane crank, slowed" },
+    { "from": 19, "to": 24.5, "subject": "Cross-plane at real speed" },
+    { "from": 24.5, "to": 30, "subject": "Flat-plane at real speed" }
+  ],
+  "captions": [
+    { "from": 0.3, "to": 2.9, "lines": ["SAME 8 CYLINDERS.", "SAME {bangs} BANGS A SECOND."], "size": "big", "y": 300 },
+    { "from": 3.2, "to": 5.9, "lines": ["SO WHY DOES THIS ONE", "SOUND SO DIFFERENT?"], "size": "big", "y": 300 },
+    { "from": 6.4, "to": 9.2, "lines": ["SLOWED DOWN {slow}×", "{crossLabel} CRANK"] },
+    { "from": 9.2, "to": 12.4, "lines": ["CRANK PINS {crossPins}° APART", "EACH BANK FIRES UNEVENLY"] },
+    { "from": 12.8, "to": 15.6, "lines": ["{flatLabel} CRANK", "CRANK PINS {flatPins}° APART"] },
+    { "from": 15.6, "to": 18.8, "lines": ["THE BANKS TAKE TURNS:", "EACH FIRES EVERY {flatGap}°"] },
+    { "from": 19.3, "to": 21.9, "lines": ["{crossLabel}, REAL SPEED", "BANK GAPS: {crossGaps}°"] },
+    { "from": 21.9, "to": 24.4, "lines": ["UNEVEN GAPS = BURBLE", "LOUDEST BANK NOTE: {crossTone} HZ"] },
+    { "from": 24.8, "to": 27.3, "lines": ["{flatLabel}, REAL SPEED", "EVEN GAPS: {flatGap}°"] },
+    { "from": 27.3, "to": 29.4, "lines": ["EVEN GAPS = SHRIEK", "LOUDEST BANK NOTE: {flatTone} HZ"] }
+  ]
+}

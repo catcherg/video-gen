@@ -1,8 +1,8 @@
 {
-  "name": "engine-reels",
+  "name": "video-gen",
   "version": "1.0.0",
   "license": "UNLICENSED",
-  "description": "Pixel-art how-engines-work explainer videos generated from code",
+  "description": "Generates 8-bit explainer reels, with original bass-heavy music, from a description",
   "scripts": {
     "studio": "remotion studio src/index.ts",
     "audio": "tsx scripts/audio.ts",
@@ -18,7 +18,7 @@
     "set-key": "tsx scripts/set-key.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "new-episode": "tsx scripts/new-episode.ts"
+    "new-video": "tsx scripts/new-video.ts"
   },
   "dependencies": {
     "@react-three/fiber": "^9.8.2",

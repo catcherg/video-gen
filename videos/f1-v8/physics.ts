@@ -1,4 +1,4 @@
-// Single source of truth for this episode: scene, HUD, labels, captions and audio all read from here.
+// Single source of truth for this video: scene, HUD, labels, captions and audio all read from here.
 //
 // Engine: Honda RA808E, 2008 Formula One 2.4 L 90° V8 (generic body on screen, no badges).
 // Primary sources, Honda R&D Technical Review 2009, F1 Special (The Third Era Activities):
@@ -26,38 +26,39 @@
 //     (opens 64° BBDC, closes 19° ATDC). The table gives no reference lift and no reading convention.
 
 import { createFourStroke } from "../../src/kits/engine/fourStroke";
-import type { ToneCheck } from "../../src/core/episode";
+import type { ToneCheck } from "../../src/core/video";
 import { ramp } from "../../src/core/math";
-import { meta } from "./meta";
+import { listFact, numberFact } from "../../src/core/spec";
+import { meta, spec } from "./meta";
 
-export const BORE_MM = 97;
-export const STROKE_MM = 40.52;
-export const BANK_ANGLE_DEG = 90;
-export const REDLINE = 19000;
-export const VALVETRAIN_LIMIT_RPM = 20300;
-export const COMPRESSION_RATIO = 13.0;
-export const PISTON_G = 230;
-export const BORE_PITCH_MM = 106.35;
-export const ENGINE_LENGTH_MM = 490;
-export const ENGINE_MASS_KG = 95.1;
-export const CRANK_HEIGHT_MM = 58.5;
-export const INTAKE_VALVE_MM = 41.6;
-export const EXHAUST_VALVE_MM = 32.4;
-export const INTAKE_LIFT_MM = 13.5;
-export const EXHAUST_LIFT_MM = 13.0;
-export const VALVE_ACCEL_G = 6000;
-export const AIR_BOTTLE_CC = 570;
-export const CAMSHAFTS = 4;
-export const VALVES_PER_CYLINDER = 4;
+export const BORE_MM = numberFact(spec, "boreMm");
+export const STROKE_MM = numberFact(spec, "strokeMm");
+export const BANK_ANGLE_DEG = numberFact(spec, "bankAngleDeg");
+export const REDLINE = numberFact(spec, "redlineRpm");
+export const VALVETRAIN_LIMIT_RPM = numberFact(spec, "valvetrainLimitRpm");
+export const COMPRESSION_RATIO = numberFact(spec, "compressionRatio");
+export const PISTON_G = numberFact(spec, "pistonG");
+export const BORE_PITCH_MM = numberFact(spec, "borePitchMm");
+export const ENGINE_LENGTH_MM = numberFact(spec, "engineLengthMm");
+export const ENGINE_MASS_KG = numberFact(spec, "engineMassKg");
+export const CRANK_HEIGHT_MM = numberFact(spec, "crankHeightMm");
+export const INTAKE_VALVE_MM = numberFact(spec, "intakeValveMm");
+export const EXHAUST_VALVE_MM = numberFact(spec, "exhaustValveMm");
+export const INTAKE_LIFT_MM = numberFact(spec, "intakeLiftMm");
+export const EXHAUST_LIFT_MM = numberFact(spec, "exhaustLiftMm");
+export const VALVE_ACCEL_G = numberFact(spec, "valveAccelG");
+export const AIR_BOTTLE_CC = numberFact(spec, "airBottleCc");
+export const CAMSHAFTS = numberFact(spec, "camshafts");
+export const VALVES_PER_CYLINDER = numberFact(spec, "valvesPerCylinder");
 /** Lowest slowed speed. The papers put idling at 5500 rpm and below ([V] section 4.2.3). */
-export const IDLE_RANGE_MAX_RPM = 5500;
+export const IDLE_RANGE_MAX_RPM = numberFact(spec, "idleRangeMaxRpm");
 
 /** Tachometer scale on the HUD. */
 export const TACH_MAX = 21000;
 export const TACH_RED_FROM = 18000;
 
 // Cylinders 1-4 = bank A, 5-8 = bank B. Assumed flat-plane order, see the header comment.
-export const FIRING_ORDER = [1, 5, 3, 7, 4, 8, 2, 6];
+export const FIRING_ORDER = listFact(spec, "firingOrder");
 export const CYLINDERS = FIRING_ORDER.length;
 /** Each pin carries one rod from each bank. */
 export const CRANK_PINS: [number, number][] = [
@@ -81,8 +82,7 @@ export const PISTON_PULL_MIN_TONNES = (PISTON_ACCEL_MIN_G * PISTON_G) / 1e6;
 // lowest slowed speed is exactly 2 bars, one stroke is 2 beats and one bank fires on every other beat.
 export const FRAMES_PER_BEAT = 14;
 export const BPM = (60 * meta.fps) / FRAMES_PER_BEAT;
-export const BEATS_PER_BAR = 4;
-export const BARS = 18;
+export const { beatsPerBar: BEATS_PER_BAR, bars: BARS } = spec.song;
 /** On-screen time of a beat. Written as a single division so grid times match the crank table exactly. */
 export const beatT = (beat: number) => (beat * FRAMES_PER_BEAT) / meta.fps;
 export const barT = (bar: number) => beatT(bar * BEATS_PER_BAR);

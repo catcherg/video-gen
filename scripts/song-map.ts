@@ -7,7 +7,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { songHits } from "../src/core/music/plan";
 import { makeAudibleDelay } from "./lib/audible";
-import { audioPath, loadMeta, loadSongPlan, requireSlug, ROOT, videoDir } from "./lib/episode";
+import { audioPath, loadMeta, loadSongPlan, requireSlug, ROOT, videoDir } from "./lib/video";
 
 const slug = requireSlug(process.argv[2], "npm run song-map <slug>");
 const wavPath = audioPath(slug);

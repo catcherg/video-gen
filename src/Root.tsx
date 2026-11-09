@@ -1,11 +1,11 @@
 import { Composition } from "remotion";
-import { EPISODES } from "../videos/registry";
+import { VIDEOS } from "../videos/registry";
 import { VISUAL_GALLERY_FRAMES, VisualGallery } from "./core/VisualGallery";
 import { PartsGallery } from "./kits/engine/parts/Gallery";
 
 export const RemotionRoot: React.FC = () => (
   <>
-    {EPISODES.map(({ meta, load }) => (
+    {VIDEOS.map(({ meta, load }) => (
       <Composition
         key={meta.slug}
         id={meta.slug}

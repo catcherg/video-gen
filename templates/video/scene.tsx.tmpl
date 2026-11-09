@@ -1,0 +1,32 @@
+// The 3D scene. Everything is a pure function of the time. Replace these shapes with your subject.
+import { useCurrentFrame, useVideoConfig } from "remotion";
+import { hitPulse } from "../../src/core/motion";
+import { usePalette } from "../../src/core/palette";
+import { PixelStage } from "../../src/core/PixelStage";
+import { Ball, Block, Floor, Particles } from "../../src/core/shapes";
+import { cameraAt, KICKS } from "./timeline";
+
+const Subject: React.FC<{ t: number }> = ({ t }) => {
+  const { series, accent } = usePalette();
+  const punch = hitPulse(t, KICKS);
+  return (
+    <>
+      <Floor />
+      <Block position={[-9, 3, 0]} size={[6, 6, 6]} color={series[0]} />
+      <Ball position={[0, 7 + punch, 0]} radius={6 + punch} detail={20} color={series[1]} glow={0.3} />
+      <Block position={[9, 4, 0]} size={[6, 8, 6]} color={series[2]} />
+      <Particles t={t} count={36} seed={5} origin={[-16, 1, -10]} box={[32, 22, 16]} velocity={[0.6, 1.2, 0]} size={0.5} colors={[accent, ...series]} glow={0.6} />
+    </>
+  );
+};
+
+export const Scene: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const t = frame / fps;
+  return (
+    <PixelStage t={t} cameraAt={cameraAt} pixelSize={2} normalEdge={0.55} depthEdge={0.85}>
+      <Subject t={t} />
+    </PixelStage>
+  );
+};

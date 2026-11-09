@@ -2,8 +2,8 @@
 // Usage: npm run verify-audio <slug>
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
-import type { ToneCheck } from "../src/core/episode";
-import { audioPath, loadToneChecks, requireSlug, ROOT } from "./lib/episode";
+import type { ToneCheck } from "../src/core/video";
+import { audioPath, loadToneChecks, requireSlug, ROOT } from "./lib/video";
 import { spectralPeaks } from "./lib/fft";
 
 const TOLERANCE = 0.01;

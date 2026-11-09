@@ -1,4 +1,4 @@
-import { type EpisodeAudio } from "../../src/core/audio";
+import { type VideoAudio } from "../../src/core/audio";
 import { defaultEngineAudio, renderEngineAudio, type EngineAudioSettings } from "../../src/kits/engine/engineAudio";
 import { meta } from "./meta";
 import { CROSS, engineAt, FLAT, isSlowed, PULSE_TAU_S, REAL_SPEED_START, SLOW_START, type V8 } from "./physics";
@@ -24,7 +24,7 @@ export const settings: EngineAudioSettings = {
   ],
 };
 
-const audio: EpisodeAudio = {
+const audio: VideoAudio = {
   render: () => renderEngineAudio({ durationS: meta.durationS, bangs, isSlowed, settings }),
 };
 

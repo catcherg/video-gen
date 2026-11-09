@@ -1,6 +1,8 @@
 # Video Production Playbook
 
-How to make an engine explainer at the quality of the finished V12 reel: 1080×1920, 30 fps, about 30 seconds, generated entirely from code.
+How to make a reel at the quality of the finished V12 video: 1080×1920, 30 fps, about 30 seconds, generated entirely from code.
+
+The process was worked out on engine videos, so many of the examples and formulas below are about engines. The stages and gates apply to every topic. `videos/sky-blue` shows them on a video with no engine in it, and `CLAUDE.md` marks which rules only apply to the engine kit.
 
 `videos/v12` is the reference implementation. When this document and the code disagree, trust the code and fix this document. The rules that every session must follow are summarised in [CLAUDE.md](../CLAUDE.md).
 
@@ -81,7 +83,7 @@ The soundtrack has to be a real song: chords, bass, drums, a melody and an arran
 - **Tune the song to the engine.** Set A4 to half the redline note, so the engine's tone is the song's tonic. See `SONG_A4_HZ`.
 - **Map the arrangement to the story.** Each doubling of RPM is a musical build. The largest drop in the song lands at the return to redline.
 - **Keep the engine audible as an instrument.** In the intro, carve its note into a rhythm with throttle stabs. In the chorus, duck it under each kick.
-- **Share the structure.** Bars, kicks and stabs live in the episode's `song.ts`, read by both the audio and the visuals.
+- **Share the structure.** Bars, kicks and stabs live in the video's `song.ts`, read by both the audio and the visuals.
 - **Check the engine separately from the music.** Give `toneChecks` a `minHz` and `maxHz` band above the bass, chords and lead. Keep the lead melody below the engine's note.
 - **Uneven engines need per-bank analysis.** Pan each bank with `pulsePan`, set `channel` on the check, and predict the tone with `dominantPulseHz`.
 

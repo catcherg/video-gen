@@ -10,8 +10,8 @@ export type PlaceholderCylinder = { cyl: number; x: number; bankRad: number; c: 
 export const pinFor = (x: number, bankRad: number, c: number): CrankPin => ({ x, alpha: bankRad + (c % 360) * D2R });
 
 /**
- * Stand-in engine for a new episode: real piston and crank motion, plain block.
- * Replace it with detailed parts when the episode's full scene is built.
+ * Stand-in engine for a new video: real piston and crank motion, plain block.
+ * Replace it with detailed parts when the video's full scene is built.
  */
 export const PlaceholderEngine: React.FC<{
   origin: [number, number, number];

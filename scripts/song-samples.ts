@@ -4,7 +4,7 @@ import path from "node:path";
 import { encodeWav } from "../src/core/audio";
 import { planSong, songHits, STYLE_FRAMES_PER_BEAT, type SongStyle } from "../src/core/music/plan";
 import { renderSong } from "../src/core/music/render";
-import { ROOT } from "./lib/episode";
+import { ROOT } from "./lib/video";
 import { analyseSong, formatReport, songProblems } from "./lib/songAnalysis";
 
 const flag = (name: string, fallback: number) => {

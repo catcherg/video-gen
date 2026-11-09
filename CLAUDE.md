@@ -1,14 +1,14 @@
 # Video Gen
 
-A framework for short vertical explainer videos on any topic, in a pixel-art 3D style (1080×1920, 30 fps, about 30 s), with picture and music generated entirely from code. Stack: Remotion 4, @remotion/three, React Three Fiber, three.js, TypeScript.
+Video Gen generates 8-bit reels: someone describes a video, uploads information about the subject, and gets back a finished vertical reel (1080×1920, 30 fps, about 30 s) and an original song, on any topic. Picture and music are generated entirely from code. Stack: Remotion 4, @remotion/three, React Three Fiber, three.js, TypeScript.
 
-It started as a series of engine explainers. Engines are now one kit among many that the framework will support. **End goal:** an interface where someone describes a video, uploads information, and gets back the finished video and an original song. See [Roadmap](#roadmap).
+**What this is becoming:** a local interface for generating those reels, installed on each person's own computer. The machinery underneath already works from one command: `npm run generate` goes from a brief and uploads to a finished video with nobody editing code, stopping for a person to approve the facts, the song and the frames. The interface is a layer on top of that command, and it is the remaining milestone. See [Roadmap](#roadmap).
 
-The full production process, with reasoning and worked formulas, is in [docs/VIDEO_PRODUCTION.md](docs/VIDEO_PRODUCTION.md). Read it before starting or substantially changing a video. `videos/v12` is the reference implementation.
+Engines were the first subject and are now one kit. Everything else in the framework works for any topic.
+
+[README.md](README.md) is the guide for people using it. The full production process, with reasoning and worked formulas, is in [docs/VIDEO_PRODUCTION.md](docs/VIDEO_PRODUCTION.md). Read that before starting or substantially changing a video. `videos/v12` is the reference for quality, and `videos/sky-blue` is the simplest example of a video on a general topic.
 
 Video status, approved song hashes, milestone progress and the backlog are in [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md). Read it at the start of any new work, and keep it up to date.
-
-"Episode" in code and commands means one video.
 
 ## Non-negotiable rules
 
@@ -50,10 +50,7 @@ Update the status of each milestone in `docs/PROJECT_STATUS.md`.
    - Keep AI credentials out of anything shared with other people.
    - Re-check Remotion's licence if use ever goes beyond friends and family. It is free for individuals and for-profit companies with up to 3 employees, larger companies need a paid licence, and selling a modified copy of Remotion is not allowed.
    - Add a licence to this repository, and set a policy for the rights to uploaded material.
-9. **Identity cleanup, at the start of interface work.**
-   - Write an in-depth `README.md`, and reframe this file around an interface for generating 8-bit reels.
-   - Rename the `engine-reels` package, and change "episode" to "video" in code and commands.
-   - Replace the engine-only scaffold with a general template, and move `f1-v8` and `v8-cross-flat` onto the spec.
+9. **Identity cleanup.** Done: a README, this framing, the `video-gen` package, "video" in code and commands, a general template, and every video on a spec.
 10. **Local interface.** One command starts it and prompts the user to open a local page. On that page they describe, upload, approve the song, review frames and download the video. Renders run on the same computer. Setup must be simple enough for non-developers, and must be tested on computers other than this Mac, including ones without a strong GPU. Renders need to repeat on one computer, but not match byte for byte between computers.
 
 ## Product decisions
@@ -66,7 +63,7 @@ Decided by the user. Later milestones build on these.
 - **Musical inspiration is Odd Mob and Subtronics.** Take inspiration from the style only. Never copy their melodies, vocals, samples or track structures, and keep their names out of what appears in a video.
 - **Users are friends and family.** It is not a public product.
 - **Everyone installs it on their own computer.** Renders run locally, through a local page the user is prompted to open. Nothing is hosted.
-- **Everyone uses their own Claude API key.** `npm run set-key` stores it outside the repository, readable only by that account. Never put a key in this repository.
+- **Everyone uses their own Claude access:** an API key that `npm run set-key` stores outside the repository, readable only by that account, or their own signed-in Claude plan with `--engine claude-code`. Never put a key in this repository.
 
 ## Layout
 
@@ -74,7 +71,7 @@ Decided by the user. Later milestones build on these.
 videos/           Umbrella folder: one folder per generated video
   registry.ts     Every video is listed here; Root.tsx registers one Composition each
   <slug>/
-    spec.json     optional for now: format, question, song grid, sourced facts, shot list, captions
+    spec.json     format, question, song grid, palette, sourced facts, shot list, captions
     meta.ts       title, description, fps, duration, size (derived from spec.json when there is one)
     physics.ts    computed values and sources; for engines, RPM curve, slow-motion, firing order, toneChecks
     geometry.ts   model dimensions and world placement, shared by scene and overlay
@@ -84,7 +81,7 @@ videos/           Umbrella folder: one folder per generated video
     song.ts       optional: bars, kicks and other musical data shared by audio and visuals
     songMap.ts    generated by song-map: the video frame on which each hit is actually audible
     audio.ts      mix settings or a full song
-    index.tsx     makeEpisode(slug, Scene, Overlay)
+    index.tsx     makeVideo(slug, Scene, Overlay, palette)
     physics.test.ts  tests for the video's numbers
     output/       ignored: audio.wav, <slug>.mp4, <slug>-preview.mp4, stills/
 src/core/         Subject-neutral: spec, palette, layout (safe zones and regions), motion, shapes (3D blocks, particles),
@@ -96,9 +93,9 @@ src/kits/engine/  Engine kit: fourStroke physics + testkit, engineAudio, HUD, en
 public/           fonts/, and videos -> ../videos (symlink so Remotion can serve each video's output/)
 docs/             VIDEO_PRODUCTION.md (production playbook), PROJECT_STATUS.md (status, songs, backlog),
                   UPLOAD_POLICY.md, THIRD_PARTY.md, licenses/
-scripts/          audio, song-map, song-samples, stills, render, verify-audio, check-video, check-scene, compare-frames, new-episode,
+scripts/          audio, song-map, song-samples, stills, render, verify-audio, check-video, check-scene, compare-frames, new-video,
                   generate, set-key, pipeline/ (stages, model client, prompts)
-templates/        episode/ is copied by new-episode (an engine video); generated/ is copied by the AI pipeline
+templates/        video/ is the general template, also used by the AI pipeline; engine/ is the engine kit's template
 poc/              Original proof of concept, kept for reference. Not part of the build.
 ```
 
@@ -108,7 +105,7 @@ Units in engine scenes: 1 = 10 cm.
 
 ```bash
 npm run studio                       # Remotion Studio preview
-npm run new-episode <slug>           # scaffold and register a new video
+npm run new-video <slug>             # scaffold and register a new video, with a first song (-- --kit engine for an engine video)
 npm test                             # spec, boundary and physics tests
 npm run typecheck
 npm run audio <slug>                 # writes videos/<slug>/output/audio.wav
@@ -135,7 +132,7 @@ GL settings live in `render-settings.ts`. `angle` uses the Mac's GPU.
 
 ## The video spec
 
-`spec.json` is defined and validated by `src/core/spec.ts`. In V12 it drives:
+Every video has a `spec.json`, defined and validated by `src/core/spec.ts`. It drives:
 
 - `format`, `title`, `description`: `meta.ts` is derived from them.
 - `song`: tempo, beats per bar and bars, read by `physics.ts`. It also records the approved WAV's hash.
@@ -182,15 +179,24 @@ After rendering, run `npm run verify-audio <slug>`.
 
 ## Adding a video
 
-The scaffold currently produces an engine video. A general template arrives with Milestone 9.
+`npm run generate` is the normal way: see [The AI pipeline](#the-ai-pipeline). To make one by hand:
 
-1. Run `npm run new-episode <slug> -- --title "Title"`, or use `/new-episode`. It copies `templates/episode/` and registers the video. The scaffold works as-is with a placeholder inline-4, so fix TODOs one at a time and keep it running.
-2. Replace the placeholders in `physics.ts` first. Add sources. Use `createFourStroke` for four-stroke engines, with `firingAnglesDeg` if the engine is odd-fire.
-3. Define `toneChecks`: real-speed sections held at constant RPM, clear of ramps and whooshes. `expectedHz` is what should be dominant, and it is not always the firing frequency. With uneven firing per bank, pan each bank to its own side with `pulsePan`, set `channel` on the check, and predict the tone with `dominantPulseHz`. `videos/v8-cross-flat` does this.
-4. Add `physics.test.ts` with `describeFourStroke`.
-5. Build the scene from the kit's `parts/`, replacing `PlaceholderEngine`. Add new reusable models to the kit, not to the video.
-6. Create the song, get it approved, record its hash, then run `npm run song-map <slug>`. Do this before building shots.
-7. Follow the check-frames workflow, then render.
+1. Run `npm run new-video <slug> -- --title "Title"`, or use `/new-video`. It copies `templates/video/`, registers the video, generates a first song and writes its song map. The result passes `check-video` with placeholder shapes, so fix TODOs one at a time and keep it running.
+2. Get the song approved, changing the seed in `spec.json` if needed. Record its hash as `lockedWavSha256` and in `docs/PROJECT_STATUS.md`, then run `npm run song-map <slug>`. Do this before building shots.
+3. Replace the placeholder fact in `spec.json` with real facts, each with sources and a confidence level.
+4. Write the shots and captions in `spec.json`, then `physics.ts` (with its sources comment), `timeline.ts` and `scene.tsx`. Put reusable models in a kit, not in the video.
+5. Follow the check-frames workflow, then render.
+
+### Engine videos
+
+Add `-- --kit engine` to copy `templates/engine/` instead, which works as-is with a placeholder inline-4 and a placeholder music bed.
+
+1. Replace the placeholder facts in `spec.json` first, and the speeds in `physics.ts`. Add sources. Use `createFourStroke` for four-stroke engines, with `firingAnglesDeg` if the engine is odd-fire.
+2. Define `toneChecks`: real-speed sections held at constant RPM, clear of ramps and whooshes. `expectedHz` is what should be dominant, and it is not always the firing frequency. With uneven firing per bank, pan each bank to its own side with `pulsePan`, set `channel` on the check, and predict the tone with `dominantPulseHz`. `videos/v8-cross-flat` does this.
+3. Extend `physics.test.ts`, which uses `describeFourStroke`.
+4. Build the scene from the kit's `parts/`, replacing `PlaceholderEngine`. Add new reusable models to the kit, not to the video.
+5. Create the song, get it approved, record its hash, then run `npm run song-map <slug>`. Do this before building shots.
+6. Follow the check-frames workflow, then render.
 
 ## Production rules
 

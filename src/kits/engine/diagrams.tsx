@@ -1,5 +1,5 @@
 // Live 2D diagrams for the panel under the captions. Each one is a pure function of its props,
-// which an episode computes from its physics, so a diagram can never disagree with the 3D scene.
+// which a video computes from its physics, so a diagram can never disagree with the 3D scene.
 import { C, FONT, STROKE_COLORS, UI } from "./theme";
 
 export { DiagramPanel, PANEL } from "../../core/DiagramPanel";

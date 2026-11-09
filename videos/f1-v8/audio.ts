@@ -1,7 +1,7 @@
 // The soundtrack: an original deep bass house track in D# minor, at a tempo and tuning taken
 // from the engine. The sub's root is the engine's redline note five octaves down, and while
 // slowed every firing event is a drum hit, so the kick pattern is literally the engine.
-import { SAMPLE_RATE, type EpisodeAudio, type Rng } from "../../src/core/audio";
+import { SAMPLE_RATE, type VideoAudio, type Rng } from "../../src/core/audio";
 import { defaultEngineAudio, renderEngineAudio, type EngineAudioSettings, type SongTrack } from "../../src/kits/engine/engineAudio";
 import { applyGain, clap, growl, houseKick, sidechain, subLine, type SubNote } from "../../src/core/houseSynth";
 import { crash, hat, midiHz, mixInto, newBus, pingPongDelay, playNote, riser, snare, type Bus, type Voice } from "../../src/core/synth";
@@ -259,7 +259,7 @@ export const settings: EngineAudioSettings = {
   mix: { ...defaultEngineAudio.mix, pulseGain: 0.34, thumpGain: 0.14, fadeOutS: 0.7, masterDrive: 0.6, targetPeak: 0.92 },
 };
 
-const audio: EpisodeAudio = {
+const audio: VideoAudio = {
   render: () => renderEngineAudio({ durationS: meta.durationS, bangs: BANGS, isSlowed: isSlowedBang, settings, song: buildSong }),
 };
 

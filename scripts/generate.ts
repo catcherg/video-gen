@@ -15,7 +15,7 @@ import path from "node:path";
 import { planSong, songHits } from "../src/core/music/plan";
 import { encodeWav } from "../src/core/audio";
 import { renderSong } from "../src/core/music/render";
-import { audioPath, loadSongPlan, outputDir, ROOT, videoDir, writeEpisodeAudio } from "./lib/episode";
+import { audioPath, loadSongPlan, outputDir, ROOT, videoDir, writeVideoAudio } from "./lib/video";
 import { cleanEnv } from "./lib/sandbox";
 import { analyseSong, songProblems } from "./lib/songAnalysis";
 import { createClaudeCodeClient } from "./pipeline/claudeCode";
@@ -25,8 +25,8 @@ import { approve, GATES, isRunning, loadState, type Engine, newState, nextStep, 
 
 const SLUG = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
 const DEFAULT_MAX_USD = 10;
-const IMPORT_MARK = "// new-episode: imports";
-const ENTRY_MARK = "  // new-episode: entries";
+const IMPORT_MARK = "// new-video: imports";
+const ENTRY_MARK = "  // new-video: entries";
 
 const args = process.argv.slice(2);
 const option = (name: string) => {
@@ -71,7 +71,7 @@ const realDeps = (model: ModelClient): Deps => ({
   log: (line) => console.log(line),
   now: () => Date.now(),
   makeSong: async (s) => {
-    await writeEpisodeAudio(s);
+    await writeVideoAudio(s);
     const map = run("npm", ["run", "--silent", "song-map", s]);
     if (map.status !== 0) return [`song-map failed: ${map.stderr}`];
     const plan = loadSongPlan(s);

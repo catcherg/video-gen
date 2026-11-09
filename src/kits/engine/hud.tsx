@@ -1,4 +1,4 @@
-// HUD building blocks, plus EngineHud which assembles them for a four-stroke episode.
+// HUD building blocks, plus EngineHud which assembles them for a four-stroke video.
 import { fmtInt, noteName } from "../../core/math";
 import type { FourStroke } from "./fourStroke";
 import { FONT, UI } from "./theme";

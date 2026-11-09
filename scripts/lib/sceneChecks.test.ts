@@ -2,7 +2,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { checkSource } from "./sceneChecks";
-import { ROOT } from "./episode";
+import { ROOT } from "./video";
 
 const rulesFor = (source: string, kit?: string) => checkSource("videos/demo/scene.tsx", source, { videoDir: "videos/demo", kit }).map((f) => f.rule);
 
@@ -29,7 +29,7 @@ describe("checkSource", () => {
     ["node modules", 'import fs from "node:fs";', "import"],
     ["other packages", 'import x from "left-pad";', "import"],
     ["another video", 'import { x } from "../other/physics";', "import"],
-    ["outside the framework", 'import { x } from "../../scripts/lib/episode";', "import"],
+    ["outside the framework", 'import { x } from "../../scripts/lib/video";', "import"],
     ["re-export from outside", 'export { x } from "../other/physics";', "import"],
     ["URL", 'export const x = "https://example.com/a.png";', "url"],
     ["URL in a template", "export const x = `https://example.com/${1}`;", "url"],

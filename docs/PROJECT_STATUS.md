@@ -8,7 +8,7 @@ The goal is an interface that turns a description and uploaded information into 
 
 | # | Milestone | State | Notes |
 |---|---|---|---|
-| 1 | Core split, umbrella folder and spec | Done | All three videos and WAVs were byte-identical before and after. V12 is the only video on the spec so far. |
+| 1 | Core split, umbrella folder and spec | Done | All three videos and WAVs were byte-identical before and after. |
 | 2 | Product decisions | Done | Recorded in `CLAUDE.md`. Everyone installs it on their own computer. |
 | 3 | Generic visual library | Done | Palettes, safe zones, motion, 3D shapes, six diagram types and `check-scene`. Only the gallery uses them so far; Milestone 5 is the first real test. |
 | 4 | Song generator | Done | Deep bass house by default, dubstep as the option for slower, dramatic videos. The user approved six samples; their hashes are under Locked songs. |
@@ -16,14 +16,17 @@ The goal is an interface that turns a description and uploaded information into 
 | 6 | Automated checks | Done | `check-video` and `compare-frames`. Tested against deliberately broken layouts. They found three problems in finished videos, listed below. |
 | 7 | AI pipeline, run headless | Done | `npm run generate`. The first real run, `why-cats-purr`, went from a one-line brief to a finished video on a Max plan. Its scene code passed `check-video` on the second attempt, for about $7.34 of API-equivalent value and 24 minutes of model time, $6.62 of it on scene code. |
 | 8 | Sandboxing and licensing | Done | Generated code is contained in Node and the browser, tested against hostile code. Credentials are stripped from child processes. Upload policy and third-party notices are written. The repository is all rights reserved, by the user's choice. |
-| 9 | Identity cleanup | Not started | At the start of interface work: README, 8-bit reel framing in `CLAUDE.md`, renames, general template. |
+| 9 | Identity cleanup | Done | README, 8-bit reel framing in `CLAUDE.md`, the `video-gen` package, "video" in code and commands, a general template, and every video on a spec. |
 | 10 | Local interface | Not started | One command starts it and prompts the user to open a local page. Renders run on the same computer. Needs simple setup, tested beyond this Mac. |
 
 Known gaps after Milestone 1:
 
-- `f1-v8` and `v8-cross-flat` still use a hand-written `meta.ts` and captions, not a spec.
-- `new-episode` still scaffolds an engine video without a spec.
 - V12's camshaft and valve counts are marked `assumed` in `spec.json`, because no source was ever recorded for them. Find one.
+
+Known gaps after Milestone 9:
+
+- `f1-v8`'s opening hook lines stay in `timeline.ts`, because they are timed to the song's stabs rather than to bars. Its other captions are in the spec.
+- `v8-cross-flat` is on the spec, but its song is still a placeholder bed, so it has no locked hash.
 
 Known gaps after Milestone 3:
 
@@ -41,7 +44,6 @@ Found by `check-video` in approved videos. The user chose to leave these as they
 Found while making `sky-blue`. None blocked the video, but each is manual work the AI pipeline (Milestone 7) will trip over:
 
 - Spec diagrams can only read facts, not computed values, so this video builds its diagrams in `timeline.ts`.
-- `new-episode` only makes engine videos, so the files were written by hand.
 - Placing a subject inside the safe zone needs a manual camera offset, and callout positions are tuned by eye. A core helper for aiming a subject into a region would remove the first.
 - Shot titles aren't part of the spec.
 - A video with no `toneChecks` passes `verify-audio` without checking anything.
@@ -49,9 +51,9 @@ Found while making `sky-blue`. None blocked the video, but each is manual work t
 - `check-video` can't judge whether a shot explains its idea, whether a label points at the right thing, or whether the camera passes through geometry. A vision review in Milestone 7 could cover part of this.
 - The tile map has no real geography, so the route map is drawn by hand and labelled schematic.
 
-## Episodes
+## Videos
 
-| Episode | State | Notes |
+| Video | State | Notes |
 |---|---|---|
 | `v12` | Finished | The reference for quality. Song approved by the user. |
 | `f1-v8` | Finished | Honda RA808E, 2008 F1 2.4 L V8, sourced from the Honda R&D Technical Review F1 special. Deep bass house song, approved and locked. Stroke, crank type and firing order are not in the Honda papers: see the source notes in `physics.ts`. |
@@ -62,14 +64,14 @@ Found while making `sky-blue`. None blocked the video, but each is manual work t
 
 ## Locked songs
 
-These songs are approved. Do not change them without asking the user. After any work on the episode, regenerate the WAV and confirm the hash still matches:
+These songs are approved. Do not change them without asking the user. After any work on the video, regenerate the WAV and confirm the hash still matches:
 
 ```bash
 npm run audio v12
 shasum -a 256 videos/v12/output/audio.wav
 ```
 
-| Episode | Approved WAV SHA-256 |
+| Video | Approved WAV SHA-256 |
 |---|---|
 | `v12` | `888e4c9f260f1523857f3dddcf311369b134cc05e5cabfbaf695c3d3bf19bfd6` |
 | `f1-v8` | `db3c0a963368a75578b9fedf9f24b8a906f91133c34deb56688adb10e52dad1f` |
@@ -92,11 +94,11 @@ The user approved these 18-bar samples from `npm run song-samples`. If work on `
 
 ## Backlog
 
-Nothing here has been started. Suggested order: safe zones first, because that changes the layout of every episode. Leave 60 fps until the visuals settle, since it invalidates frame-based checks.
+Nothing here has been started. Suggested order: safe zones first, because that changes the layout of every video. Leave 60 fps until the visuals settle, since it invalidates frame-based checks.
 
 1. **Reels and TikTok safe zones.** The shared setting is done in Milestone 3; moving the finished videos into it and testing a real upload are not. The HUD starts at y=150, captions at y=1290, and the diagram panel runs from y=1478 to y=1758, so platform buttons may cover parts of them. Move the positions into a shared safe-area setting in `src/core/`, then check them against each platform's current guidance and a real upload.
 2. **Build the full V8 scene.** Replace `PlaceholderEngine` with detailed parts and a car, and give it a real song that follows the beat-grid rules. Make it clear that the HUD shows the firing rate while captions give the per-bank note. During the camera swings around frames 190 and 585, pistons reach the frame edge.
-3. **End-card and branding slot.** Add an optional end card to `makeEpisode`, with its length in `meta.ts` so the video and audio fades move with it. Use the user's own branding only.
+3. **End-card and branding slot.** Add an optional end card to `makeVideo`, with its length in `meta.ts` so the video and audio fades move with it. Use the user's own branding only.
 4. **Subtitle export.** Captions are already timed data with physics-derived text, so a `subtitles <slug>` script can write SRT or VTT from `timeline.ts`.
 5. **60 fps option.** Physics and camera run on time, so they carry over. The seeded flicker uses the frame number and would need retuning, render time roughly doubles, crank strobing at real speed changes, and frame numbers in checks need redoing.
 6. **F1 V8 sources.** Find a published stroke, crank type and firing order for the Honda RA808E, plus the reading convention for the "19/64" valve timing in the valvetrain paper. The video currently labels the firing order as typical.

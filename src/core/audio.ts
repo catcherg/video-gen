@@ -43,4 +43,4 @@ export const encodeWav = ({ L, R, norm }: StereoAudio): Buffer => {
   return buf;
 };
 
-export type EpisodeAudio = { render: () => StereoAudio };
+export type VideoAudio = { render: () => StereoAudio };

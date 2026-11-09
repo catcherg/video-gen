@@ -3,7 +3,7 @@ import { mkdirSync } from "node:fs";
 import path from "node:path";
 import { renderStill, selectComposition } from "@remotion/renderer";
 import { GL } from "../render-settings";
-import { outputDir, requireSlug, ROOT } from "./lib/episode";
+import { outputDir, requireSlug, ROOT } from "./lib/video";
 import { guardedBrowser, secureBundle } from "./lib/sandbox";
 
 const usage = "npm run stills <slug> <frame> [frame...]";

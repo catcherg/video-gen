@@ -1,0 +1,11 @@
+// The numbers for this video. Inputs come from the facts in spec.json; anything else is computed here.
+//
+// Sources: TODO. List where each fact came from, and say so if one is single-sourced or assumed.
+import { numberFact } from "../../src/core/spec";
+import { spec } from "./meta";
+
+export const EXAMPLE_COUNT = numberFact(spec, "exampleCount");
+
+export const FRAMES_PER_BEAT = Math.round((60 * spec.format.fps) / spec.song.bpm);
+export const beatT = (beat: number) => (beat * FRAMES_PER_BEAT) / spec.format.fps;
+export const barT = (bar: number) => beatT(bar * spec.song.beatsPerBar);

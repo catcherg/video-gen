@@ -1,5 +1,5 @@
 // Four-stroke engine timing: integrates an RPM curve into a crank-angle table and
-// derives every firing event from it. Episodes configure this from their physics.ts.
+// derives every firing event from it. Videos configure this from their physics.ts.
 
 export type FourStrokeSpec = {
   /** Cylinder numbers in firing sequence. */

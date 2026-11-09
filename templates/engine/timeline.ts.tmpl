@@ -2,6 +2,8 @@
 import { makeCameraRig, type CameraKey } from "../../src/core/camera";
 import type { Caption } from "../../src/core/Captions";
 import { fmtInt } from "../../src/core/math";
+import { resolveCaptions } from "../../src/core/spec";
+import { spec } from "./meta";
 import { bangsPerSecond, CYLINDERS, REDLINE, SLOW } from "./physics";
 
 const KEYS: CameraKey[] = [
@@ -14,12 +16,7 @@ const KEYS: CameraKey[] = [
 
 export const cameraAt = makeCameraRig(KEYS);
 
-// TODO: write this episode's own captions.
-export const CAPTIONS: Caption[] = [
-  { from: 0.25, to: 2.9, lines: [`${fmtInt(REDLINE)} RPM. ${CYLINDERS} CYLINDERS.`, "TODO: THE HOOK"], size: "big", y: 300 },
-  { from: 3.3, to: 12, lines: [`SLOWED DOWN ${SLOW}×`, "TODO: EXPLAIN"] },
-  { from: 24.5, to: 29.5, lines: [`${fmtInt(bangsPerSecond(REDLINE))} BANGS A SECOND.`, "TODO: THE PAYOFF"] },
-];
+export const CAPTIONS: Caption[] = resolveCaptions(spec, { redline: fmtInt(REDLINE), cylinders: CYLINDERS, slow: SLOW, bangs: fmtInt(bangsPerSecond(REDLINE)) });
 
 export const HUD_IN = 3.05;
 export const END_FADE_FROM = 29.5;

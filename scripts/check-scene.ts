@@ -5,7 +5,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync } from "node:f
 import path from "node:path";
 import { renderStill, selectComposition } from "@remotion/renderer";
 import { GL } from "../render-settings";
-import { outputDir, requireSlug, ROOT, videoDir } from "./lib/episode";
+import { outputDir, requireSlug, ROOT, videoDir } from "./lib/video";
 import { guardedBrowser, secureBundle } from "./lib/sandbox";
 import { checkSource } from "./lib/sceneChecks";
 

@@ -1,4 +1,4 @@
-// A small offline instrument set for episode soundtracks: drums and subtractive synth voices.
+// A small offline instrument set for video soundtracks: drums and subtractive synth voices.
 // Everything writes into stereo buses at exact sample positions, so hits land exactly where asked.
 import { SAMPLE_RATE as SR, type Rng } from "./audio";
 

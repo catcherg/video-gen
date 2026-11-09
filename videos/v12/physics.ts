@@ -1,4 +1,4 @@
-// Single source of truth for this episode: scene, HUD, labels, captions and audio all read from here.
+// Single source of truth for this video: scene, HUD, labels, captions and audio all read from here.
 //
 // Engine: Lamborghini L539, 6.5 L 60° V12 (generic body on screen, no badges).
 // Sources:
@@ -15,7 +15,7 @@
 //     1-6 is likewise unconfirmed for this engine, and the labels assume right = 1-6.
 
 import { createFourStroke } from "../../src/kits/engine/fourStroke";
-import type { ToneCheck } from "../../src/core/episode";
+import type { ToneCheck } from "../../src/core/video";
 import { ramp } from "../../src/core/math";
 import { listFact, numberFact } from "../../src/core/spec";
 import { meta, spec } from "./meta";

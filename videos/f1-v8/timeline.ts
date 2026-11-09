@@ -17,6 +17,8 @@ import * as THREE from "three";
 import { makeCameraRig, type CameraFn, type CameraKey } from "../../src/core/camera";
 import type { Caption } from "../../src/core/Captions";
 import { fmtInt, hash, noteName } from "../../src/core/math";
+import { resolveCaptions, type TimeRef } from "../../src/core/spec";
+import { spec } from "./meta";
 import { heroS, HERO_Z, LIFT, TRACK_FROM } from "./geometry";
 import { barT, beatT, DROP, BORE_MM, bangsPerSecond, CRANK_PINS, ENGINE_MASS_KG, INTAKE_LIFT_MM, PISTON_G, PISTON_PULL_MIN_TONNES, REDLINE, SLOW, STROKE_MM, SUB_HZ, VALVE_ACCEL_G } from "./physics";
 import { kickPulse, STABS, stabPulse } from "./beatmap";
@@ -136,23 +138,27 @@ const SLOW_TXT = Math.round(SLOW * 10) / 10;
 export const HOOK_LINES = [[REDLINE_TXT, "RPM."], ["WHY", "DOESN'T", "IT"], ["FLY APART?"]];
 export const HOOK_END = barT(2) - 0.08;
 
-export const CAPTIONS: Caption[] = [
-  { from: barT(2) + 0.1, to: barT(4) - 0.1, lines: [`SLOWED DOWN ${SLOW_TXT}×`, "EVERY BANG IS A KICK DRUM"] },
-  { from: barT(4), to: barT(5) - 0.08, lines: ["4 STROKES.", "ONLY ONE IS A BANG."] },
-  { from: barT(5), to: barT(6) - 0.08, lines: [`${BORE_MM} MM WIDE, ${Math.round(STROKE_MM * 10) / 10} MM TRAVEL:`, "A VERY SHORT STROKE"] },
-  { from: barT(6), to: barT(7) - 0.08, lines: [`FLAT CRANK: ${CRANK_PINS.length} PINS,`, "ONE BANG EVERY 90°"] },
-  { from: barT(7), to: barT(8) - 0.08, lines: [`EACH ${PISTON_G} G PISTON PULLS`, `OVER ${Math.floor(PISTON_PULL_MIN_TONNES * 10) / 10} TONNES AT REDLINE`] },
-  { from: barT(8), to: barT(9) - 0.08, lines: ["NO CHAIN. NO BELT.", "GEARS TURN THE CAMS"] },
-  { from: barT(9), to: barT(10) - 0.08, lines: ["FINGER FOLLOWERS", `PUSH VALVES ${INTAKE_LIFT_MM} MM OPEN`] },
-  { from: barT(10), to: barT(11) - 0.08, lines: ["AT THIS SPEED", "METAL SPRINGS SURGE"] },
-  { from: barT(11), to: barT(12) - 0.08, lines: ["SO COMPRESSED AIR SHUTS", `THE VALVES: OVER ${fmtInt(VALVE_ACCEL_G)} G`] },
-  { from: barT(12) + 0.08, to: barT(13) - 0.08, lines: ["BACK TO REAL SPEED"] },
-  { from: barT(13), to: barT(14) - 0.08, lines: [`${ENGINE_MASS_KG} KG, BOLTED IN`, "AS PART OF THE CAR"] },
-  { from: barT(14), to: barT(15) - 0.08, lines: [`${fmtInt(TONE_HZ)} BANGS A SECOND`] },
-  { from: barT(15), to: barT(16) - 0.08, lines: [`YOUR EAR HEARS ONE NOTE:`, `${fmtInt(TONE_HZ)} HZ, ${TONE_NOTE.name.replace(/\d/, "")}`] },
-  { from: barT(16), to: barT(17) - 0.08, lines: ["THAT SUB BASS IS THE", `SAME NOTE AT ${SUB_HZ.toFixed(1)} HZ`] },
-  { from: barT(17), to: barT(18) - 0.5, lines: ["5 OCTAVES DOWN"] },
-];
+/** Times on this video's exact frame grid, so that every caption starts on the frame it always has. */
+const gridTime = (ref: TimeRef) => (typeof ref === "number" ? ref : ("bar" in ref ? barT(ref.bar) : beatT(ref.beat)) + (ref.add ?? 0));
+
+export const CAPTIONS: Caption[] = resolveCaptions(
+  spec,
+  {
+    slow: SLOW_TXT,
+    bore: BORE_MM,
+    stroke: Math.round(STROKE_MM * 10) / 10,
+    pins: CRANK_PINS.length,
+    piston: PISTON_G,
+    pull: Math.floor(PISTON_PULL_MIN_TONNES * 10) / 10,
+    lift: INTAKE_LIFT_MM,
+    accel: fmtInt(VALVE_ACCEL_G),
+    mass: ENGINE_MASS_KG,
+    tone: fmtInt(TONE_HZ),
+    note: TONE_NOTE.name.replace(/\d/, ""),
+    sub: SUB_HZ.toFixed(1),
+  },
+  gridTime,
+);
 
 export const SHOW_BANK_LABELS = (t: number) => t > barT(3) - 0.2 && t < barT(4) - 0.3;
 export const SHOW_CYL_NUMBERS = (t: number) => t > barT(3) - 0.2 && t < barT(4) - 0.3;

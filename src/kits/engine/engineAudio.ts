@@ -71,7 +71,7 @@ export type EngineAudioSettings = {
   thump: ThumpSettings;
   pulse: PulseSettings;
   shaping: ToneShaping;
-  /** Simple looping backing. Leave out when the episode supplies a `song`. */
+  /** Simple looping backing. Leave out when the video supplies a `song`. */
   bed?: MusicBed;
   whooshes: Whoosh[];
   mix: MixSettings;
@@ -80,7 +80,7 @@ export type EngineAudioSettings = {
 /** A full stereo music track, plus an optional per-sample gain for the real-speed engine tone. */
 export type SongTrack = { L: Float32Array; R: Float32Array; engineGain?: Float32Array };
 
-/** Starting point for an episode: spread this, then set voiceOf and whooshes. */
+/** Starting point for a video: spread this, then set voiceOf and whooshes. */
 export const defaultEngineAudio: Omit<EngineAudioSettings, "voiceOf" | "whooshes"> = {
   seed: 1234567,
   thump: {
