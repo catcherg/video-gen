@@ -5,6 +5,7 @@
   "description": "A 12-cylinder engine slowed down 40×, then back to real speed, where 870 bangs a second become one note.",
   "question": "What makes a V12 scream?",
   "kit": "engine",
+  "palette": "machines",
   "format": { "fps": 30, "width": 1080, "height": 1920, "durationS": 32 },
   "song": {
     "bpm": 150,

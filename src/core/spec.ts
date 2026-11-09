@@ -1,7 +1,10 @@
 // The video spec: everything about a video that is data rather than code.
 // It is plain JSON, so that a person, a form or an AI can write it, and it is validated every time it loads.
 import type { Caption } from "./Captions";
+import { validateDiagram, type DiagramSpec } from "./diagrams/spec";
 import type { EpisodeMeta } from "./episode";
+import { captionFits } from "./layout";
+import { DEFAULT_PALETTE, paletteProblems, PALETTES, resolvePalette, type Palette, type PaletteRef } from "./palette";
 
 /** A moment in the video: seconds, or a position on the song's grid plus an offset in seconds. */
 export type TimeRef = number | { bar: number; add?: number } | { beat: number; add?: number };
@@ -17,7 +20,7 @@ export type Fact = { id: string; claim: string; value: FactValue; unit?: string;
 export type Shot = { from: TimeRef; to: TimeRef; subject: string; diagram?: string };
 
 /** Caption text can hold {tokens}, filled from values the video computes from its facts. */
-export type SpecCaption = { from: TimeRef; to: TimeRef; lines: string[]; size?: "big" | "small"; y?: number };
+export type SpecCaption = { from: TimeRef; to: TimeRef; lines: string[]; size?: "big" | "small" | "compact"; y?: number };
 
 export type VideoSpec = {
   version: 1;
@@ -30,9 +33,13 @@ export type VideoSpec = {
   kit: string;
   format: { fps: number; width: number; height: number; durationS: number };
   song: { bpm: number; beatsPerBar: number; bars: number; style: string; lockedWavSha256?: string };
+  /** A preset chosen for the type of video, or a full palette. Leave out for the default. */
+  palette?: PaletteRef;
   facts: Fact[];
   shots: Shot[];
   captions: SpecCaption[];
+  /** Named general diagrams. A number in one can be written as {"fact": "id"} to read it from the facts. */
+  diagrams?: Record<string, unknown>;
 };
 
 const SLUG = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
@@ -72,6 +79,15 @@ const checkSpans = (spans: Span[], durationS: number, errors: string[]) => {
     const next = spans[i + 1];
     if (next && next.from < s.to - EPSILON) errors.push(`${next.label}: starts before ${s.label} ends`);
   });
+};
+
+/** A copy of some JSON with every {"fact": "id"} replaced by that fact's value. */
+const fillFacts = (spec: VideoSpec, value: unknown): unknown => {
+  if (Array.isArray(value)) return value.map((v) => fillFacts(spec, v));
+  if (!isRecord(value)) return value;
+  const keys = Object.keys(value);
+  if (keys.length === 1 && keys[0] === "fact") return findFact(spec, String(value.fact)).value;
+  return Object.fromEntries(keys.map((k) => [k, fillFacts(spec, value[k])]));
 };
 
 /** Every problem with a candidate spec. An empty list means it is valid. */
@@ -116,6 +132,28 @@ export const validateSpec = (raw: unknown): string[] => {
     else if (fact.sources.length === 0 && !UNSOURCED_OK.includes(fact.confidence)) errors.push(`${fact.id}: needs a source, or confidence "assumed" or "illustrative"`);
   });
 
+  if (typeof spec.palette === "string") {
+    if (!(spec.palette in PALETTES)) errors.push(`palette: unknown preset "${spec.palette}"; use one of ${Object.keys(PALETTES).join(", ")}, or a full palette`);
+  } else if (spec.palette !== undefined) {
+    errors.push(...paletteProblems(spec.palette));
+  }
+
+  if (spec.diagrams !== undefined) {
+    if (!isRecord(spec.diagrams)) errors.push("diagrams: must be an object of named diagrams");
+    else {
+      for (const [id, diagram] of Object.entries(spec.diagrams)) {
+        try {
+          errors.push(...validateDiagram(fillFacts(spec, diagram), `diagrams.${id}`));
+        } catch (err) {
+          errors.push(`diagrams.${id}: ${(err as Error).message}`);
+        }
+      }
+      spec.shots.forEach((shot, i) => {
+        if (shot.diagram !== undefined && !(shot.diagram in (spec.diagrams as object))) errors.push(`shots[${i}]: no diagram named "${shot.diagram}"`);
+      });
+    }
+  }
+
   const timed = (list: { from: TimeRef; to: TimeRef }[], name: string): Span[] | null => {
     const bad = list.findIndex((item) => !isRecord(item) || !isTimeRef(item.from) || !isTimeRef(item.to));
     if (bad >= 0) {
@@ -143,6 +181,7 @@ export const validateSpec = (raw: unknown): string[] => {
   if (captionSpans) checkSpans(captionSpans, durationS, errors);
   spec.captions.forEach((caption, i) => {
     if (!isRecord(caption) || !isTextList(caption.lines) || caption.lines.length === 0) errors.push(`captions[${i}]: needs at least one line of text`);
+    else if (caption.size === "compact" && !captionFits(caption.lines)) errors.push(`captions[${i}]: too long for the caption region`);
   });
   return errors;
 };
@@ -160,6 +199,16 @@ const findFact = (spec: VideoSpec, id: string): Fact => {
   const fact = spec.facts.find((f) => f.id === id);
   if (!fact) throw new Error(`Spec "${spec.slug}" has no fact "${id}"`);
   return fact;
+};
+
+/** The video's palette. */
+export const specPalette = (spec: VideoSpec): Palette => (spec.palette === undefined ? DEFAULT_PALETTE : resolvePalette(spec.palette));
+
+/** A named diagram with its facts filled in. */
+export const specDiagram = (spec: VideoSpec, id: string): DiagramSpec => {
+  const diagram = spec.diagrams?.[id];
+  if (diagram === undefined) throw new Error(`Spec "${spec.slug}" has no diagram "${id}"`);
+  return fillFacts(spec, diagram) as DiagramSpec;
 };
 
 export const numberFact = (spec: VideoSpec, id: string): number => {

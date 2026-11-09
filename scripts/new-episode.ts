@@ -6,7 +6,7 @@ import { ROOT } from "./lib/episode";
 
 const USAGE = 'npm run new-episode <slug> [-- --title "Episode title"]';
 const SLUG = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
-const RESERVED = new Set(["parts-gallery"]);
+const RESERVED = new Set(["parts-gallery", "visual-gallery"]);
 const IMPORT_MARK = "// new-episode: imports";
 const ENTRY_MARK = "  // new-episode: entries";
 

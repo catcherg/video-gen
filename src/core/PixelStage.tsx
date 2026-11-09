@@ -7,7 +7,8 @@ import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
 import { RenderPixelatedPass } from "three/examples/jsm/postprocessing/RenderPixelatedPass.js";
 import { useVideoConfig } from "remotion";
 import { CAMERA_FAR, CAMERA_NEAR, type CameraFn } from "./camera";
-import { C, PIXEL_SIZE } from "./theme";
+import { PaletteContext, usePalette } from "./palette";
+import { PIXEL_SIZE } from "./theme";
 
 const PixelPass: React.FC<{ pixelSize: number; normalEdge: number; depthEdge: number }> = ({ pixelSize, normalEdge, depthEdge }) => {
   const { gl, scene, camera, size } = useThree();
@@ -47,14 +48,16 @@ export const PixelStage: React.FC<{ t: number; cameraAt: CameraFn; children: Rea
   depthEdge = 0.5,
 }) => {
   const { width, height } = useVideoConfig();
+  const palette = usePalette();
   return (
     <ThreeCanvas width={width} height={height} flat linear={false} camera={{ fov: 30, position: [40, 15, 40] }}>
-      <color attach="background" args={[C.bg]} />
+      <color attach="background" args={[palette.background]} />
       <hemisphereLight args={["#ffffff", "#2a2b50", 1.15]} />
       <directionalLight position={[20, 40, -25]} intensity={2.1} />
       <directionalLight position={[-30, 15, 30]} intensity={0.55} color="#b9c0ff" />
       <CameraRig t={t} cameraAt={cameraAt} />
-      {children}
+      {/* The canvas is a separate React tree, so the palette has to be passed into it. */}
+      <PaletteContext.Provider value={palette}>{children}</PaletteContext.Provider>
       <PixelPass pixelSize={pixelSize} normalEdge={normalEdge} depthEdge={depthEdge} />
     </ThreeCanvas>
   );

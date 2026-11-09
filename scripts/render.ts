@@ -1,5 +1,5 @@
 // Writes the audio, then the MP4. Usage: npm run render <slug> [-- --fast]
-// Default output is byte-reproducible. --fast uses more browser tabs and writes a separate preview file.
+// The default is the most repeatable render. --fast uses more browser tabs and writes a separate preview file.
 import { spawnSync } from "node:child_process";
 import { mkdirSync } from "node:fs";
 import path from "node:path";

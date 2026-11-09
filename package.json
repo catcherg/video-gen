@@ -9,6 +9,7 @@
     "stills": "tsx scripts/stills.ts",
     "render": "tsx scripts/render.ts",
     "verify-audio": "tsx scripts/verify-audio.ts",
+    "check-scene": "tsx scripts/check-scene.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "new-episode": "tsx scripts/new-episode.ts"
@@ -25,6 +26,7 @@
     "three": "^0.187.0"
   },
   "devDependencies": {
+    "@babel/parser": "7.24.1",
     "@types/node": "^26.6.6",
     "@types/react": "^19.3.0",
     "@types/three": "^0.187.0",

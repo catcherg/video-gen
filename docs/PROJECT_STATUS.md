@@ -10,7 +10,7 @@ The goal is an interface that turns a description and uploaded information into 
 |---|---|---|---|
 | 1 | Core split, umbrella folder and spec | Done | All three videos and WAVs were byte-identical before and after. V12 is the only video on the spec so far. |
 | 2 | Product decisions | Done | Recorded in `CLAUDE.md`. Everyone installs it on their own computer. |
-| 3 | Generic visual library | Not started | Includes the safe zones from the backlog, and a palette per video. |
+| 3 | Generic visual library | Done | Palettes, safe zones, motion, 3D shapes, six diagram types and `check-scene`. Only the gallery uses them so far; Milestone 5 is the first real test. |
 | 4 | Song generator | Not started | Deep bass house by default, dubstep as the option for slower, dramatic videos. |
 | 5 | Non-machine videos from specs | Not started | "Why the sky is blue", then a history or finance topic. |
 | 6 | Automated checks | Not started | Includes the sync and frame-comparison scripts from the backlog. |
@@ -24,6 +24,13 @@ Known gaps after Milestone 1:
 - `f1-v8` and `v8-cross-flat` still use a hand-written `meta.ts` and captions, not a spec.
 - `new-episode` still scaffolds an engine video without a spec.
 - V12's camshaft and valve counts are marked `assumed` in `spec.json`, because no source was ever recorded for them. Find one.
+
+Known gaps after Milestone 3:
+
+- The safe zones come from conflicting third-party guides, because neither platform's own page was found. Test them with a real upload to each platform.
+- The finished videos keep their original layout, so parts of their captions and diagrams still sit where platform buttons can cover them.
+- The tile map draws tiles it is given. There is no built-in world or country map yet.
+- `check-scene` doesn't detect hard-coded on-screen numbers, and it is not a sandbox (Milestone 8).
 
 ## Episodes
 
@@ -51,7 +58,7 @@ shasum -a 256 videos/v12/output/audio.wav
 
 Nothing here has been started. Suggested order: safe zones first, because that changes the layout of every episode. Leave 60 fps until the visuals settle, since it invalidates frame-based checks.
 
-1. **Reels and TikTok safe zones.** Now part of Milestone 3. The HUD starts at y=150, captions at y=1290, and the diagram panel runs from y=1478 to y=1758, so platform buttons may cover parts of them. Move the positions into a shared safe-area setting in `src/core/`, then check them against each platform's current guidance and a real upload.
+1. **Reels and TikTok safe zones.** The shared setting is done in Milestone 3; moving the finished videos into it and testing a real upload are not. The HUD starts at y=150, captions at y=1290, and the diagram panel runs from y=1478 to y=1758, so platform buttons may cover parts of them. Move the positions into a shared safe-area setting in `src/core/`, then check them against each platform's current guidance and a real upload.
 2. **Build the full V8 scene.** Replace `PlaceholderEngine` with detailed parts and a car, and give it a real song that follows the beat-grid rules. Make it clear that the HUD shows the firing rate while captions give the per-bank note. During the camera swings around frames 190 and 585, pistons reach the frame edge.
 3. **End-card and branding slot.** Add an optional end card to `makeEpisode`, with its length in `meta.ts` so the video and audio fades move with it. Use the user's own branding only.
 4. **Subtitle export.** Captions are already timed data with physics-derived text, so a `subtitles <slug>` script can write SRT or VTT from `timeline.ts`.
@@ -59,7 +66,7 @@ Nothing here has been started. Suggested order: safe zones first, because that c
 6. **F1 V8 sources.** Find a published stroke, crank type and firing order for the Honda RA808E, plus the reading convention for the "19/64" valve timing in the valvetrain paper. The video currently labels the firing order as typical.
 7. **Better sources.** Find factory documents for the L539 firing order and bank numbering, the SVJ's 8,700 rpm limit, the F136 firing order, and real L539 valve timing to replace the panel labelled "SCHEMATIC".
 8. **Sync and frame-comparison scripts.** Now part of Milestone 6. The checks that measured drum timing on the finished MP4 and compared every frame between renders were one-off scripts and are not in the repo. Add them under `scripts/`.
-9. **Fully repeatable multi-tab renders.** Find out why a few frames differ by about 0.05% of pixels with several tabs. If that is fixed, final renders could use four tabs and take well under half the time.
+9. **Fully repeatable renders.** `f1-v8` varies between one-tab renders of the same code, on up to about 40 of its 1,008 frames and by under 0.004% of pixels, in frames 98, 447, 781-785 and 924-992. It isn't visible, but it makes byte comparisons of that video unreliable, so Milestone 6's frame comparison needs to allow for it. Multi-tab renders vary more. Find out why a few frames differ by about 0.05% of pixels with several tabs. If that is fixed, final renders could use four tabs and take well under half the time.
 
 ## Done from the original backlog
 

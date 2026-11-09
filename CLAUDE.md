@@ -24,7 +24,8 @@ Video status, approved song hashes, milestone progress and the backlog are in [d
 - **`src/core/` stays subject-neutral.** Nothing in it may import from a kit or a video, or mention a subject. A test enforces this. Anything specific to a subject belongs in `src/kits/<kit>/`.
 - **Every video lives in one folder**, `videos/<slug>/`, with its generated files in the ignored `videos/<slug>/output/`. Nothing specific to a video goes anywhere else, and videos never import from each other.
 - **The spec is plain data.** `spec.json` must stay JSON, because the AI pipeline will eventually write it. It is validated every time it loads.
-- **Generated code gets no special trust.** Code written by AI goes through the same tests, frame checks and approvals as code written by hand. Compiling is not evidence that a shot works.
+- **Generated code gets no special trust.** Code written by AI goes through the same tests, frame checks and approvals as code written by hand, and must pass `npm run check-scene`. Compiling is not evidence that a shot works. `check-scene` is not a sandbox.
+- **New videos keep text in the safe zone.** Place headlines, diagrams and captions with `REGIONS` from `core/layout.ts`. The finished videos predate this and keep their original layout so they don't change.
 - **People approve what cannot be measured.** Timing, overlaps and numbers can be checked automatically. Song taste and whether a shot explains the idea need a person.
 
 ## Roadmap
@@ -85,13 +86,15 @@ videos/           Umbrella folder: one folder per generated video
     index.tsx     makeEpisode(slug, Scene, Overlay)
     physics.test.ts  tests for the video's numbers
     output/       ignored: audio.wav, <slug>.mp4, <slug>-preview.mp4, stills/
-src/core/         Subject-neutral: spec, camera rig + projection, PixelStage, Lam + DimContext, Captions,
-                  Callout, DiagramPanel, Tag, Flashes, fonts, base theme, WAV encoding, music synthesis
+src/core/         Subject-neutral: spec, palette, layout (safe zones and regions), motion, shapes (3D blocks, particles),
+                  diagrams/ (bar, line, timeline, flow, comparison, tile map), camera rig + projection, PixelStage,
+                  Lam + DimContext, Captions, Headline, Callout, DiagramPanel, Tag, Flashes, fonts, base theme,
+                  WAV encoding, music synthesis, VisualGallery (dev preview)
 src/kits/engine/  Engine kit: fourStroke physics + testkit, engineAudio, HUD, engine diagrams, part colours,
                   parts/ (PistonRod, Crankshaft, ValveTrain, Headers, F1*, Garage, cars/, Gallery, ...)
 public/           fonts/, and videos -> ../videos (symlink so Remotion can serve each video's output/)
 docs/             VIDEO_PRODUCTION.md (production playbook), PROJECT_STATUS.md (status, songs, backlog)
-scripts/          audio, song-map, stills, render, verify-audio, new-episode
+scripts/          audio, song-map, stills, render, verify-audio, check-scene, new-episode
 templates/        Files copied by new-episode (currently an engine video)
 poc/              Original proof of concept, kept for reference. Not part of the build.
 ```
@@ -109,12 +112,16 @@ npm run audio <slug>                 # writes videos/<slug>/output/audio.wav
 npm run song-map <slug>              # measures the WAV, writes videos/<slug>/songMap.ts for the animation
 npm run stills <slug> <frames...>    # writes videos/<slug>/output/stills/still_NNNN.png
 npm run verify-audio <slug>          # FFT check against physics, within 1%
-npm run render <slug>                # audio, then videos/<slug>/output/<slug>.mp4 (1 tab, byte-reproducible)
+npm run check-scene <slug>           # code rules, then frames rendered in opposite orders must match (-- --static for code only)
+npm run render <slug>                # audio, then videos/<slug>/output/<slug>.mp4 (1 tab)
 npm run render <slug> -- --fast      # videos/<slug>/output/<slug>-preview.mp4 (4 tabs, about 2.5× faster)
 npx remotion still parts-gallery out/gallery.png   # eyeball the engine kit's car models
+npx remotion still visual-gallery out/visual-gallery.png --frame=52   # eyeball the visual library; sections change every 60 frames
 ```
 
 Final renders use one browser tab on purpose. With more tabs, a few frames differ by about 0.05% of pixels between runs, which breaks rule 1 in the strict sense. Use `--fast` for previews only.
+
+One tab is not always byte-exact either. `v12` and `v8-cross-flat` have matched on every comparison, but two renders of `f1-v8` from the same code can differ on a few dozen of its 1,008 frames, by under 0.004% of pixels. So if a byte comparison fails, render the old code again as a control before calling it a regression. The cause is unknown; see the backlog.
 
 GL settings live in `render-settings.ts`. `angle` uses the Mac's GPU.
 
@@ -126,6 +133,9 @@ GL settings live in `render-settings.ts`. `angle` uses the Mac's GPU.
 - `song`: tempo, beats per bar and bars, read by `physics.ts`. It also records the approved WAV's hash.
 - `facts`: each has a value, sources and a confidence level. `physics.ts` reads its inputs from them.
 - `captions`: timed in seconds, or bars and beats. `{token}` placeholders are filled from values the video computes, so text can't disagree with physics.
+- `palette`: a preset for the type of video (`machines`, `science`, `nature`, `history`, `finance`, `health`, `space`), or a full palette, which is rejected if its text would be hard to read.
+
+Specs can also define `diagrams`: named general diagrams drawn by `core/diagrams/Diagram.tsx`. A number in one can be written as `{"fact": "id"}`. Validation enforces text limits so that every label fits. No video uses these yet.
 
 `shots` is the shot list. The renderer doesn't read it yet, but tests check it against the video's real diagram windows. Camera moves and the 3D scene stay in code.
 
@@ -188,7 +198,7 @@ These define the finished quality level. Follow them for every full video, in th
 
 - Write a shot list first: bar number, one subject, caption and diagram for each shot.
 - Put every camera arrival, caption change, label and flash on a bar or beat.
-- Keep the subject between the HUD (y=484) and the captions (y=1290). At 40° field of view, camera distance is about 3.3 × subject height.
+- Keep the subject in `REGIONS.subject`. *Engine kit:* the finished videos keep it between the HUD (y=484) and the captions (y=1290). At 40° field of view, camera distance is about 3.3 × subject height.
 - The scene and overlay must use the same `cameraAt`.
 
 **Detail**
@@ -201,10 +211,10 @@ These define the finished quality level. Follow them for every full video, in th
 **Clarity**
 
 - One subject per shot: `focusAt` names it, and `DimContext` fades the rest and drops their fine detail.
-- Colour means a job. Define colours once in the kit's `theme.ts`, and use them in 3D, callouts and diagrams alike.
+- Colour means a job. Choose the palette for the type of video in the spec, read it with `usePalette`, and use the same colours in 3D, callouts and diagrams alike. *Engine kit:* part colours are defined once in the kit's `theme.ts`.
 - Show what is invisible, such as gas coloured by stroke.
 - Name things with `core/Callout.tsx`, one per beat, in the same top-to-bottom order as the subject. Compute which way the axes run in a shot before choosing label sides.
-- Explain with a live panel in `core/DiagramPanel.tsx`, driven by the facts.
+- Explain with a live diagram from `core/diagrams/Diagram.tsx`, driven by the facts. Diagram text must read at phone size: check a still scaled down to about 450 pixels wide. *Engine kit:* engine diagrams sit in `core/DiagramPanel.tsx`.
 
 **Changing finished work**
 

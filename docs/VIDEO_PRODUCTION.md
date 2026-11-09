@@ -141,7 +141,7 @@ Detail without hierarchy is noise. The clearest version of the V12 came from the
 - **Colour means a job.** Part and stroke colours are defined once in `src/core/theme.ts` and used in 3D, callouts and diagrams alike. Intake is blue, exhaust is red, the crank is gold, and each bank has its own rod colour.
 - **Show what is invisible.** The gas in the cylinder is coloured by stroke and gets denser under compression.
 - **Name the parts.** `src/core/Callout.tsx` draws a label in a fixed screen column with a leader line to the part. Bring labels in one per beat.
-- **Explain with a live diagram.** `src/kits/engine/diagrams.tsx` panels sit below the captions and take their values from the same physics as the scene.
+- **Explain with a live diagram.** `src/core/diagrams/Diagram.tsx` draws general diagrams for any topic. For engines, `src/kits/engine/diagrams.tsx` panels sit below the captions and take their values from the same physics as the scene.
 - **Sharpen the image.** The V12 uses `pixelSize={2}` with stronger outline settings than the default.
 
 Callout layout rules:
