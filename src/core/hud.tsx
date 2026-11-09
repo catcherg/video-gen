@@ -104,9 +104,8 @@ export const WhatYouHear: React.FC<{ t: number; engine: FourStroke; isSlowed: (t
   );
 };
 
-export const Piano: React.FC<{ midi: number }> = ({ midi }) => {
+export const Piano: React.FC<{ midi: number; hi?: number }> = ({ midi, hi = 84 /* C6 */ }) => {
   const lo = 45; // A2
-  const hi = 84; // C6
   const isBlack = (m: number) => [1, 3, 6, 8, 10].includes(((m % 12) + 12) % 12);
   const whites: number[] = [];
   for (let m = lo; m <= hi; m++) if (!isBlack(m)) whites.push(m);
@@ -125,14 +124,14 @@ export const Piano: React.FC<{ midi: number }> = ({ midi }) => {
   );
 };
 
-export const NoteReadout: React.FC<{ hz: number }> = ({ hz }) => {
+export const NoteReadout: React.FC<{ hz: number; pianoHi?: number }> = ({ hz, pianoHi }) => {
   const note = noteName(hz);
   return (
     <div>
       <div style={{ fontSize: 40, lineHeight: 1, color: UI.yellow, marginBottom: 6 }}>
         {fmtInt(hz)} HZ · {note.name}
       </div>
-      <Piano midi={note.midi} />
+      <Piano midi={note.midi} hi={pianoHi} />
     </div>
   );
 };
@@ -148,6 +147,8 @@ export type EngineHudConfig = {
   tachRedFrom: number;
   /** Beat within the bar (0-3). When set, the HUD shows a four-light beat counter. */
   beatAt?: (t: number) => number;
+  /** Highest MIDI note on the HUD piano, for engines whose note is above C6. */
+  pianoHi?: number;
 };
 
 /** RPM, bangs per second, rev bar, what-you-hear strip and note readout. */
@@ -164,7 +165,7 @@ export const EngineHud: React.FC<{ t: number; config: EngineHudConfig }> = ({ t,
       <div style={{ display: "flex", justifyContent: "space-between", fontFamily: FONT.label, fontSize: 24, color: UI.dim }}>
         <span>RPM</span>
         <span style={{ marginLeft: 210 }}>BANGS / SEC</span>
-        <span style={{ color: slowed ? UI.cream : UI.yellow }}>{slowed ? `SLOWED ${slow}×` : "REAL SPEED"}</span>
+        <span style={{ color: slowed ? UI.cream : UI.yellow }}>{slowed ? `SLOWED ${Math.round(slow * 10) / 10}×` : "REAL SPEED"}</span>
       </div>
       <BigNumbers left={fmtInt(rpm)} right={fmtInt(bangs)} leftColor={hot ? UI.red : UI.cream} />
       {config.beatAt ? (
@@ -184,10 +185,39 @@ export const EngineHud: React.FC<{ t: number; config: EngineHudConfig }> = ({ t,
               <span style={{ fontSize: 30, color: UI.dim }}> CLICKS/S</span>
             </div>
           ) : (
-            <NoteReadout hz={engine.bangsPerSecond(engine.rpmAt(t))} />
+            <NoteReadout hz={engine.bangsPerSecond(engine.rpmAt(t))} pianoHi={config.pianoHi} />
           )}
         </div>
       </div>
+    </HudPanel>
+  );
+};
+
+/** Lowest screen y the compact HUD reaches. */
+export const MINI_HUD_BOTTOM = 316;
+
+/** A one-row HUD for close-ups: RPM, bangs per second and the rev bar, leaving more of the frame to the subject. */
+export const MiniHud: React.FC<{ t: number; config: EngineHudConfig }> = ({ t, config }) => {
+  const { engine, isSlowed, slow, tachMax, tachRedFrom } = config;
+  const rpm = Math.round(engine.rpmAt(t) / 10) * 10;
+  const hot = rpm >= tachRedFrom;
+  return (
+    <HudPanel pop={1}>
+      <div style={{ display: "flex", alignItems: "center", height: 84 }}>
+        <span style={{ fontSize: 92, width: 300, lineHeight: 1, color: hot ? UI.red : UI.cream }}>{fmtInt(rpm)}</span>
+        <span style={{ fontFamily: FONT.label, fontSize: 18, color: UI.dim, width: 66, lineHeight: 1.05 }}>RPM</span>
+        <span style={{ fontSize: 92, width: 214, lineHeight: 1, color: UI.yellow }}>{fmtInt(Math.round(engine.bangsPerSecond(rpm)))}</span>
+        <span style={{ fontFamily: FONT.label, fontSize: 18, color: UI.dim, width: 96, lineHeight: 1.05 }}>BANGS / SEC</span>
+        <div style={{ marginLeft: "auto", textAlign: "right" }}>
+          <div style={{ fontFamily: FONT.label, fontSize: 19, color: UI.cream }}>{isSlowed(t) ? `${Math.round(slow * 10) / 10}× SLOW` : "REAL"}</div>
+          <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 8 }}>
+            {[0, 1, 2, 3].map((b) => (
+              <div key={b} style={{ width: 20, height: 20, background: b === config.beatAt?.(t) ? UI.yellow : "#262848" }} />
+            ))}
+          </div>
+        </div>
+      </div>
+      <RevBar rpm={rpm} max={tachMax} redFrom={tachRedFrom} hot={hot} />
     </HudPanel>
   );
 };

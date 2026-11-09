@@ -226,3 +226,27 @@ export const PulseTrain: React.FC<{ hz: number; windowMs: number; width?: number
     </svg>
   );
 };
+
+/** Section through one pneumatic valve spring: the valve opens downward and squeezes the air beneath its piston. */
+export const AirSpringSection: React.FC<{ lift01: number; liftUnits: number; color: string }> = ({ lift01, liftUnits, color }) => {
+  const W = 190;
+  const H = 214;
+  const CHAMBER_TOP = 44;
+  const CHAMBER_FLOOR = 142;
+  const TRAVEL = (liftUnits / 0.14) * 44;
+  const headY = 160 + lift01 * TRAVEL;
+  const pistonY = CHAMBER_TOP + lift01 * TRAVEL;
+  const cx = W / 2;
+  return (
+    <svg width={W} height={H} style={{ display: "block", flex: "none" }}>
+      <rect x={cx - 52} y={CHAMBER_TOP - 26} width={8} height={CHAMBER_FLOOR - CHAMBER_TOP + 34} fill={C.metalDark} />
+      <rect x={cx + 44} y={CHAMBER_TOP - 26} width={8} height={CHAMBER_FLOOR - CHAMBER_TOP + 34} fill={C.metalDark} />
+      <rect x={cx - 52} y={CHAMBER_FLOOR} width={104} height={8} fill={C.metalDark} />
+      <rect x={cx - 44} y={pistonY + 12} width={88} height={CHAMBER_FLOOR - pistonY - 12} fill={C.air} opacity={0.3 + 0.65 * lift01} />
+      <rect x={cx - 44} y={pistonY} width={88} height={12} fill={C.metalLight} />
+      <rect x={cx - 5} y={pistonY - 24} width={10} height={24} fill={color} />
+      <rect x={cx - 5} y={pistonY + 12} width={10} height={headY - pistonY - 12} fill={color} />
+      <rect x={cx - 34} y={headY} width={68} height={10} fill={color} />
+    </svg>
+  );
+};

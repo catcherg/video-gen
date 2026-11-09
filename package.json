@@ -5,6 +5,7 @@
   "scripts": {
     "studio": "remotion studio src/index.ts",
     "audio": "tsx scripts/audio.ts",
+    "song-map": "tsx scripts/song-map.ts",
     "stills": "tsx scripts/stills.ts",
     "render": "tsx scripts/render.ts",
     "verify-audio": "tsx scripts/verify-audio.ts",

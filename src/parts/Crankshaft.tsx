@@ -27,7 +27,7 @@ const TEETH = 28;
  * A crankshaft generated from a pin layout. Flat-plane, cross-plane and shared-pin cranks are just different layouts.
  * `spin` is the shaft's rotation in radians, used to turn the flywheel and pulley when `ends` is set.
  */
-export const Crankshaft: React.FC<{ pins: CrankPin[]; throwR: number; length: number; webOffset?: number; spin?: number; ends?: boolean; color?: string; weightColor?: string }> = ({
+export const Crankshaft: React.FC<{ pins: CrankPin[]; throwR: number; length: number; webOffset?: number; spin?: number; ends?: boolean; color?: string; weightColor?: string; weightScale?: number }> = ({
   pins,
   throwR,
   length,
@@ -36,6 +36,7 @@ export const Crankshaft: React.FC<{ pins: CrankPin[]; throwR: number; length: nu
   ends = false,
   color = C.metalLight,
   weightColor = C.metal,
+  weightScale = 1,
 }) => (
   <group>
     <mesh rotation={ALONG_X}>
@@ -59,7 +60,7 @@ export const Crankshaft: React.FC<{ pins: CrankPin[]; throwR: number; length: nu
               <cylinderGeometry args={[0.05, 0.05, 0.02, 8]} />
               <Lam c={C.metalDark} />
             </mesh>
-            <mesh geometry={counterweightGeo}>
+            <mesh geometry={counterweightGeo} scale={[1, weightScale, weightScale]}>
               <Lam c={weightColor} />
             </mesh>
           </group>

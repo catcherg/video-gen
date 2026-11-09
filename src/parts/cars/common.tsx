@@ -29,14 +29,26 @@ export const Box: React.FC<{ p: XYZ; s: XYZ; c: string; r?: XYZ }> = ({ p, s, c,
   </mesh>
 );
 
-export const Wheel: React.FC<{ x: number; z: number }> = ({ x, z }) => {
+export const Wheel: React.FC<{ x: number; z: number; spin?: number; grooves?: number; sidewall?: string }> = ({ x, z, spin = 0, grooves = 0, sidewall }) => {
   const out = Math.sign(z);
   return (
-    <group position={[x, WHEEL_R, z]} rotation={[Math.PI / 2, 0, 0]}>
+    <group position={[x, WHEEL_R, z]} rotation={[Math.PI / 2, spin, 0]}>
       <mesh>
         <cylinderGeometry args={[WHEEL_R, WHEEL_R, 2.7, 18]} />
         <meshLambertMaterial color={C.tyre} flatShading />
       </mesh>
+      {Array.from({ length: grooves }, (_, g) => (
+        <mesh key={g} position={[0, ((g + 0.5) / grooves - 0.5) * 2.1, 0]}>
+          <cylinderGeometry args={[WHEEL_R + 0.015, WHEEL_R + 0.015, 0.16, 18, 1, true]} />
+          <meshLambertMaterial color="#0c0d1c" side={2} flatShading />
+        </mesh>
+      ))}
+      {sidewall ? (
+        <mesh position={[0, out * 1.36, 0]}>
+          <cylinderGeometry args={[3.0, 3.0, 0.06, 18]} />
+          <meshLambertMaterial color={sidewall} flatShading />
+        </mesh>
+      ) : null}
       <mesh position={[0, out * 1.38, 0]}>
         <cylinderGeometry args={[2.45, 2.45, 0.1, 12]} />
         <meshLambertMaterial color={C.rim} flatShading />

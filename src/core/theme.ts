@@ -31,6 +31,9 @@ export const C = {
   intake: "#4fc3ff",
   exhaust: "#ff6a4d",
   camLobe: "#f4f1ff",
+  gear: "#f0a13a",
+  finger: "#ffe066",
+  air: "#7ff5d2",
 };
 
 /** What each of the four strokes looks like, in 3D gas and in diagrams. */
