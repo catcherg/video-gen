@@ -34,6 +34,19 @@ const findings: Finding[] = [];
 const fail = (check: string, message: string) => findings.push({ check, severity: "error", message });
 const step = (name: string, detail: string) => console.log(`${findings.some((f) => f.check.startsWith(name) && f.severity === "error") ? "FAIL" : "PASS"} ${name}: ${detail}`);
 
+let framesChecked: number[] = [];
+
+/** Reports everything found so far and exits. */
+const finish = (): never => {
+  const errors = findings.filter((f) => f.severity === "error");
+  const warnings = findings.filter((f) => f.severity === "warning");
+  for (const f of [...errors, ...warnings]) console.log(`${f.severity === "error" ? "ERROR" : "warn "} [${f.check}]${f.frame === undefined ? "" : ` frame ${f.frame}`} ${f.message}`);
+  mkdirSync(outputDir(slug), { recursive: true });
+  writeFileSync(path.join(outputDir(slug), "checks.json"), `${JSON.stringify({ slug, strict, passed: errors.length === 0, quick, framesChecked, errors: errors.length, warnings: warnings.length, findings }, null, 2)}\n`);
+  console.log(`${errors.length === 0 ? "PASSED" : "FAILED"}: ${errors.length} errors, ${warnings.length} warnings${strict ? "" : " (older video: layout problems are warnings)"}`);
+  process.exit(errors.length === 0 ? 0 : 1);
+};
+
 const specPath = path.join(dir, "spec.json");
 const rawSpec: unknown = existsSync(specPath) ? JSON.parse(readFileSync(specPath, "utf8")) : undefined;
 let spec: VideoSpec | undefined;
@@ -49,6 +62,8 @@ step("spec", rawSpec === undefined ? "none" : "validated");
 const files = readdirSync(dir).filter((f) => /\.tsx?$/.test(f) && !f.includes(".test."));
 for (const f of files) for (const s of checkSource(`${relativeDir}/${f}`, readFileSync(path.join(dir, f), "utf8"), { videoDir: relativeDir, kit: spec?.kit })) findings.push({ check: `code-${s.rule}`, severity: "error", message: `${s.file}:${s.line} ${s.message}` });
 step("code", `${files.length} files`);
+// Nothing below may run a video's code until the code rules have passed.
+if (findings.some((f) => f.check.startsWith("code-"))) finish();
 
 const timelinePath = path.join(dir, "timeline.ts");
 const captions = existsSync(timelinePath) ? ((await import(pathToFileURL(timelinePath).href)) as { CAPTIONS?: Caption[] }).CAPTIONS ?? [] : [];
@@ -98,7 +113,6 @@ else {
 }
 
 // ---- Pictures ----
-let framesChecked: number[] = [];
 if (!quick) {
   const durationFrames = Math.round(meta.durationS * meta.fps);
   const shots = spec ? spec.shots.map((s) => ({ from: resolveTime(spec as VideoSpec, s.from), to: resolveTime(spec as VideoSpec, s.to) })) : [];
@@ -149,10 +163,4 @@ if (!quick) {
   rmSync(tempDir, { recursive: true });
 }
 
-const errors = findings.filter((f) => f.severity === "error");
-const warnings = findings.filter((f) => f.severity === "warning");
-for (const f of [...errors, ...warnings]) console.log(`${f.severity === "error" ? "ERROR" : "warn "} [${f.check}]${f.frame === undefined ? "" : ` frame ${f.frame}`} ${f.message}`);
-mkdirSync(outputDir(slug), { recursive: true });
-writeFileSync(path.join(outputDir(slug), "checks.json"), `${JSON.stringify({ slug, strict, passed: errors.length === 0, quick, framesChecked, errors: errors.length, warnings: warnings.length, findings }, null, 2)}\n`);
-console.log(`${errors.length === 0 ? "PASSED" : "FAILED"}: ${errors.length} errors, ${warnings.length} warnings${strict ? "" : " (older video: layout problems are warnings)"}`);
-process.exit(errors.length === 0 ? 0 : 1);
+finish();

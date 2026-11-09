@@ -14,7 +14,7 @@ The goal is an interface that turns a description and uploaded information into 
 | 4 | Song generator | Done | Deep bass house by default, dubstep as the option for slower, dramatic videos. The user approved six samples; their hashes are under Locked songs. |
 | 5 | Non-machine videos from specs | Done | `sky-blue` and `voc-economics` are approved. Neither needed framework changes. The gaps they exposed are listed below. |
 | 6 | Automated checks | Done | `check-video` and `compare-frames`. Tested against deliberately broken layouts. They found three problems in finished videos, listed below. |
-| 7 | AI pipeline, run headless | Not started | Must settle how each person gets AI access without sharing the owner's key. |
+| 7 | AI pipeline, run headless | Built, waiting on a real run | `npm run generate`. Dry-run end to end with scripted answers. It has never called the real model, because that needs a key and spends money. Each person uses their own key. |
 | 8 | Sandboxing and licensing | Not started | Required before friends and family use it. |
 | 9 | Identity cleanup | Not started | At the start of interface work: README, 8-bit reel framing in `CLAUDE.md`, renames, general template. |
 | 10 | Local interface | Not started | One command starts it and prompts the user to open a local page. Renders run on the same computer. Needs simple setup, tested beyond this Mac. |

@@ -13,6 +13,8 @@
     "check-scene": "tsx scripts/check-scene.ts",
     "check-video": "tsx scripts/check-video.ts",
     "compare-frames": "tsx scripts/compare-frames.ts",
+    "generate": "tsx scripts/generate.ts",
+    "set-key": "tsx scripts/set-key.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "new-episode": "tsx scripts/new-episode.ts"
@@ -29,6 +31,7 @@
     "three": "^0.187.0"
   },
   "devDependencies": {
+    "@anthropic-ai/sdk": "1.6.0",
     "@babel/parser": "7.24.1",
     "@types/node": "^26.6.6",
     "@types/react": "^19.3.0",

@@ -66,6 +66,7 @@ Decided by the user. Later milestones build on these.
 - **Musical inspiration is Odd Mob and Subtronics.** Take inspiration from the style only. Never copy their melodies, vocals, samples or track structures, and keep their names out of what appears in a video.
 - **Users are friends and family.** It is not a public product.
 - **Everyone installs it on their own computer.** Renders run locally, through a local page the user is prompted to open. Nothing is hosted.
+- **Everyone uses their own Claude API key.** `npm run set-key` stores it outside the repository, readable only by that account. Never put a key in this repository.
 
 ## Layout
 
@@ -94,8 +95,9 @@ src/kits/engine/  Engine kit: fourStroke physics + testkit, engineAudio, HUD, en
                   parts/ (PistonRod, Crankshaft, ValveTrain, Headers, F1*, Garage, cars/, Gallery, ...)
 public/           fonts/, and videos -> ../videos (symlink so Remotion can serve each video's output/)
 docs/             VIDEO_PRODUCTION.md (production playbook), PROJECT_STATUS.md (status, songs, backlog)
-scripts/          audio, song-map, song-samples, stills, render, verify-audio, check-video, check-scene, compare-frames, new-episode
-templates/        Files copied by new-episode (currently an engine video)
+scripts/          audio, song-map, song-samples, stills, render, verify-audio, check-video, check-scene, compare-frames, new-episode,
+                  generate, set-key, pipeline/ (stages, model client, prompts)
+templates/        episode/ is copied by new-episode (an engine video); generated/ is copied by the AI pipeline
 poc/              Original proof of concept, kept for reference. Not part of the build.
 ```
 
@@ -113,6 +115,8 @@ npm run song-map <slug>              # measures the WAV, writes videos/<slug>/so
 npm run song-samples                 # writes generated songs to out/song-samples and measures them (-- --seeds 8 --bars 18)
 npm run stills <slug> <frames...>    # writes videos/<slug>/output/stills/still_NNNN.png
 npm run verify-audio <slug>          # FFT check against physics, within 1%
+npm run set-key                      # save your own Claude API key, outside this repository
+npm run generate -- <slug> --brief "..." [--upload file]   # make a video with AI, stopping for your approval (see The AI pipeline)
 npm run check-video <slug>           # every automated check; writes videos/<slug>/output/checks.json (-- --quick skips the browser)
 npm run check-scene <slug>           # code rules, then frames rendered in opposite orders must match (-- --static for code only)
 npm run compare-frames <slug>        # renders every frame and compares with a saved baseline, ignoring render noise (-- --save to save one)
@@ -143,6 +147,16 @@ A spec can generate its song by adding `song.generator`: `{ "style": "house" | "
 Specs can also define `diagrams`: named general diagrams drawn by `core/diagrams/Diagram.tsx`. A number in one can be written as `{"fact": "id"}`. Validation enforces text limits so that every label fits. No video uses these yet.
 
 `shots` is the shot list. The renderer doesn't read it yet, but tests check it against the video's real diagram windows. Camera moves and the 3D scene stay in code.
+
+## The AI pipeline
+
+`npm run generate` makes a video in six stages: facts, story, song, scene, frames, render. It stops for a person to approve the facts, the song and the frames, and resumes from saved state in `videos/<slug>/output/pipeline/`. Those stops become the interface's screens. To send a stage back, use `--revise <stage> --note "..."`.
+
+- Each answer is checked before it's used. Facts must cite an upload or a URL that a search really returned. Scene code goes through the static rules before it's written or run, then typecheck and `check-video`, and failures go back to the model. After 4 failed attempts the code is renamed `.rejected` and unregistered, so other videos still build.
+- Spending is tracked per call, and the run stops at `--max-usd` (default $10).
+- Uploads and web pages are data, never instructions. Keep them that way in any prompt change.
+- Generated code runs on the user's computer after static checks only. Until Milestone 8 adds a sandbox, only run it yourself, and only with material you trust.
+- `--fixture answers.json` replaces the model with scripted answers, at no cost.
 
 ## Check frames before rendering
 
