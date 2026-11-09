@@ -31,16 +31,30 @@ Video status, approved song hashes, milestone progress and the backlog are in [d
 
 Update the status of each milestone in `docs/PROJECT_STATUS.md`.
 
+**Ready for the interface when:** one command takes a description and uploads and produces a reel, with nobody editing code. The interface is then a layer on top of that command.
+
 1. **Core split, umbrella folder and spec.**
    - Reorganise the repository so all generated videos sit under one umbrella folder, `videos/`, with each video's source and generated output together.
    - Separate the subject-neutral core from an engine kit.
    - Define the video spec, and have it drive V12's format, song grid, facts and captions.
    - Prove every finished video is byte-identical afterwards, in both frames and audio.
-2. **Generic visual library.** Shape, motion and layout tools, general diagrams (charts, timelines, flows, comparisons, maps), and automated code checks for generated scenes.
-3. **Song generator.** Style and structure in, a seeded and repeatable WAV out, with `song-map` running automatically.
-4. **First non-machine video from a spec.** "Why the sky is blue", then a history or finance topic to test sourcing.
-5. **AI pipeline.** Uploads become facts, then a story, a spec and scene code, with automatic retries when checks fail.
-6. **Interface and render workers.** Describe, upload, approve the song, review frames, download the video.
+2. **Product decisions.** These shape everything after them, and they are the user's to make.
+   - Define "8-bit": whether colours are limited to a fixed palette, and whether every song must be chiptune.
+   - Decide who uses the interface, and where renders run. Byte-exact renders are so far proven only on this Mac's GPU.
+3. **Generic visual library.** Shape, motion and layout tools, general diagrams (charts, timelines, flows, comparisons, maps), code checks for generated scenes, and shared Reels and TikTok safe zones.
+4. **Song generator.** Style and structure in, a seeded and repeatable WAV out, with the data `song-map` needs generated too, so it runs automatically. The user listens across several styles and seeds.
+5. **Non-machine videos from specs.** "Why the sky is blue", then a history or finance topic to test sourcing. Neither may need changes to framework code.
+6. **Automated checks.** Replace the manual reviews: frame checks, overlaps, on-screen numbers, drum timing and frame comparison. The pipeline can't retry on its own without these.
+7. **AI pipeline, run headless.** Uploads become facts, then a story, a spec and scene code, with automatic retries when checks fail. It is one command with resumable stages that stop for approval of facts, song and frames; those stops become the interface's screens. Track the cost and time per video.
+8. **Sandboxing and licensing.** Required before anyone other than the user can generate videos; skip it if the interface stays personal.
+   - Isolate generated code from the network and file system, because an uploaded document could steer what gets written.
+   - Check Remotion's licence for the planned use. It is free for individuals and for-profit companies with up to 3 employees, larger companies need a paid licence, and selling a modified copy of Remotion is not allowed.
+   - Add a licence to this repository, and set a policy for the rights to uploaded material.
+9. **Identity cleanup, at the start of interface work.**
+   - Write an in-depth `README.md`, and reframe this file around an interface for generating 8-bit reels.
+   - Rename the `engine-reels` package, and change "episode" to "video" in code and commands.
+   - Replace the engine-only scaffold with a general template, and move `f1-v8` and `v8-cross-flat` onto the spec.
+10. **Interface and render workers.** Describe, upload, approve the song, review frames, download the video.
 
 ## Layout
 
@@ -121,7 +135,7 @@ After rendering, run `npm run verify-audio <slug>`.
 
 ## Adding a video
 
-The scaffold currently produces an engine video. A general template arrives with Milestones 2 to 4.
+The scaffold currently produces an engine video. A general template arrives with Milestone 9.
 
 1. Run `npm run new-episode <slug> -- --title "Title"`, or use `/new-episode`. It copies `templates/episode/` and registers the video. The scaffold works as-is with a placeholder inline-4, so fix TODOs one at a time and keep it running.
 2. Replace the placeholders in `physics.ts` first. Add sources. Use `createFourStroke` for four-stroke engines, with `firingAnglesDeg` if the engine is odd-fire.
