@@ -11,7 +11,7 @@ The goal is an interface that turns a description and uploaded information into 
 | 1 | Core split, umbrella folder and spec | Done | All three videos and WAVs were byte-identical before and after. V12 is the only video on the spec so far. |
 | 2 | Product decisions | Done | Recorded in `CLAUDE.md`. Everyone installs it on their own computer. |
 | 3 | Generic visual library | Done | Palettes, safe zones, motion, 3D shapes, six diagram types and `check-scene`. Only the gallery uses them so far; Milestone 5 is the first real test. |
-| 4 | Song generator | Not started | Deep bass house by default, dubstep as the option for slower, dramatic videos. |
+| 4 | Song generator | Done | Deep bass house by default, dubstep as the option for slower, dramatic videos. The user approved six samples; their hashes are under Locked songs. |
 | 5 | Non-machine videos from specs | Not started | "Why the sky is blue", then a history or finance topic. |
 | 6 | Automated checks | Not started | Includes the sync and frame-comparison scripts from the backlog. |
 | 7 | AI pipeline, run headless | Not started | Must settle how each person gets AI access without sharing the owner's key. |
@@ -53,6 +53,19 @@ shasum -a 256 videos/v12/output/audio.wav
 |---|---|
 | `v12` | `888e4c9f260f1523857f3dddcf311369b134cc05e5cabfbaf695c3d3bf19bfd6` |
 | `f1-v8` | `db3c0a963368a75578b9fedf9f24b8a906f91133c34deb56688adb10e52dad1f` |
+
+### Approved generator samples
+
+The user approved these 18-bar samples from `npm run song-samples`. If work on `src/core/music/` changes a hash on this Mac, the generator's sound has changed, so ask the user to listen again.
+
+| Sample | WAV SHA-256 |
+|---|---|
+| `house-seed1` | `9592fc073190576ce1aa9f91307d8b5a84e00c7b173bc2f5d3b51ad8cd150b74` |
+| `house-seed2` | `5478366b55088680e020746cb84f25bbc40d7846b3b5106e4d58d40ac7757b42` |
+| `house-seed3` | `5fcf20c7beb1f9a4faa102bc5e594360e8a41cb281b7ea323c737094ae21bd9a` |
+| `dubstep-seed1` | `ccbe26888eb19cf0e0ecd0ea5762eec2fe94f6b689e2e4079dad56f460a8befd` |
+| `dubstep-seed2` | `43270dee375019188d0a53a52b4f6a884250fcf2a45fb352b86aa8e04ef55a64` |
+| `dubstep-seed3` | `4e0087938ceffb43ae2d7a26aa2304eb1b713cb62ad068b7f3cd445860344a90` |
 
 ## Backlog
 

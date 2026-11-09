@@ -89,12 +89,12 @@ videos/           Umbrella folder: one folder per generated video
 src/core/         Subject-neutral: spec, palette, layout (safe zones and regions), motion, shapes (3D blocks, particles),
                   diagrams/ (bar, line, timeline, flow, comparison, tile map), camera rig + projection, PixelStage,
                   Lam + DimContext, Captions, Headline, Callout, DiagramPanel, Tag, Flashes, fonts, base theme,
-                  WAV encoding, music synthesis, VisualGallery (dev preview)
+                  WAV encoding, music synthesis, music/ (song generator: plan, render, voices), VisualGallery (dev preview)
 src/kits/engine/  Engine kit: fourStroke physics + testkit, engineAudio, HUD, engine diagrams, part colours,
                   parts/ (PistonRod, Crankshaft, ValveTrain, Headers, F1*, Garage, cars/, Gallery, ...)
 public/           fonts/, and videos -> ../videos (symlink so Remotion can serve each video's output/)
 docs/             VIDEO_PRODUCTION.md (production playbook), PROJECT_STATUS.md (status, songs, backlog)
-scripts/          audio, song-map, stills, render, verify-audio, check-scene, new-episode
+scripts/          audio, song-map, song-samples, stills, render, verify-audio, check-scene, new-episode
 templates/        Files copied by new-episode (currently an engine video)
 poc/              Original proof of concept, kept for reference. Not part of the build.
 ```
@@ -110,6 +110,7 @@ npm test                             # spec, boundary and physics tests
 npm run typecheck
 npm run audio <slug>                 # writes videos/<slug>/output/audio.wav
 npm run song-map <slug>              # measures the WAV, writes videos/<slug>/songMap.ts for the animation
+npm run song-samples                 # writes generated songs to out/song-samples and measures them (-- --seeds 8 --bars 18)
 npm run stills <slug> <frames...>    # writes videos/<slug>/output/stills/still_NNNN.png
 npm run verify-audio <slug>          # FFT check against physics, within 1%
 npm run check-scene <slug>           # code rules, then frames rendered in opposite orders must match (-- --static for code only)
@@ -134,6 +135,8 @@ GL settings live in `render-settings.ts`. `angle` uses the Mac's GPU.
 - `facts`: each has a value, sources and a confidence level. `physics.ts` reads its inputs from them.
 - `captions`: timed in seconds, or bars and beats. `{token}` placeholders are filled from values the video computes, so text can't disagree with physics.
 - `palette`: a preset for the type of video (`machines`, `science`, `nature`, `history`, `finance`, `health`, `space`), or a full palette, which is rejected if its text would be hard to read.
+
+A spec can generate its song by adding `song.generator`: `{ "style": "house" | "dubstep", "seed": 1 }`, plus optional `rootMidi` and `sections` to put the drop on the video's payoff. The video then needs no `audio.ts` or `song.ts`: `npm run audio` and `npm run song-map` work from the spec, and `songMap.ts` gains `impactFrames` for each drop. Use 14 frames a beat for house and 13 for dubstep at 30 fps.
 
 Specs can also define `diagrams`: named general diagrams drawn by `core/diagrams/Diagram.tsx`. A number in one can be written as `{"fact": "id"}`. Validation enforces text limits so that every label fits. No video uses these yet.
 
@@ -188,6 +191,7 @@ These define the finished quality level. Follow them for every full video, in th
 
 - Make a real song with chords, bass, drums, melody and an arrangement that builds with the story. New songs follow the styles in [Product decisions](#product-decisions).
 - Put shared musical data in the video's `song.ts`, read by both `audio.ts` and the visuals.
+- Generated songs must pass `song-samples`' measurements: no clipping, at least 80% of the energy in the bass, hits that jump at least 5 dB through a simulated phone speaker, and a drop that jumps at least 6 dB. Passing only shows a song isn't broken.
 - Timing can be measured but taste cannot. Get the user's approval on the song before building on it.
 - Once approved, record the WAV's SHA-256 in `docs/PROJECT_STATUS.md` and confirm it is unchanged after any later work.
 - *Engine kit:* turn slowed firing events into drum hits directly from the bang list, so they cannot drift.

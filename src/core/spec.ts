@@ -4,6 +4,7 @@ import type { Caption } from "./Captions";
 import { validateDiagram, type DiagramSpec } from "./diagrams/spec";
 import type { EpisodeMeta } from "./episode";
 import { captionFits } from "./layout";
+import { validateSongRequest, type SongRequest, type SongSection, type SongStyle } from "./music/plan";
 import { DEFAULT_PALETTE, paletteProblems, PALETTES, resolvePalette, type Palette, type PaletteRef } from "./palette";
 
 /** A moment in the video: seconds, or a position on the song's grid plus an offset in seconds. */
@@ -32,7 +33,15 @@ export type VideoSpec = {
   /** Folder under src/kits that supplies the video's subject-specific models and diagrams. */
   kit: string;
   format: { fps: number; width: number; height: number; durationS: number };
-  song: { bpm: number; beatsPerBar: number; bars: number; style: string; lockedWavSha256?: string };
+  song: {
+    bpm: number;
+    beatsPerBar: number;
+    bars: number;
+    style: string;
+    lockedWavSha256?: string;
+    /** When set, the song is generated from this rather than written by hand in audio.ts. */
+    generator?: { style: SongStyle; seed: number; rootMidi?: number; sections?: SongSection[] };
+  };
   /** A preset chosen for the type of video, or a full palette. Leave out for the default. */
   palette?: PaletteRef;
   facts: Fact[];
@@ -47,6 +56,8 @@ const SHA256 = /^[0-9a-f]{64}$/;
 const CONFIDENCE: Confidence[] = ["primary", "secondary", "single-source", "assumed", "illustrative"];
 const UNSOURCED_OK: Confidence[] = ["assumed", "illustrative"];
 const EPSILON = 1e-9;
+/** A tempo such as 1800 / 14 can only be written approximately in JSON. */
+const FRAME_TOLERANCE = 1e-6;
 
 const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 const isText = (v: unknown): v is string => typeof v === "string" && v.trim().length > 0;
@@ -116,7 +127,7 @@ export const validateSpec = (raw: unknown): string[] => {
   const { fps, durationS } = spec.format;
   const { bpm, beatsPerBar, bars } = spec.song;
   if (!Number.isInteger(durationS * fps)) errors.push("format: durationS must be a whole number of frames");
-  if (!Number.isInteger((60 * fps) / bpm)) errors.push(`song: at ${fps} fps, ${bpm} BPM does not put every beat on a whole frame`);
+  if (Math.abs((60 * fps) / bpm - Math.round((60 * fps) / bpm)) > FRAME_TOLERANCE) errors.push(`song: at ${fps} fps, ${bpm} BPM does not put every beat on a whole frame`);
   if (Math.abs((bars * beatsPerBar * 60) / bpm - durationS) > EPSILON) errors.push("song: bars do not add up to format.durationS");
 
   const seen = new Set<string>();
@@ -137,6 +148,8 @@ export const validateSpec = (raw: unknown): string[] => {
   } else if (spec.palette !== undefined) {
     errors.push(...paletteProblems(spec.palette));
   }
+
+  if (spec.song.generator !== undefined) errors.push(...validateSongRequest(specSongRequest(spec)).map((e) => `song.generator.${e}`));
 
   if (spec.diagrams !== undefined) {
     if (!isRecord(spec.diagrams)) errors.push("diagrams: must be an object of named diagrams");
@@ -199,6 +212,13 @@ const findFact = (spec: VideoSpec, id: string): Fact => {
   const fact = spec.facts.find((f) => f.id === id);
   if (!fact) throw new Error(`Spec "${spec.slug}" has no fact "${id}"`);
   return fact;
+};
+
+/** The song generator's request, with its tempo and length taken from the spec. Only valid when the spec has a generator. */
+export const specSongRequest = (spec: VideoSpec): SongRequest => {
+  const { generator, bpm, bars } = spec.song;
+  if (!generator) throw new Error(`Spec "${spec.slug}" has no song generator`);
+  return { ...generator, fps: spec.format.fps, framesPerBeat: Math.round((60 * spec.format.fps) / bpm), bars };
 };
 
 /** The video's palette. */

@@ -1,8 +1,11 @@
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { encodeWav, type EpisodeAudio } from "../../src/core/audio";
 import type { EpisodeMeta, ToneCheck } from "../../src/core/episode";
+import { planSong, type SongPlan } from "../../src/core/music/plan";
+import { renderSong } from "../../src/core/music/render";
+import { loadSpec, specSongRequest } from "../../src/core/spec";
 
 export const ROOT = path.resolve(import.meta.dirname, "../..");
 
@@ -33,9 +36,21 @@ export const loadToneChecks = async (slug: string): Promise<ToneCheck[]> =>
 
 export const audioPath = (slug: string) => path.join(outputDir(slug), "audio.wav");
 
+/** The planned song, for a video whose spec generates one. */
+export const loadSongPlan = (slug: string): SongPlan | undefined => {
+  const file = path.join(videoDir(slug), "spec.json");
+  if (!existsSync(file)) return undefined;
+  const spec = loadSpec(JSON.parse(readFileSync(file, "utf8")));
+  return spec.song.generator ? planSong(specSongRequest(spec)) : undefined;
+};
+
 export const writeEpisodeAudio = async (slug: string) => {
-  const { default: audio } = await load<{ default: EpisodeAudio }>(slug, "audio.ts");
-  const rendered = audio.render();
+  const plan = loadSongPlan(slug);
+  if (!plan && !existsSync(path.join(videoDir(slug), "audio.ts"))) {
+    console.error(`videos/${slug} has no audio.ts and no song generator in its spec.`);
+    process.exit(2);
+  }
+  const rendered = plan ? renderSong(plan) : (await load<{ default: EpisodeAudio }>(slug, "audio.ts")).default.render();
   const out = audioPath(slug);
   mkdirSync(path.dirname(out), { recursive: true });
   writeFileSync(out, encodeWav(rendered));

@@ -5,7 +5,8 @@ import { createHash } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { audioPath, loadMeta, requireSlug, ROOT, videoDir } from "./lib/episode";
+import { songHits } from "../src/core/music/plan";
+import { audioPath, loadMeta, loadSongPlan, requireSlug, ROOT, videoDir } from "./lib/episode";
 
 const WINDOW_S = 0.005;
 const SCAN_S = 0.12;
@@ -19,11 +20,13 @@ if (!existsSync(wavPath)) {
   process.exit(2);
 }
 const songPath = path.join(videoDir(slug), "song.ts");
-if (!existsSync(songPath)) {
-  console.error(`videos/${slug}/song.ts not found: it must export KICKS (and optionally STABS), in seconds.`);
+type Hits = { KICKS: number[]; STABS?: number[]; IMPACTS?: number[] };
+const plan = loadSongPlan(slug);
+if (!plan && !existsSync(songPath)) {
+  console.error(`videos/${slug}/song.ts not found: it must export KICKS (and optionally STABS), in seconds. A generated song needs no song.ts.`);
   process.exit(2);
 }
-const { KICKS, STABS = [] } = (await import(pathToFileURL(songPath).href)) as { KICKS: number[]; STABS?: number[] };
+const { KICKS, STABS = [], IMPACTS = [] }: Hits = plan ? songHits(plan) : ((await import(pathToFileURL(songPath).href)) as Hits);
 const { fps } = await loadMeta(slug);
 
 const wav = readFileSync(wavPath);
@@ -48,17 +51,20 @@ const audibleDelay = (t: number) => {
   return levels.findIndex((l) => l >= threshold) * STEP;
 };
 
-// Picture hits land on whole frames. A hit that is late by under half a frame stays on its grid frame;
-// otherwise it takes the first frame at or after the sound, because a picture that leads its sound reads as out of sync.
+// Picture hits land on whole frames. A hit on a frame that is late by under half a frame stays on that frame.
+// Anything else takes the first frame at or after the sound, because a picture that leads its sound reads as out of sync.
+// A hit between two frames, such as an eighth note at an odd number of frames per beat, must not round down.
 const placeHit = (t: number) => {
   const delay = audibleDelay(t);
-  const frame = delay < 0.5 / fps ? Math.round(t * fps) : Math.ceil((t + delay) * fps);
+  const onFrame = Math.abs(t * fps - Math.round(t * fps)) < 1e-6;
+  const frame = onFrame && delay < 0.5 / fps ? Math.round(t * fps) : Math.ceil((t + delay) * fps);
   return { t, delayMs: delay * 1000, frame };
 };
 
 const kicks = KICKS.map(placeHit);
 const stabs = STABS.map(placeHit);
-const moved = [...kicks, ...stabs].filter((h) => h.frame !== Math.round(h.t * fps));
+const impacts = IMPACTS.map(placeHit);
+const moved = [...kicks, ...stabs, ...impacts].filter((h) => h.frame !== Math.round(h.t * fps));
 const sha = createHash("sha256").update(wav).digest("hex");
 
 const list = (hits: { frame: number }[]) => `[${hits.map((h) => h.frame).join(", ")}]`;
@@ -72,7 +78,7 @@ export const SONG_MAP = {
   /** Video frame on which each kick is first audible. */
   kickFrames: ${list(kicks)},
   /** Video frame on which each stab is first audible. */
-  stabFrames: ${list(stabs)},
+  stabFrames: ${list(stabs)},${impacts.length > 0 ? `\n  /** Video frame on which each drop's first hit is audible. */\n  impactFrames: ${list(impacts)},` : ""}
 };
 `,
 );
