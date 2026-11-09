@@ -6,6 +6,7 @@ export const Tag: React.FC<{ x: number; y: number; text: string; hot?: boolean; 
   const { ink, text: cream, accent } = usePalette();
   return (
   <div
+    data-audit="label"
     style={{
       position: "absolute",
       left: x,

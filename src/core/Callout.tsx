@@ -12,7 +12,7 @@ export const Callout: React.FC<{ x: number; y: number; px: number; py: number; t
   const startX = px > x ? x + halfW : x - halfW;
   return (
     <>
-      <svg width={1080} height={1920} style={{ position: "absolute", left: 0, top: 0, pointerEvents: "none" }}>
+      <svg data-leader={`${startX},${y},${px},${py}`} width={1080} height={1920} style={{ position: "absolute", left: 0, top: 0, pointerEvents: "none" }}>
         <line x1={startX} y1={y} x2={px} y2={py} stroke={ink} strokeWidth={7} />
         <line x1={startX} y1={y} x2={px} y2={py} stroke={stroke} strokeWidth={3} />
         <rect x={px - 6} y={py - 6} width={12} height={12} fill={stroke} stroke={ink} strokeWidth={2} />

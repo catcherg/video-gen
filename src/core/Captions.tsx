@@ -6,6 +6,10 @@ import { FONT } from "./theme";
 export type Caption = { from: number; to: number; lines: string[]; size?: "big" | "small" | "compact"; y?: number };
 
 const CHARS_PER_S = 42;
+const LINE_GAP_S = 0.18;
+
+/** Seconds until every line has finished typing. */
+export const typingSeconds = (lines: string[]) => lines.reduce((sum, line) => sum + line.length / CHARS_PER_S, 0) + (lines.length - 1) * LINE_GAP_S;
 const DEFAULT_Y = 1290;
 
 /** Typewriter captions: each line types on in sequence. Pass `region` to keep them inside a layout region. */
@@ -17,7 +21,7 @@ export const Captions: React.FC<{ t: number; captions: Caption[]; region?: Rect 
   let start = cap.from;
   const shown = cap.lines.map((line) => {
     const n = Math.max(0, Math.min(line.length, Math.floor((t - start) * CHARS_PER_S)));
-    start += line.length / CHARS_PER_S + 0.18;
+    start += line.length / CHARS_PER_S + LINE_GAP_S;
     return { line, n };
   });
   const fade = Math.min(1, (cap.to - t) / 0.15, (t - cap.from) / 0.08);
@@ -35,6 +39,7 @@ export const Captions: React.FC<{ t: number; captions: Caption[]; region?: Rect 
       }}
     >
       <div
+        data-audit="caption"
         style={{
           background: ink,
           border: `4px solid ${text}`,

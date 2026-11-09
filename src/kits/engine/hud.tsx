@@ -13,6 +13,7 @@ export const HUD_BOTTOM = 484;
 
 export const HudPanel: React.FC<{ pop: number; children: React.ReactNode }> = ({ pop, children }) => (
   <div
+    data-audit="hud"
     style={{
       position: "absolute",
       left: (1080 - HUD_W) / 2,

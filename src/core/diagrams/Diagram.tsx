@@ -280,6 +280,7 @@ export const Diagram: React.FC<{ spec: DiagramSpec; progress: number; fade?: num
   const inner = { w: region.w - CARD_SIDE_CHROME, h: region.h - CARD_CHROME - TITLE_ROW, p: progress };
   return (
     <div
+      data-audit="diagram"
       style={{
         position: "absolute",
         left: region.x,

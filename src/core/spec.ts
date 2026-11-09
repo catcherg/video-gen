@@ -58,6 +58,8 @@ const UNSOURCED_OK: Confidence[] = ["assumed", "illustrative"];
 const EPSILON = 1e-9;
 /** A tempo such as 1800 / 14 can only be written approximately in JSON. */
 const FRAME_TOLERANCE = 1e-6;
+/** Stands in for a {token} when estimating a caption's width. check-video measures the real text. */
+const TOKEN_ESTIMATE = "0000";
 
 const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 const isText = (v: unknown): v is string => typeof v === "string" && v.trim().length > 0;
@@ -194,7 +196,7 @@ export const validateSpec = (raw: unknown): string[] => {
   if (captionSpans) checkSpans(captionSpans, durationS, errors);
   spec.captions.forEach((caption, i) => {
     if (!isRecord(caption) || !isTextList(caption.lines) || caption.lines.length === 0) errors.push(`captions[${i}]: needs at least one line of text`);
-    else if (caption.size === "compact" && !captionFits(caption.lines)) errors.push(`captions[${i}]: too long for the caption region`);
+    else if (caption.size === "compact" && !captionFits(caption.lines.map((line) => line.replace(/\{\w+\}/g, TOKEN_ESTIMATE)))) errors.push(`captions[${i}]: too long for the caption region`);
   });
   return errors;
 };

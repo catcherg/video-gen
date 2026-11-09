@@ -11,6 +11,8 @@
     "render": "tsx scripts/render.ts",
     "verify-audio": "tsx scripts/verify-audio.ts",
     "check-scene": "tsx scripts/check-scene.ts",
+    "check-video": "tsx scripts/check-video.ts",
+    "compare-frames": "tsx scripts/compare-frames.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "new-episode": "tsx scripts/new-episode.ts"

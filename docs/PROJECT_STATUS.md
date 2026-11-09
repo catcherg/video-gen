@@ -13,7 +13,7 @@ The goal is an interface that turns a description and uploaded information into 
 | 3 | Generic visual library | Done | Palettes, safe zones, motion, 3D shapes, six diagram types and `check-scene`. Only the gallery uses them so far; Milestone 5 is the first real test. |
 | 4 | Song generator | Done | Deep bass house by default, dubstep as the option for slower, dramatic videos. The user approved six samples; their hashes are under Locked songs. |
 | 5 | Non-machine videos from specs | Done | `sky-blue` and `voc-economics` are approved. Neither needed framework changes. The gaps they exposed are listed below. |
-| 6 | Automated checks | Not started | Includes the sync and frame-comparison scripts from the backlog. |
+| 6 | Automated checks | Done | `check-video` and `compare-frames`. Tested against deliberately broken layouts. They found three problems in finished videos, listed below. |
 | 7 | AI pipeline, run headless | Not started | Must settle how each person gets AI access without sharing the owner's key. |
 | 8 | Sandboxing and licensing | Not started | Required before friends and family use it. |
 | 9 | Identity cleanup | Not started | At the start of interface work: README, 8-bit reel framing in `CLAUDE.md`, renames, general template. |
@@ -30,7 +30,13 @@ Known gaps after Milestone 3:
 - The safe zones come from conflicting third-party guides, because neither platform's own page was found. Test them with a real upload to each platform.
 - The finished videos keep their original layout, so parts of their captions and diagrams still sit where platform buttons can cover them.
 - The tile map draws tiles it is given. There is no built-in world or country map yet.
-- `check-scene` doesn't detect hard-coded on-screen numbers, and it is not a sandbox (Milestone 8).
+- Automated checks trace numbers typed into captions, but not literal numbers in hand-written diagrams. They are also not a sandbox (Milestone 8).
+
+Found by `check-video` in approved videos. The user chose to leave these as they are, so the caption timings keep `sky-blue` and `voc-economics` reporting as failed:
+
+- `f1-v8`, around frame 384: the "58.5 MM" label runs off the right edge of the frame.
+- `sky-blue`: "THE SKY BLUE?" is only complete for 0.16 s.
+- `voc-economics`: the caption about the debts passing to the Dutch state is only complete for 0.22 s.
 
 Found while making `sky-blue`. None blocked the video, but each is manual work the AI pipeline (Milestone 7) will trip over:
 
@@ -39,8 +45,8 @@ Found while making `sky-blue`. None blocked the video, but each is manual work t
 - Placing a subject inside the safe zone needs a manual camera offset, and callout positions are tuned by eye. A core helper for aiming a subject into a region would remove the first.
 - Shot titles aren't part of the spec.
 - A video with no `toneChecks` passes `verify-audio` without checking anything.
-- The caption fit check measures raw `{token}` names rather than the filled-in text, so `voc-economics` uses one-letter tokens to pass.
-- Nothing checks how long a caption stays fully visible. A long caption can finish typing just as it disappears, and only frame review caught this.
+- The caption fit check estimates token width. `voc-economics` still uses the one-letter tokens it needed before this was fixed.
+- `check-video` can't judge whether a shot explains its idea, whether a label points at the right thing, or whether the camera passes through geometry. A vision review in Milestone 7 could cover part of this.
 - The tile map has no real geography, so the route map is drawn by hand and labelled schematic.
 
 ## Episodes
@@ -93,7 +99,7 @@ Nothing here has been started. Suggested order: safe zones first, because that c
 5. **60 fps option.** Physics and camera run on time, so they carry over. The seeded flicker uses the frame number and would need retuning, render time roughly doubles, crank strobing at real speed changes, and frame numbers in checks need redoing.
 6. **F1 V8 sources.** Find a published stroke, crank type and firing order for the Honda RA808E, plus the reading convention for the "19/64" valve timing in the valvetrain paper. The video currently labels the firing order as typical.
 7. **Better sources.** Find factory documents for the L539 firing order and bank numbering, the SVJ's 8,700 rpm limit, the F136 firing order, and real L539 valve timing to replace the panel labelled "SCHEMATIC".
-8. **Sync and frame-comparison scripts.** Now part of Milestone 6. The checks that measured drum timing on the finished MP4 and compared every frame between renders were one-off scripts and are not in the repo. Add them under `scripts/`.
+8. **Sync and frame-comparison scripts.** Done in Milestone 6: see `check-video` and `compare-frames`.
 9. **Fully repeatable renders.** `f1-v8` varies between one-tab renders of the same code, on up to about 40 of its 1,008 frames and by under 0.004% of pixels, in frames 98, 447, 781-785 and 924-992. It isn't visible, but it makes byte comparisons of that video unreliable, so Milestone 6's frame comparison needs to allow for it. Multi-tab renders vary more. Find out why a few frames differ by about 0.05% of pixels with several tabs. If that is fixed, final renders could use four tabs and take well under half the time.
 
 ## Done from the original backlog

@@ -6,12 +6,8 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { songHits } from "../src/core/music/plan";
+import { makeAudibleDelay } from "./lib/audible";
 import { audioPath, loadMeta, loadSongPlan, requireSlug, ROOT, videoDir } from "./lib/episode";
-
-const WINDOW_S = 0.005;
-const SCAN_S = 0.12;
-/** A hit counts as audible once it is within this many dB of its own peak. */
-const AUDIBLE_DB = 6;
 
 const slug = requireSlug(process.argv[2], "npm run song-map <slug>");
 const wavPath = audioPath(slug);
@@ -30,26 +26,7 @@ const { KICKS, STABS = [], IMPACTS = [] }: Hits = plan ? songHits(plan) : ((awai
 const { fps } = await loadMeta(slug);
 
 const wav = readFileSync(wavPath);
-const sampleRate = wav.readUInt32LE(24);
-const frames = (wav.length - 44) / 4;
-const mono = (i: number) => (wav.readInt16LE(44 + i * 4) + wav.readInt16LE(46 + i * 4)) / 65536;
-
-const rmsAt = (t: number) => {
-  const from = Math.round(t * sampleRate);
-  const n = Math.round(WINDOW_S * sampleRate);
-  let sum = 0;
-  for (let i = from; i < Math.min(frames, from + n); i++) sum += mono(i) ** 2;
-  return Math.sqrt(sum / n);
-};
-
-/** Seconds from the scheduled hit until the sound reaches its audible level. */
-const audibleDelay = (t: number) => {
-  const STEP = 0.001;
-  const levels: number[] = [];
-  for (let d = 0; d < SCAN_S; d += STEP) levels.push(rmsAt(t + d));
-  const threshold = Math.max(...levels) * 10 ** (-AUDIBLE_DB / 20);
-  return levels.findIndex((l) => l >= threshold) * STEP;
-};
+const audibleDelay = makeAudibleDelay(wav);
 
 // Picture hits land on whole frames. A hit on a frame that is late by under half a frame stays on that frame.
 // Anything else takes the first frame at or after the sound, because a picture that leads its sound reads as out of sync.

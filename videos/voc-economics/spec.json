@@ -17,6 +17,56 @@
   },
   "facts": [
     {
+      "id": "foundedYear",
+      "claim": "The company was founded in 1602",
+      "value": 1602,
+      "confidence": "secondary",
+      "sources": ["https://www.worldhistory.org/Dutch_East_India_Company/", "https://en.wikipedia.org/wiki/Dutch_East_India_Company"]
+    },
+    {
+      "id": "dividendYears",
+      "claim": "Dividends were paid for almost this many years",
+      "value": 200,
+      "unit": "years",
+      "confidence": "single-source",
+      "sources": ["https://en.wikipedia.org/wiki/Dutch_East_India_Company"]
+    },
+    {
+      "id": "voyagePeriod",
+      "claim": "The period covered by the voyage count",
+      "value": [1602, 1795],
+      "confidence": "secondary",
+      "sources": ["https://resolve.cambridge.org/core/journals/journal-of-southeast-asian-studies/article/between-batavia-and-the-cape-shipping-patterns-of-the-dutch-east-india-company/9CD79760674B0AE0363828DF9FDE9C6D"]
+    },
+    {
+      "id": "conquestYear",
+      "claim": "The Banda Islands were conquered in 1621",
+      "value": 1621,
+      "confidence": "secondary",
+      "sources": ["https://en.wikipedia.org/wiki/Dutch_conquest_of_the_Banda_Islands"]
+    },
+    {
+      "id": "profitlessGrowthYears",
+      "claim": "The period of expansion without added profit",
+      "value": [1680, 1730],
+      "confidence": "secondary",
+      "sources": ["https://en.wikipedia.org/wiki/Dutch_East_India_Company"]
+    },
+    {
+      "id": "warYears",
+      "claim": "The Fourth Anglo-Dutch War ran from 1780 to 1784",
+      "value": [1780, 1784],
+      "confidence": "secondary",
+      "sources": ["https://en.wikipedia.org/wiki/Dutch_East_India_Company"]
+    },
+    {
+      "id": "dissolvedYear",
+      "claim": "The company was dissolved on 31 December 1799",
+      "value": 1799,
+      "confidence": "secondary",
+      "sources": ["https://en.wikipedia.org/wiki/Dutch_East_India_Company"]
+    },
+    {
       "id": "capitalM",
       "claim": "Capital raised at the founding in 1602, in millions of guilders",
       "value": 6.4,

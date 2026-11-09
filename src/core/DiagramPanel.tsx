@@ -8,6 +8,7 @@ export const DiagramPanel: React.FC<{ title: string; fade: number; children: Rea
   const { ink, text, dim, border } = usePalette();
   return (
   <div
+    data-audit="diagram"
     style={{
       position: "absolute",
       left: PANEL.left,

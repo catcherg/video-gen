@@ -24,7 +24,7 @@ Video status, approved song hashes, milestone progress and the backlog are in [d
 - **`src/core/` stays subject-neutral.** Nothing in it may import from a kit or a video, or mention a subject. A test enforces this. Anything specific to a subject belongs in `src/kits/<kit>/`.
 - **Every video lives in one folder**, `videos/<slug>/`, with its generated files in the ignored `videos/<slug>/output/`. Nothing specific to a video goes anywhere else, and videos never import from each other.
 - **The spec is plain data.** `spec.json` must stay JSON, because the AI pipeline will eventually write it. It is validated every time it loads.
-- **Generated code gets no special trust.** Code written by AI goes through the same tests, frame checks and approvals as code written by hand, and must pass `npm run check-scene`. Compiling is not evidence that a shot works. `check-scene` is not a sandbox.
+- **Generated code gets no special trust.** Code written by AI goes through the same tests, frame checks and approvals as code written by hand, and must pass `npm run check-video`. Compiling is not evidence that a shot works. These checks are not a sandbox.
 - **New videos keep text in the safe zone.** Place headlines, diagrams and captions with `REGIONS` from `core/layout.ts`. The finished videos predate this and keep their original layout so they don't change.
 - **People approve what cannot be measured.** Timing, overlaps and numbers can be checked automatically. Song taste and whether a shot explains the idea need a person.
 
@@ -94,7 +94,7 @@ src/kits/engine/  Engine kit: fourStroke physics + testkit, engineAudio, HUD, en
                   parts/ (PistonRod, Crankshaft, ValveTrain, Headers, F1*, Garage, cars/, Gallery, ...)
 public/           fonts/, and videos -> ../videos (symlink so Remotion can serve each video's output/)
 docs/             VIDEO_PRODUCTION.md (production playbook), PROJECT_STATUS.md (status, songs, backlog)
-scripts/          audio, song-map, song-samples, stills, render, verify-audio, check-scene, new-episode
+scripts/          audio, song-map, song-samples, stills, render, verify-audio, check-video, check-scene, compare-frames, new-episode
 templates/        Files copied by new-episode (currently an engine video)
 poc/              Original proof of concept, kept for reference. Not part of the build.
 ```
@@ -113,7 +113,9 @@ npm run song-map <slug>              # measures the WAV, writes videos/<slug>/so
 npm run song-samples                 # writes generated songs to out/song-samples and measures them (-- --seeds 8 --bars 18)
 npm run stills <slug> <frames...>    # writes videos/<slug>/output/stills/still_NNNN.png
 npm run verify-audio <slug>          # FFT check against physics, within 1%
+npm run check-video <slug>           # every automated check; writes videos/<slug>/output/checks.json (-- --quick skips the browser)
 npm run check-scene <slug>           # code rules, then frames rendered in opposite orders must match (-- --static for code only)
+npm run compare-frames <slug>        # renders every frame and compares with a saved baseline, ignoring render noise (-- --save to save one)
 npm run render <slug>                # audio, then videos/<slug>/output/<slug>.mp4 (1 tab)
 npm run render <slug> -- --fast      # videos/<slug>/output/<slug>-preview.mp4 (4 tabs, about 2.5× faster)
 npx remotion still parts-gallery out/gallery.png   # eyeball the engine kit's car models
@@ -122,7 +124,7 @@ npx remotion still visual-gallery out/visual-gallery.png --frame=52   # eyeball 
 
 Final renders use one browser tab on purpose. With more tabs, a few frames differ by about 0.05% of pixels between runs, which breaks rule 1 in the strict sense. Use `--fast` for previews only.
 
-One tab is not always byte-exact either. `v12` and `v8-cross-flat` have matched on every comparison, but two renders of `f1-v8` from the same code can differ on a few dozen of its 1,008 frames, by under 0.004% of pixels. So if a byte comparison fails, render the old code again as a control before calling it a regression. The cause is unknown; see the backlog.
+One tab is not always byte-exact either. `v12` and `v8-cross-flat` have matched on every comparison, but two renders of `f1-v8` from the same code can differ on a few dozen of its 1,008 frames, by under 0.004% of pixels. So if a byte comparison fails, use `compare-frames` or render the old code again as a control before calling it a regression. The cause is unknown; see the backlog.
 
 GL settings live in `render-settings.ts`. `angle` uses the Mac's GPU.
 
@@ -143,6 +145,10 @@ Specs can also define `diagrams`: named general diagrams drawn by `core/diagrams
 `shots` is the shot list. The renderer doesn't read it yet, but tests check it against the video's real diagram windows. Camera moves and the 3D scene stay in code.
 
 ## Check frames before rendering
+
+Run `npm run check-video <slug>` first. It validates the spec and code rules, traces caption numbers to the facts, checks that captions stay up long enough, and compares the WAV, song map and MP4 for sync. On sampled frames it measures the real page for text off the frame or outside the safe zone, overlaps, diagram text that spills or collides, leader lines that cross things, and an empty subject region. Errors fail the video. Videos made before the safe zones only get warnings for layout.
+
+It can't tell whether a shot explains its idea, whether a label points at the right thing, or whether the camera passes through geometry. So a person or a vision review still looks at the frames.
 
 Before any full render:
 
@@ -223,7 +229,7 @@ These define the finished quality level. Follow them for every full video, in th
 **Changing finished work**
 
 - Record what must not change before starting: stills, the audio hash, or both.
-- Prove refactors neutral by byte comparison. Keep intentional changes in a separate commit and report which frames changed.
+- Prove refactors neutral by byte comparison, or with `compare-frames`, which tells real changes from render noise. Keep intentional changes in a separate commit and report which frames changed.
 - Visual-only work must leave `audio.ts`, `song.ts` and physics timing alone.
 
 **Publishing**

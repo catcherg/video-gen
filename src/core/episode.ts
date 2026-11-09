@@ -9,7 +9,7 @@ export type EpisodeMeta = {
   height: number;
 };
 
-export type EpisodeProps = { withAudio?: boolean };
+export type EpisodeProps = { withAudio?: boolean; /** Reports text positions for automated checks. Draws nothing. */ audit?: boolean };
 
 /**
  * One section of the finished audio whose dominant pitch must match a prediction.
