@@ -2,7 +2,7 @@
 
 Video Gen generates 8-bit reels: someone describes a video, uploads information about the subject, and gets back a finished vertical reel (1080×1920, 30 fps, about 30 s) and an original song, on any topic. Picture and music are generated entirely from code. Stack: Remotion 4, @remotion/three, React Three Fiber, three.js, TypeScript.
 
-**What this is becoming:** a local interface for generating those reels, installed on each person's own computer. The machinery underneath already works from one command: `npm run generate` goes from a brief and uploads to a finished video with nobody editing code, stopping for a person to approve the facts, the song and the frames. The interface is a layer on top of that command, and it is the remaining milestone. See [Roadmap](#roadmap).
+**The interface** is a local page, installed on each person's own computer and started with `npm start`. People describe a video there, upload information, approve the facts, song and frames, and download the result. Underneath, the page runs `npm run generate`, which goes from a brief and uploads to a finished video with nobody editing code. See [The local interface](#the-local-interface) and the [Roadmap](#roadmap).
 
 Engines were the first subject and are now one kit. Everything else in the framework works for any topic.
 
@@ -65,9 +65,23 @@ Decided by the user. Later milestones build on these.
 - **Everyone installs it on their own computer.** Renders run locally, through a local page the user is prompted to open. Nothing is hosted.
 - **Everyone uses their own Claude access:** an API key that `npm run set-key` stores outside the repository, readable only by that account, or their own signed-in Claude plan with `--engine claude-code`. Never put a key in this repository.
 
+## The local interface
+
+`npm start`, or the `Start Video Gen` launcher, runs `interface/start.ts`: it builds the page, listens on `127.0.0.1` from port 4646 up, and prompts the person to open it.
+
+- **There is only one pipeline.** The server starts `scripts/generate.ts` and reads its saved state. Never give the interface its own version of a stage. Anything the page can do must also work through `generate`.
+- **The server trusts nothing it's sent.** Every request must carry a local `Host`; every change must carry a local `Origin` and a JSON content type; slugs, stages, gates, upload names and media names are all checked. Keep those guards in `interface/guard.ts`, and add a test for any new route in `interface/server.test.ts`.
+- **Credentials go in and never come out.** A key is written outside the repository and is never returned. Only the yes or no is kept from `claude auth status`, whose output includes an email address. `interface/types.ts` is everything the page may see.
+- **Model and upload text is hostile on the page too.** Render it as text, never as HTML, and allow only `http` and `https` links. The page policy forbids inline and outside scripts.
+- **One video runs at a time,** because videos share `registry.ts`, the typecheck and the CPU.
+- **Stop kills the whole process tree.** Remotion starts Chrome in its own process group, so a group signal misses it.
+- **Graphics are chosen once per computer.** `interface/check-graphics.ts` tries the GPU, then software rendering, and saves the answer to `out/graphics.json`, which `render-settings.ts` reads. `VIDEO_GEN_GL` overrides it.
+- `VIDEO_GEN_FIXTURE=<answers.json> npm start` runs the page on scripted answers, for testing at no cost. Those facts must cite an upload, because a scripted run has no search results.
+
 ## Layout
 
 ```
+interface/        The local page: start.ts, server.ts, guards, the run manager, page/ (React, built by esbuild at startup)
 videos/           Umbrella folder: one folder per generated video
   registry.ts     Every video is listed here; Root.tsx registers one Composition each
   <slug>/
@@ -104,6 +118,7 @@ Units in engine scenes: 1 = 10 cm.
 ## Commands
 
 ```bash
+npm start                            # the local page: describe, upload, approve, download
 npm run studio                       # Remotion Studio preview
 npm run new-video <slug>             # scaffold and register a new video, with a first song (-- --kit engine for an engine video)
 npm test                             # spec, boundary and physics tests

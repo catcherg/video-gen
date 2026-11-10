@@ -6,13 +6,13 @@ Every video is vertical (1080×1920, 30 fps, about 30 seconds) and pixel-art 3D.
 
 Colours change with the type of video. "8-bit" describes only the pixelated rendering and pixel type.
 
-**Status:** the whole process works from one command, and the local page for it is the next piece of work. There is no hosted version and there won't be one. Everyone installs it on their own computer and renders there. So far it has only been tested on one Mac.
+**Status:** it runs from a local page on your own computer. There is no hosted version and there won't be one. So far it has only been tested on one Mac.
 
 ## Contents
 
 - [How a video gets made](#how-a-video-gets-made)
-- [Setup](#setup)
-- [Make a video with AI](#make-a-video-with-ai)
+- [Getting started](#getting-started)
+- [Make a video from the command line](#make-a-video-from-the-command-line)
 - [Make a video by hand](#make-a-video-by-hand)
 - [How it is built](#how-it-is-built)
 - [The checks](#the-checks)
@@ -23,7 +23,7 @@ Colours change with the type of video. "8-bit" describes only the pixelated rend
 
 ## How a video gets made
 
-A single command, `npm run generate`, runs six stages. It stops at three of them for a person to approve the work, because some things can't be measured.
+Six stages run in order. The process stops at three of them for you to approve the work, because some things can't be measured.
 
 | Stage | What happens | Who decides it's good |
 |---|---|---|
@@ -36,55 +36,33 @@ A single command, `npm run generate`, runs six stages. It stops at three of them
 
 The order matters: the song is locked first, and then the animation adapts to it. Every kick, cut and flash in the picture comes from where that hit is actually audible in the finished song.
 
-## Setup
+## Getting started
 
-You need:
+You need a Claude plan you can sign in to, or a Claude API key. Each person uses their own.
 
-- [Node.js](https://nodejs.org/) 22.13 or newer. It has been developed on Node 26.
-- Either a Claude API key, or a Claude plan you can sign in to.
-- A Mac, ideally. Other systems haven't been tested yet, and on Windows part of the code containment doesn't apply (see [Security and limits](#security-and-limits)).
+1. Install [Node.js](https://nodejs.org/), the LTS version. Video Gen needs 22.13 or newer.
+2. Get this folder onto your computer. Either use `git clone https://github.com/catcherg/video-gen.git`, or choose **Code**, then **Download ZIP**, on GitHub and unzip it.
+3. Double-click **Start Video Gen.command** on a Mac, or **Start Video Gen.bat** on Windows. The first run sets everything up, which takes a few minutes. On a Mac, if it says the file can't be opened, Control-click it and choose **Open**.
+4. Press Enter when the window asks, or open <http://localhost:4646> yourself.
+5. Connect Claude on the page, describe your video and press **Start video**.
 
-```bash
-git clone https://github.com/catcherg/video-gen.git
-```
+Keep that window open while a video is being made. Closing it stops the work, and **Continue** on the page picks up from the last finished step.
 
-```bash
-cd video-gen
-```
+From a terminal, the same thing is:
 
 ```bash
 npm install
 ```
 
-Remotion downloads its own copy of headless Chrome the first time you render, and ffmpeg comes with it.
-
-Then give the tool access to Claude, in one of two ways. Each person uses their own.
-
-**An API key.** This stores the key outside the repository, in a file only your account can read. It's billed per use.
-
 ```bash
-npm run set-key
+npm start
 ```
 
-**A Claude plan.** Sign in, then add `--engine claude-code` to the `generate` command. Usage comes out of your plan and the dollar figures shown are what the same work would have cost on the API. PDF uploads need the API key for now.
+Only your own computer can open the page. Renders use your graphics card if the render browser can reach one. Without one they fall back to drawing in software, which works but takes longer. Mac is the only system tested so far. Windows and Linux are expected to work, but on Windows part of the code containment doesn't apply (see [Security and limits](#security-and-limits)).
 
-```bash
-claude auth login
-```
+## Make a video from the command line
 
-To check that everything works before spending anything:
-
-```bash
-npm test
-```
-
-```bash
-npm run typecheck
-```
-
-## Make a video with AI
-
-Start with a slug (the video's folder name) and a one-line brief. Uploads are optional, and you can add several.
+The page runs this same command underneath. Start with a slug (the video's folder name) and a one-line brief. Uploads are optional, and you can add several. To connect Claude without the page, run `npm run set-key` to save an API key, or `claude auth login` and add `--engine claude-code`.
 
 ```bash
 npm run generate -- black-holes --brief "How a black hole bends light" --upload notes.txt --engine claude-code
@@ -146,6 +124,7 @@ From there:
 The stack is [Remotion](https://www.remotion.dev/) 4, React Three Fiber, three.js and TypeScript.
 
 ```
+interface/         The local page and its server
 videos/            One folder per video, with its source and generated output together
   registry.ts      Lists every video
   <slug>/
@@ -196,6 +175,7 @@ It can't tell whether a shot explains its idea, whether a label points at the ri
 
 | Command | What it does |
 |---|---|
+| `npm start` | Starts Video Gen and its local page |
 | `npm run studio` | Opens the Remotion preview |
 | `npm run generate -- <slug> --brief "..."` | Makes a video with AI |
 | `npm run new-video <slug>` | Creates a video from a template |
@@ -213,6 +193,8 @@ It can't tell whether a shot explains its idea, whether a label points at the ri
 | `npm test`, `npm run typecheck` | Runs the tests and type checks |
 
 ## Security and limits
+
+The page's server listens only on your own computer. It refuses requests sent from other websites or under another site's name, and a saved API key is never sent back to the page.
 
 AI-written code runs on your own computer, and an uploaded document could try to steer what gets written. So generated code gets no special trust:
 

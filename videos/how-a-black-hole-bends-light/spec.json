@@ -1,0 +1,568 @@
+{
+  "version": 1,
+  "slug": "how-a-black-hole-bends-light",
+  "title": "How a Black Hole Bends Light",
+  "description": "From starlight nudged by the Sun to light looping around a black hole, here is how gravity turns light into the ring we see.",
+  "question": "How does a black hole bend light?",
+  "kit": "none",
+  "palette": "space",
+  "format": {
+    "fps": 30,
+    "width": 1080,
+    "height": 1920,
+    "durationS": 33.6
+  },
+  "song": {
+    "bpm": 128.57142857142858,
+    "beatsPerBar": 4,
+    "bars": 18,
+    "style": "Deep bass house",
+    "generator": {
+      "style": "house",
+      "seed": 42
+    },
+    "lockedWavSha256": "81176da551795d7a48e2a4c81e8a3c050555e87e6d1b25a1608b0bf5c7035210"
+  },
+  "facts": [
+    {
+      "id": "photonSphere",
+      "claim": "Around a non-spinning black hole, light can orbit at the photon sphere, 1.5 times the Schwarzschild radius (3GM/c²).",
+      "value": 1.5,
+      "confidence": "secondary",
+      "sources": [
+        "https://arxiv.org/pdf/1910.02957",
+        "https://arxiv.org/pdf/2212.06054"
+      ],
+      "unit": "Schwarzschild radii",
+      "note": "Applies to the non-spinning (Schwarzschild) case. The 1.5 factor is the photon sphere's physical radius, not the apparent shadow radius."
+    },
+    {
+      "id": "shadowToHorizon",
+      "claim": "A black hole's shadow looks at least about twice as wide as its event horizon, because gravity lenses the light around it.",
+      "value": 2,
+      "confidence": "secondary",
+      "sources": [
+        "https://svs.gsfc.nasa.gov/14576/",
+        "https://arxiv.org/pdf/1910.02957",
+        "https://messier-objects.com/first-image-of-a-black-hole-captured-in-m87"
+      ],
+      "unit": "times the horizon size (lower bound)",
+      "note": "Sources differ in precision: NASA says about twice, one popular source says about 2.5, and the non-spinning calculation gives √27/2 ≈ 2.6 (shadow radius √27 GM/c² ≈ 5.2 GM/c²). 'More than twice' is the safe on-screen wording; use 2.6 only if labelled as the non-spinning theoretical value."
+    },
+    {
+      "id": "weakDeflection",
+      "claim": "Far from a mass, general relativity gives a light-bending angle of 4GM/(c²b), twice the value from Newtonian gravity.",
+      "value": 2,
+      "confidence": "secondary",
+      "sources": [
+        "https://icc.dur.ac.uk/~tt/Lectures/Galaxies/TeX/lec/node101.html",
+        "https://ar5iv.labs.arxiv.org/html/gr-qc/0611086"
+      ],
+      "unit": "times the Newtonian deflection",
+      "note": "b is how closely the ray passes the mass. This is only the weak-field limit and does not hold near the photon sphere."
+    },
+    {
+      "id": "strongDeflection",
+      "claim": "As a light ray's path approaches the critical distance at the photon sphere, its bending angle grows without limit, so it can wrap around the black hole.",
+      "value": "logarithmic divergence at the critical impact parameter",
+      "confidence": "primary",
+      "sources": [
+        "https://arxiv.org/html/2503.02320v4",
+        "https://ar5iv.labs.arxiv.org/html/gr-qc/0611086"
+      ],
+      "note": "Rays passing just inside the critical distance are captured; rays just outside can loop around and escape."
+    },
+    {
+      "id": "sunDeflection",
+      "claim": "Einstein's theory predicted that the Sun would shift a star's apparent position by 1.75 arcseconds for light grazing the Sun's rim.",
+      "value": 1.75,
+      "confidence": "secondary",
+      "sources": [
+        "https://www.scielo.br/j/rbef/a/tsCDFzLWszcgV8XzMN9KvQH/",
+        "https://eclipse-history.wp.st-andrews.ac.uk/the-controversial-british-led-eclipse-expeditions-of-1919-that-validated-general-relativity/"
+      ],
+      "unit": "arcseconds"
+    },
+    {
+      "id": "eclipseDate",
+      "claim": "Expeditions to Sobral, Brazil, and Príncipe observed the total solar eclipse of May 29, 1919, to test light bending.",
+      "value": "1919-05-29",
+      "confidence": "secondary",
+      "sources": [
+        "https://www.scielo.br/j/rbef/a/tsCDFzLWszcgV8XzMN9KvQH/",
+        "https://eclipse-history.wp.st-andrews.ac.uk/the-controversial-british-led-eclipse-expeditions-of-1919-that-validated-general-relativity/"
+      ],
+      "unit": "date",
+      "note": "Results were announced in London on November 6, 1919."
+    },
+    {
+      "id": "eclipseResults",
+      "claim": "The 1919 expeditions reported star shifts of 1.98 arcseconds at Sobral and 1.61 arcseconds at Príncipe.",
+      "value": [
+        1.98,
+        1.61
+      ],
+      "confidence": "secondary",
+      "sources": [
+        "https://www.scielo.br/j/rbef/a/tsCDFzLWszcgV8XzMN9KvQH/",
+        "https://eclipse-history.wp.st-andrews.ac.uk/the-controversial-british-led-eclipse-expeditions-of-1919-that-validated-general-relativity/",
+        "https://gulfnews.com/uae/science/the-eclipse-that-revealed-the-universe-1.2075558"
+      ],
+      "unit": "arcseconds",
+      "note": "Reported uncertainties are ±0.12 (Sobral) and ±0.3 (Príncipe). The handling of the data is contested: Eddington's decision to discard Sobral astrograph data is debated, though a 1979 plate remeasurement is reported as supporting the original analysis. Avoid saying the eclipse alone 'proved' Einstein right."
+    },
+    {
+      "id": "diskArcs",
+      "claim": "Gravity bends light from the far side of a black hole's disk over and under the hole, so the disk seems to form arcs above and below the shadow.",
+      "value": "far-side disk light appears above and below the shadow",
+      "confidence": "primary",
+      "sources": [
+        "https://svs.gsfc.nasa.gov/13326/",
+        "https://www.sciencenews.org/article/nasa-new-black-hole-visualizations-showcase-how-gravity-warps-light"
+      ],
+      "note": "The effect is strongest when the disk is seen nearly edge-on. These arcs are separate from the photon ring."
+    },
+    {
+      "id": "photonRing",
+      "claim": "Inside the disk's image is a thin photon ring, formed by light that has circled the black hole one or more times before escaping.",
+      "value": "one or more orbits",
+      "confidence": "primary",
+      "sources": [
+        "https://science.nasa.gov/universe/black-holes/supermassive-black-holes/new-nasa-black-hole-visualization-takes-viewers-beyond-the-brink/",
+        "https://svs.gsfc.nasa.gov/14585"
+      ],
+      "note": "The ring is really a set of progressively fainter, thinner rings from light making more orbits. This is not the broad bright ring in the EHT images, which could not resolve these thin subrings as a separate feature in the sources reviewed."
+    },
+    {
+      "id": "m87ImageDate",
+      "claim": "The first image of a black hole, M87*, was released by the Event Horizon Telescope on April 10, 2019.",
+      "value": "2019-04-10",
+      "confidence": "secondary",
+      "sources": [
+        "https://www.astronomy.com/science/event-horizon-telescope-releases-first-ever-black-hole-image/",
+        "https://eso.org/public/images/eso1907a"
+      ],
+      "unit": "date",
+      "note": "The image used data taken in April 2017 at a wavelength of 1.3 mm."
+    },
+    {
+      "id": "m87RingDiameter",
+      "claim": "M87*'s bright ring measures 42 microarcseconds across on the sky.",
+      "value": 42,
+      "confidence": "primary",
+      "sources": [
+        "https://authors.library.caltech.edu/records/gq7fw-fd611",
+        "https://arxiv.org/abs/1906.11243"
+      ],
+      "unit": "microarcseconds",
+      "note": "Published value is 42 ± 3 μas. Some popular sources round it to about 40."
+    },
+    {
+      "id": "m87Mass",
+      "claim": "M87*'s mass is about 6.5 billion times the Sun's.",
+      "value": 6500000000,
+      "confidence": "primary",
+      "sources": [
+        "https://authors.library.caltech.edu/records/gq7fw-fd611",
+        "https://arxiv.org/abs/1906.11243"
+      ],
+      "unit": "solar masses",
+      "note": "Published value is (6.5 ± 0.7) × 10^9 solar masses."
+    },
+    {
+      "id": "m87Distance",
+      "claim": "M87* is more than 50 million light-years from Earth.",
+      "value": 50000000,
+      "confidence": "secondary",
+      "sources": [
+        "https://labnews.co.uk/first_black_hole_image_revealed/",
+        "https://www.astronomy.com/science/event-horizon-telescope-releases-first-ever-black-hole-image/",
+        "https://arxiv.org/abs/1906.11243"
+      ],
+      "unit": "light-years (lower bound)",
+      "note": "Sources disagree slightly: 55 million light-years in EHT-era coverage, 53 million in another. The EHT analysis uses 16.8 Mpc, or about 55 million light-years."
+    },
+    {
+      "id": "sgrAImageDate",
+      "claim": "The first image of Sagittarius A*, the Milky Way's central black hole, was released on May 12, 2022.",
+      "value": "2022-05-12",
+      "confidence": "secondary",
+      "sources": [
+        "https://en.wikipedia.org/wiki/Sagittarius_A*",
+        "https://www.space.com/milky-way-monster-black-hole-first-image-eht"
+      ],
+      "unit": "date",
+      "note": "Based on radio data taken in 2017."
+    },
+    {
+      "id": "sgrARing",
+      "claim": "Sagittarius A*'s ring of lensed light measures about 51.8 microarcseconds across on the sky.",
+      "value": 51.8,
+      "confidence": "secondary",
+      "sources": [
+        "https://en.wikipedia.org/wiki/Sagittarius_A*",
+        "https://iopscience.iop.org:443/article/10.3847/2041-8213/ac6674/meta"
+      ],
+      "unit": "microarcseconds",
+      "note": "Listed as 51.8 ± 2.3 μas. One outlet mislabels this as the event horizon's size; it is the size of the lensed ring."
+    },
+    {
+      "id": "sgrAGrMatch",
+      "claim": "The size of Sagittarius A*'s ring matches the general relativity prediction based only on the black hole's mass and distance.",
+      "value": "ring diameter consistent with general relativity",
+      "confidence": "primary",
+      "sources": [
+        "https://iopscience.iop.org:443/article/10.3847/2041-8213/ac6674/meta",
+        "https://research.chalmers.se/en/publication/534136"
+      ],
+      "note": "Mass is about 4.3 million Suns and distance about 27,000 light-years (Wikipedia: 4.297 ± 0.012 million solar masses; 26,996 ± 33 light-years)."
+    }
+  ],
+  "shots": [
+    {
+      "from": {
+        "bar": 0
+      },
+      "to": {
+        "bar": 2
+      },
+      "subject": "A beam of light curving around a black hole"
+    },
+    {
+      "from": {
+        "bar": 2
+      },
+      "to": {
+        "bar": 4.5
+      },
+      "subject": "Starlight grazing the rim of the Sun",
+      "diagram": "Starlight path bending past the Sun, with the star's true and apparent positions"
+    },
+    {
+      "from": {
+        "bar": 4.5
+      },
+      "to": {
+        "bar": 5.75
+      },
+      "subject": "A total solar eclipse and expedition telescopes"
+    },
+    {
+      "from": {
+        "bar": 5.75
+      },
+      "to": {
+        "bar": 8.25
+      },
+      "subject": "Light rays passing a mass at different distances",
+      "diagram": "Light rays bending more as they pass closer to a mass"
+    },
+    {
+      "from": {
+        "bar": 8.25
+      },
+      "to": {
+        "bar": 10.75
+      },
+      "subject": "Light orbiting a non-spinning black hole",
+      "diagram": "Event horizon with the photon sphere at 1.5 times its radius"
+    },
+    {
+      "from": {
+        "bar": 10.75
+      },
+      "to": {
+        "bar": 12
+      },
+      "subject": "Light rays wrapping tighter near the critical distance",
+      "diagram": "Rays near the critical distance: some captured, some looping around and escaping"
+    },
+    {
+      "from": {
+        "bar": 12
+      },
+      "to": {
+        "bar": 13.25
+      },
+      "subject": "A black hole's disk warped into arcs over the shadow",
+      "diagram": "Light from the far side of the disk bending over the hole toward the viewer"
+    },
+    {
+      "from": {
+        "bar": 13.25
+      },
+      "to": {
+        "bar": 14.5
+      },
+      "subject": "A thin photon ring inside the disk's image"
+    },
+    {
+      "from": {
+        "bar": 14.5
+      },
+      "to": {
+        "bar": 15.75
+      },
+      "subject": "A black hole's shadow compared with its event horizon",
+      "diagram": "Event horizon drawn inside a shadow more than twice as wide"
+    },
+    {
+      "from": {
+        "bar": 15.75
+      },
+      "to": {
+        "bar": 18
+      },
+      "subject": "The ring of lensed light around Sagittarius A*"
+    }
+  ],
+  "captions": [
+    {
+      "from": {
+        "bar": 0
+      },
+      "to": {
+        "bar": 0.375
+      },
+      "lines": [
+        "BLACK HOLES"
+      ],
+      "size": "big",
+      "y": 290
+    },
+    {
+      "from": {
+        "bar": 0.375
+      },
+      "to": {
+        "bar": 0.75
+      },
+      "lines": [
+        "BEND LIGHT"
+      ],
+      "size": "big",
+      "y": 290
+    },
+    {
+      "from": {
+        "bar": 0.75
+      },
+      "to": {
+        "bar": 1
+      },
+      "lines": [
+        "SO HARD"
+      ],
+      "size": "big",
+      "y": 290
+    },
+    {
+      "from": {
+        "bar": 1
+      },
+      "to": {
+        "bar": 1.375
+      },
+      "lines": [
+        "IT LOOPS"
+      ],
+      "size": "big",
+      "y": 290
+    },
+    {
+      "from": {
+        "bar": 1.375
+      },
+      "to": {
+        "bar": 1.75
+      },
+      "lines": [
+        "AROUND"
+      ],
+      "size": "big",
+      "y": 290
+    },
+    {
+      "from": {
+        "bar": 1.75
+      },
+      "to": {
+        "bar": 2
+      },
+      "lines": [
+        "HOW?"
+      ],
+      "size": "big",
+      "y": 290
+    },
+    {
+      "from": {
+        "bar": 2
+      },
+      "to": {
+        "bar": 3.2
+      },
+      "lines": [
+        "GRAVITY BENDS LIGHT",
+        "EVEN PAST THE SUN"
+      ],
+      "size": "compact"
+    },
+    {
+      "from": {
+        "bar": 3.25
+      },
+      "to": {
+        "bar": 4.45
+      },
+      "lines": [
+        "EINSTEIN PREDICTED A SHIFT",
+        "{sunDeflection} ARCSECONDS"
+      ],
+      "size": "compact"
+    },
+    {
+      "from": {
+        "bar": 4.5
+      },
+      "to": {
+        "bar": 5.7
+      },
+      "lines": [
+        "ECLIPSE EXPEDITIONS",
+        "REPORTED 1.61 AND 1.98"
+      ],
+      "size": "compact"
+    },
+    {
+      "from": {
+        "bar": 5.75
+      },
+      "to": {
+        "bar": 6.95
+      },
+      "lines": [
+        "FAR OUT, EINSTEIN'S BEND",
+        "IS TWICE NEWTON'S"
+      ],
+      "size": "compact"
+    },
+    {
+      "from": {
+        "bar": 7
+      },
+      "to": {
+        "bar": 8.2
+      },
+      "lines": [
+        "MORE MASS, CLOSER PASS:",
+        "A BIGGER BEND"
+      ],
+      "size": "compact"
+    },
+    {
+      "from": {
+        "bar": 8.25
+      },
+      "to": {
+        "bar": 9.45
+      },
+      "lines": [
+        "NEAR A NON-SPINNING HOLE",
+        "LIGHT CAN ORBIT"
+      ],
+      "size": "compact"
+    },
+    {
+      "from": {
+        "bar": 9.5
+      },
+      "to": {
+        "bar": 10.7
+      },
+      "lines": [
+        "PHOTON SPHERE RADIUS:",
+        "{photonSphere}X HORIZON"
+      ],
+      "size": "compact"
+    },
+    {
+      "from": {
+        "bar": 10.75
+      },
+      "to": {
+        "bar": 11.95
+      },
+      "lines": [
+        "NEAR THAT ORBIT, BENDING",
+        "GROWS WITHOUT LIMIT"
+      ],
+      "size": "compact"
+    },
+    {
+      "from": {
+        "bar": 12
+      },
+      "to": {
+        "bar": 13.2
+      },
+      "lines": [
+        "YOU SEE BEHIND THE HOLE:",
+        "FAR DISK ARCS OVER IT"
+      ],
+      "size": "compact"
+    },
+    {
+      "from": {
+        "bar": 13.25
+      },
+      "to": {
+        "bar": 14.45
+      },
+      "lines": [
+        "THE THIN RING IS LIGHT",
+        "THAT CIRCLED THE HOLE"
+      ],
+      "size": "compact"
+    },
+    {
+      "from": {
+        "bar": 14.5
+      },
+      "to": {
+        "bar": 15.7
+      },
+      "lines": [
+        "THE SHADOW LOOKS MORE",
+        "THAN TWICE THE HORIZON"
+      ],
+      "size": "compact"
+    },
+    {
+      "from": {
+        "bar": 15.75
+      },
+      "to": {
+        "bar": 16.95
+      },
+      "lines": [
+        "SGR A*'S RING SIZE MATCHES",
+        "EINSTEIN'S THEORY"
+      ],
+      "size": "compact"
+    },
+    {
+      "from": {
+        "bar": 17
+      },
+      "to": {
+        "bar": 18
+      },
+      "lines": [
+        "GRAVITY BENDS LIGHT INTO",
+        "THE RING WE SEE"
+      ],
+      "size": "compact"
+    }
+  ]
+}

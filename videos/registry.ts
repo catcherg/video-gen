@@ -6,6 +6,7 @@ import { meta as f1V8 } from "./f1-v8/meta";
 import { meta as skyBlue } from "./sky-blue/meta";
 import { meta as vocEconomics } from "./voc-economics/meta";
 import { meta as whyCatsPurr } from "./why-cats-purr/meta";
+import { meta as howABlackHoleBendsLight } from "./how-a-black-hole-bends-light/meta";
 // new-video: imports
 
 export type VideoEntry = {
@@ -21,5 +22,6 @@ export const VIDEOS: VideoEntry[] = [
   { meta: skyBlue, load: () => import("./sky-blue") },
   { meta: vocEconomics, load: () => import("./voc-economics") },
   { meta: whyCatsPurr, load: () => import("./why-cats-purr") },
+  { meta: howABlackHoleBendsLight, load: () => import("./how-a-black-hole-bends-light") },
   // new-video: entries
 ];

@@ -73,7 +73,7 @@ if (engine) {
 
 // A general video's timeline reads the song map, so the song has to exist before the video will compile.
 await writeVideoAudio(safeSlug);
-const map = spawnSync("npm", ["run", "--silent", "song-map", safeSlug], { cwd: ROOT, stdio: "inherit" });
+const map = spawnSync("npm", ["run", "--silent", "song-map", safeSlug], { cwd: ROOT, stdio: "inherit", shell: process.platform === "win32" });
 if (map.status !== 0) process.exit(map.status ?? 1);
 
 console.log("\nNext:");

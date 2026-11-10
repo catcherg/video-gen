@@ -127,6 +127,13 @@ const runSong = async (deps: Deps, state: PipelineState) => {
   const spec = readJson<VideoSpec>(specFile(deps, state.slug));
   const generator = spec.song.generator;
   if (!generator) throw new Error("the spec has no song generator");
+  // Sending the song back means a person wants a different one, and the same seed would only repeat it.
+  if (state.notes.song !== undefined) {
+    generator.seed += 1;
+    writeJson(specFile(deps, state.slug), spec);
+    delete state.notes.song;
+    saveState(deps.root, state);
+  }
   let problems: string[] = [];
   for (let i = 0; i < MAX_SEED_TRIES; i++) {
     setActivity(deps, state, "song", `generating and measuring seed ${generator.seed}`);

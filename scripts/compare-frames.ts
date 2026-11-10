@@ -19,7 +19,7 @@ const render = async (target: string) => {
   const browser = await guardedBrowser(ROOT);
   rmSync(target, { recursive: true, force: true });
   mkdirSync(target, { recursive: true });
-  const result = spawnSync("npx", ["remotion", "render", serveUrl, slug, target, ...(browser ? [`--browser-executable=${browser}`] : []), "--sequence", "--image-format=png", "--concurrency=1", `--props=${JSON.stringify({ withAudio: false })}`, "--log=error"], { cwd: ROOT, stdio: "inherit" });
+  const result = spawnSync("npx", ["remotion", "render", serveUrl, slug, target, ...(browser ? [`--browser-executable=${browser}`] : []), "--sequence", "--image-format=png", "--concurrency=1", `--props=${JSON.stringify({ withAudio: false })}`, "--log=error"], { cwd: ROOT, stdio: "inherit", shell: process.platform === "win32" });
   if (result.status !== 0) process.exit(result.status ?? 1);
 };
 

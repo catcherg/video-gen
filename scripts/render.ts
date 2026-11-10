@@ -31,7 +31,7 @@ const result = spawnSync(
     ...(browser ? [`--browser-executable=${browser}`] : []),
     "--log=error",
   ],
-  { cwd: ROOT, stdio: "inherit" },
+  { cwd: ROOT, stdio: "inherit", shell: process.platform === "win32" },
 );
 if (result.status !== 0) process.exit(result.status ?? 1);
 console.log(`wrote ${output} in ${((Date.now() - started) / 1000).toFixed(1)} s`);

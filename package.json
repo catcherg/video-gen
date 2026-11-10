@@ -4,6 +4,7 @@
   "license": "UNLICENSED",
   "description": "Generates 8-bit explainer reels, with original bass-heavy music, from a description",
   "scripts": {
+    "start": "tsx interface/start.ts",
     "studio": "remotion studio src/index.ts",
     "audio": "tsx scripts/audio.ts",
     "song-map": "tsx scripts/song-map.ts",
@@ -36,11 +37,15 @@
     "@babel/parser": "7.24.1",
     "@types/node": "^26.6.6",
     "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "@types/three": "^0.187.0",
     "esbuild": "0.28.1",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vitest": "^5.1.0"
+  },
+  "engines": {
+    "node": ">=22.13"
   },
   "private": true,
   "type": "module"

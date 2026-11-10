@@ -12,10 +12,17 @@ const WORK_DIR = path.join(os.tmpdir(), "video-gen-model");
 /** Removed so the command signs in with the person's own plan, whatever launched this process. */
 const STRIPPED_ENV = ["ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN", "ANTHROPIC_BASE_URL", "CLAUDECODE", "CLAUDE_CODE_ENTRYPOINT", "CLAUDE_CODE_OAUTH_TOKEN", "CLAUDE_CODE_SESSION_ACCESS_TOKEN"];
 
+/** The environment for the `claude` command, without anything that would override the person's own sign-in. */
+export const claudeEnv = () => {
+  const env = { ...process.env };
+  for (const name of STRIPPED_ENV) delete env[name];
+  return env;
+};
+
 export const findClaudeBinary = (): string => {
   if (process.env.CLAUDE_BIN) return process.env.CLAUDE_BIN;
   for (const dir of (process.env.PATH ?? "").split(path.delimiter)) {
-    const candidate = path.join(dir, "claude");
+    const candidate = path.join(dir, process.platform === "win32" ? "claude.exe" : "claude");
     if (existsSync(candidate)) return candidate;
   }
   const appRoot = path.join(os.homedir(), "Library/Application Support/Claude/claude-code");
@@ -79,9 +86,7 @@ export const buildPrompt = (request: ModelRequest) => {
 
 const runClaude = (binary: string, args: string[], input: string) =>
   new Promise<string[]>((resolve, reject) => {
-    const env = { ...process.env };
-    for (const name of STRIPPED_ENV) delete env[name];
-    const child = spawn(binary, args, { cwd: WORK_DIR, env, stdio: ["pipe", "pipe", "pipe"] });
+    const child = spawn(binary, args, { cwd: WORK_DIR, env: claudeEnv(), stdio: ["pipe", "pipe", "pipe"] });
     const timer = setTimeout(() => child.kill(), TIMEOUT_MS);
     let stdout = "";
     let stderr = "";

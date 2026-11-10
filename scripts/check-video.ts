@@ -109,7 +109,7 @@ else {
   const mp4 = path.join(outputDir(slug), `${slug}.mp4`);
   if (existsSync(mp4)) {
     const extract = path.join(outputDir(slug), "check-audio.wav");
-    const run = spawnSync("npx", ["remotion", "ffmpeg", "-v", "error", "-y", "-i", mp4, "-vn", "-acodec", "pcm_s16le", "-ar", "48000", "-ac", "2", extract], { cwd: ROOT, encoding: "utf8" });
+    const run = spawnSync("npx", ["remotion", "ffmpeg", "-v", "error", "-y", "-i", mp4, "-vn", "-acodec", "pcm_s16le", "-ar", "48000", "-ac", "2", extract], { cwd: ROOT, encoding: "utf8", shell: process.platform === "win32" });
     if (run.status !== 0 || !existsSync(extract)) fail("mp4-sync", `could not read the MP4's audio: ${run.stderr}`);
     else {
       const lag = audioLagS(wav, readFileSync(extract));

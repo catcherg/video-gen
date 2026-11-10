@@ -17,11 +17,18 @@ The goal is an interface that turns a description and uploaded information into 
 | 7 | AI pipeline, run headless | Done | `npm run generate`. The first real run, `why-cats-purr`, went from a one-line brief to a finished video on a Max plan. Its scene code passed `check-video` on the second attempt, for about $7.34 of API-equivalent value and 24 minutes of model time, $6.62 of it on scene code. |
 | 8 | Sandboxing and licensing | Done | Generated code is contained in Node and the browser, tested against hostile code. Credentials are stripped from child processes. Upload policy and third-party notices are written. The repository is all rights reserved, by the user's choice. |
 | 9 | Identity cleanup | Done | README, 8-bit reel framing in `CLAUDE.md`, the `video-gen` package, "video" in code and commands, a general template, and every video on a spec. |
-| 10 | Local interface | Not started | One command starts it and prompts the user to open a local page. Renders run on the same computer. Needs simple setup, tested beyond this Mac. |
+| 10 | Local interface | Built, not fully tested | `npm start` or a double-click launcher starts a local page that covers describe, upload, approve and download. Tested end to end on this Mac, with scripted answers and then a real run, `how-a-black-hole-bends-light`. Still needed: testing on other computers. See below. |
 
 Known gaps after Milestone 1:
 
 - V12's camshaft and valve counts are marked `assumed` in `spec.json`, because no source was ever recorded for them. Find one.
+
+Still to test for Milestone 10:
+
+- The spending limit is only checked before each call to Claude, so one call can overshoot it. The real run through the page ended at $13.91 of API-equivalent value against a $10 limit, because its third scene attempt started at $7.78 and cost $6.13. Each scene retry costs more than the last.
+- "Sign in to Claude" and saving a real API key on a fresh computer. Neither has been done through the page.
+- Another Mac, a Windows computer and a computer with no strong GPU. Windows paths, the `.bat` launcher and the `public/videos` junction are written but have never run. Software rendering was forced on this Mac as a stand-in: it works, and took 150 s against 55 s with the GPU, but a real low-end computer will be slower.
+- Whether a ZIP download keeps `Start Video Gen.command` runnable, and how macOS treats it on first open.
 
 Known gaps after Milestone 9:
 
@@ -60,6 +67,7 @@ Found while making `sky-blue`. None blocked the video, but each is manual work t
 | `sky-blue` | Finished | Approved by the user. "Why the sky is blue". First video with no engine code, built from core tools only, with a generated song. The blue and red wavelengths are representative picks, so the ratio is worded as "about". |
 | `voc-economics` | Finished | Approved by the user. The Dutch East India Company's rise and collapse, with a generated dubstep song. Mostly secondary sources; see the source notes in `spec.json`. Spice markups are left out because published figures conflict. |
 | `why-cats-purr` | Finished | First video made by the AI pipeline, with no hand edits. Facts, song, frames and the final video approved by the user. |
+| `how-a-black-hole-bends-light` | Finished | First video made through the local page, on a Claude plan. Facts, song and frames approved by the user on the page. The scene passed on its third attempt, for $13.91 of API-equivalent value and 28 minutes of model time. |
 | `v8-cross-flat` | Stub | Physics, camera, captions and audio checks are wired up. Geometry is still `PlaceholderEngine`, and its audio is not a full song yet. |
 
 ## Locked songs
@@ -78,6 +86,7 @@ shasum -a 256 videos/v12/output/audio.wav
 | `sky-blue` | `5478366b55088680e020746cb84f25bbc40d7846b3b5106e4d58d40ac7757b42` (the approved `house-seed2` sample) |
 | `voc-economics` | `ccbe26888eb19cf0e0ecd0ea5762eec2fe94f6b689e2e4079dad56f460a8befd` (the approved `dubstep-seed1` sample) |
 | `why-cats-purr` | `4eb25f180e2594c867696eb68bb53069b23ce90ba1e8620c21f9e002d205f004` |
+| `how-a-black-hole-bends-light` | `81176da551795d7a48e2a4c81e8a3c050555e87e6d1b25a1608b0bf5c7035210` |
 
 ### Approved generator samples
 

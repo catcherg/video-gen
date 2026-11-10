@@ -45,7 +45,7 @@ const stop = (message: string): never => {
 if (!slug || !SLUG.test(slug)) stop('Usage: npm run generate -- <slug> --brief "What the video is about" [--upload file]');
 const id = slug as string;
 
-const run = (command: string, commandArgs: string[]) => spawnSync(command, commandArgs, { cwd: ROOT, encoding: "utf8", env: cleanEnv() });
+const run = (command: string, commandArgs: string[]) => spawnSync(command, commandArgs, { cwd: ROOT, encoding: "utf8", env: cleanEnv(), shell: process.platform === "win32" });
 
 const registryPath = path.join(ROOT, "videos/registry.ts");
 const identifier = (s: string) => s.split("-").map((w, i) => (i === 0 ? w : w[0].toUpperCase() + w.slice(1))).join("");
@@ -169,12 +169,20 @@ if (toRevise) {
   state = revise(state, toRevise as Stage, option("note") ?? "");
 }
 
+const raisedLimit = option("max-usd");
+if (raisedLimit !== undefined) {
+  const maxUsd = Number(raisedLimit);
+  if (!Number.isFinite(maxUsd) || maxUsd <= 0) stop("--max-usd must be a positive number.");
+  state = { ...state, maxUsd };
+}
+
 const engineChoice = option("engine");
 if (engineChoice && engineChoice !== "api" && engineChoice !== "claude-code") stop("--engine must be api or claude-code");
 if (engineChoice) state = { ...state, engine: engineChoice as Engine };
 
 const fixture = option("fixture");
-const model = fixture ? createScriptedClient(JSON.parse(readFileSync(fixture, "utf8")) as unknown[]) : state.engine === "claude-code" ? createClaudeCodeClient() : createAnthropicClient();
+// A run that resumes picks up the script where the previous process left off.
+const model = fixture ? createScriptedClient((JSON.parse(readFileSync(fixture, "utf8")) as unknown[]).slice(state.usage.length)) : state.engine === "claude-code" ? createClaudeCodeClient() : createAnthropicClient();
 
 state = await runPipeline(realDeps(model), state);
 report(state);

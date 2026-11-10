@@ -51,6 +51,7 @@ const deps = (model: ModelClient, over: Partial<Deps> = {}): Deps => ({
 });
 
 const ALL = [FACTS, story(), FILES];
+
 const scripted = (answers: unknown[] = ALL) => createScriptedClient(answers, { inputTokens: 1000, outputTokens: 500, cacheReadTokens: 100, cacheWriteTokens: 0, webSearches: 1 }, [URL]);
 
 beforeEach(() => {
@@ -188,6 +189,15 @@ describe("retries", () => {
     state = await runPipeline(deps(scripted([ALL[1]]), { makeSong: async () => results.shift() as string[] }), approve(state, "facts"));
     expect(JSON.parse(readFileSync(videoPath(root, "demo", "spec.json"), "utf8")).song.generator.seed).toBe(5);
     expect(state.completed.song).toBe(true);
+  });
+
+  it("makes a different song when a person sends the song back", async () => {
+    let state = await runPipeline(deps(scripted()), start());
+    state = await runPipeline(deps(scripted([ALL[1]])), approve(state, "facts"));
+    expect(state.completed.song).toBe(true);
+    state = await runPipeline(deps(scripted([])), revise(state, "song", "another"));
+    expect(JSON.parse(readFileSync(videoPath(root, "demo", "spec.json"), "utf8")).song.generator.seed).toBe(5);
+    expect(state.notes.song).toBeUndefined();
   });
 
   it("reports a model failure as a block rather than crashing", async () => {
